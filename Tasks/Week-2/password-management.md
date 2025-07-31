@@ -9,11 +9,13 @@
 **Estimated Effort**: 5 hours
 
 **Acceptance Criteria**:
+
 - Users can request password reset via email.
 - Password change is available in profile settings.
 - Password strength validation enforces minimum requirements.
 
 **Sample Code**:
+
 ```ts
 // lib/supabaseAuth.ts
 export async function resetPassword(email: string) {
@@ -23,6 +25,7 @@ export async function resetPassword(email: string) {
   if (error) throw new Error(error.message);
 }
 ```
+
 ```tsx
 // app/reset-password/page.tsx
 'use client';
@@ -47,7 +50,9 @@ export default function ResetPasswordPage() {
         onChange={(e) => setPassword(e.target.value)}
         className="input-field"
       />
-      <button type="submit" className="button-primary">Reset Password</button>
+      <button type="submit" className="button-primary">
+        Reset Password
+      </button>
     </form>
   );
 }

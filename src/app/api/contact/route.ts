@@ -19,8 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { propertyId, agentId, name, email, phone, message } =
-      await request.json();
+    const { propertyId, name, email, message } = await request.json();
 
     // Basit validasyon
     if (!propertyId || !name || !email || !message) {
@@ -56,6 +55,7 @@ export async function POST(request: NextRequest) {
       // data
     });
   } catch (error) {
+    console.error('Contact API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

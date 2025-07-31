@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import Link from 'next/link';
@@ -59,6 +59,20 @@ export default function ListingsPage() {
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [formLoading, setFormLoading] = useState(false);
 
+  const loadProperties = useCallback(async () => {
+    try {
+      const response = await fetch('/api/listings');
+      if (!response.ok) throw new Error('Failed to load properties');
+      const data = await response.json();
+      setProperties(data);
+    } catch (error) {
+      console.error('Load properties error:', error);
+      addToast({ type: 'error', message: 'Failed to load properties' });
+    } finally {
+      setLoading(false);
+    }
+  }, [addToast]);
+
   useEffect(() => {
     if (user?.user_metadata?.role !== 'agent') {
       addToast({
@@ -68,20 +82,7 @@ export default function ListingsPage() {
       return;
     }
     loadProperties();
-  }, [user]);
-
-  const loadProperties = async () => {
-    try {
-      const response = await fetch('/api/listings');
-      if (!response.ok) throw new Error('Failed to load properties');
-      const data = await response.json();
-      setProperties(data);
-    } catch (error) {
-      addToast({ type: 'error', message: 'Failed to load properties' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user, addToast, loadProperties]);
 
   const handleFormSubmit = async (formData: PropertyFormData) => {
     setFormLoading(true);
@@ -109,6 +110,7 @@ export default function ListingsPage() {
       setEditingProperty(null);
       loadProperties();
     } catch (error) {
+      console.error('Save property error:', error);
       addToast({ type: 'error', message: 'Failed to save property' });
     } finally {
       setFormLoading(false);
@@ -133,6 +135,7 @@ export default function ListingsPage() {
       addToast({ type: 'success', message: 'Property deleted successfully' });
       loadProperties();
     } catch (error) {
+      console.error('Delete property error:', error);
       addToast({ type: 'error', message: 'Failed to delete property' });
     }
   };

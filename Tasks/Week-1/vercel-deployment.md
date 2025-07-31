@@ -9,6 +9,7 @@
 **Estimated Effort**: 4 hours
 
 **Acceptance Criteria**:
+
 - Vercel project is created and linked to GitHub repository.
 - Automatic deployments are triggered on push to main branch.
 - Environment variables are configured for Supabase and SendGrid.

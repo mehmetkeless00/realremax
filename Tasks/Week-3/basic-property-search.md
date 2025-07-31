@@ -9,11 +9,13 @@
 **Estimated Effort**: 8 hours
 
 **Acceptance Criteria**:
+
 - Search by price range, location, property type, bedrooms, bathrooms, size.
 - Returns paginated results.
 - Response time <500ms for typical queries.
 
 **Sample Code**:
+
 ```ts
 // app/api/search/route.ts
 import { createServerClient } from '@supabase/ssr';
@@ -37,7 +39,8 @@ export async function GET(request: Request) {
   if (location) query = query.ilike('location', `%${location}%`);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data);
 }
 ```

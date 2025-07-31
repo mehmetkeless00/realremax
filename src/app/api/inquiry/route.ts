@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     }
 
     // Get or create user record
-    const { data: userRecord, error: userRecordError } = await supabase
+    const { data: userRecord } = await supabase
       .from('users')
       .select('id')
       .eq('email', user.email)

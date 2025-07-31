@@ -6,23 +6,27 @@ Embed Google Maps using the Google Maps JavaScript API and Places Autocomplete. 
 **Technology Stack:** Next.js, TypeScript, Google Maps JS API, Tailwind CSS
 
 **Folder/File Path Suggestions:**
+
 - `/components/PropertyMap.tsx`
 - `/components/SearchBar.tsx`
 - `/lib/maps/`
 
 **Dependencies:**
+
 - Google Maps API key in `.env`
 - Property detail and search page components
 
 **Estimated Effort:** 5 hours
 
 **Acceptance Criteria:**
+
 - Maps render on property detail and search pages
 - Places Autocomplete works in search filters
 - Markers are interactive and support geolocation
 - No API key leaks; all keys are environment-protected
 
 **Code Example:**
+
 ```tsx
 // components/PropertyMap.tsx
 'use client';
@@ -53,4 +57,5 @@ export default function PropertyMap({ lat, lng, price }: PropertyMapProps) {
   return <div ref={mapRef} className="w-full h-96" />;
 }
 ```
+
 // Reference: See also `advanced-search-bar.md` and `property-detail-page.md` for integration points.

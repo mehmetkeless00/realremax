@@ -9,12 +9,14 @@
 **Estimated Effort**: 6 hours
 
 **Acceptance Criteria**:
+
 - Application is live on Vercel with SSL.
 - Google Analytics 4 tracks page views and events.
 - All environment variables are configured.
 - Uptime >99.9% during initial monitoring.
 
 **Sample Code**:
+
 ```ts
 // lib/analytics.ts
 export function trackEvent(eventName: string, properties: Record<string, any>) {

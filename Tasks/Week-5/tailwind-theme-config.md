@@ -6,22 +6,26 @@ Centralize the color palette, typography, and spacing in `tailwind.config.js`. A
 **Technology Stack:** Tailwind CSS, Next.js, TypeScript
 
 **Folder/File Path Suggestions:**
+
 - `/tailwind.config.js`
 - `/styles/`
 - `/docs/design-system.md`
 
 **Dependencies:**
+
 - None (should be done early in project)
 
 **Estimated Effort:** 3 hours
 
 **Acceptance Criteria:**
+
 - All colors, fonts, and spacing are defined in Tailwind config
 - Typography and color contrast meet accessibility standards
 - Font usage is documented and imported
 - Responsive utility classes are used consistently
 
 **Code Example:**
+
 ```js
 // tailwind.config.js (snippet)
 module.exports = {
@@ -40,6 +44,7 @@ module.exports = {
   },
 };
 ```
+
 ```css
 /* styles/globals.css (snippet) */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
@@ -49,4 +54,5 @@ module.exports = {
   --dark-charcoal: #232323;
 }
 ```
+
 // Reference: Use in all UI components, see also `responsive-testing-checklist.md`.

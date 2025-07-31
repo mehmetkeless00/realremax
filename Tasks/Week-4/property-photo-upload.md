@@ -9,12 +9,14 @@
 **Estimated Effort**: 6 hours
 
 **Acceptance Criteria**:
+
 - Supports drag-and-drop uploads.
 - Validates file type (JPEG/PNG) and size (<5MB).
 - Stores images in Supabase Buckets.
 - Returns public URLs for property images.
 
 **Sample Code**:
+
 ```ts
 // lib/supabaseStorage.ts
 import { createServerClient } from '@supabase/ssr';
@@ -34,6 +36,8 @@ export async function uploadImage(file: File, propertyId: string) {
     });
 
   if (error) throw new Error(error.message);
-  return supabase.storage.from('property-images').getPublicUrl(`${propertyId}/${file.name}`).data.publicUrl;
+  return supabase.storage
+    .from('property-images')
+    .getPublicUrl(`${propertyId}/${file.name}`).data.publicUrl;
 }
 ```

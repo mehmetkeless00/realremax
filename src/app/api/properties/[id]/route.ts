@@ -17,13 +17,13 @@ export async function GET(
     const { id } = await context.params;
 
     // Property'yi getir
-    const { data: property, error } = await supabase
+    const { data: property, error: propertyError } = await supabase
       .from('properties')
       .select('*')
       .eq('id', id)
       .single();
 
-    if (error || !property) {
+    if (propertyError || !property) {
       return NextResponse.json(
         { error: 'Property not found' },
         { status: 404 }
@@ -32,6 +32,7 @@ export async function GET(
 
     return NextResponse.json(property);
   } catch (error) {
+    console.error('Property API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

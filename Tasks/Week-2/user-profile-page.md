@@ -9,12 +9,14 @@
 **Estimated Effort**: 8 hours
 
 **Acceptance Criteria**:
+
 - Users can view/edit name, email, and preferences.
 - Notification settings include email alert frequency.
 - Page is accessible only to authenticated users.
 - Responsive design with Tailwind CSS.
 
 **Sample Code**:
+
 ```tsx
 // app/profile/page.tsx
 import { createServerClient } from '@supabase/ssr';
@@ -27,17 +29,22 @@ export default async function ProfilePage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     { cookies: () => {} }
   );
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-gotham font-bold text-primary-dark-blue">Profile Settings</h1>
+      <h1 className="text-3xl font-gotham font-bold text-primary-dark-blue">
+        Profile Settings
+      </h1>
       <ProfileForm user={user} />
     </div>
   );
 }
 ```
+
 ```tsx
 // components/ProfileForm.tsx
 'use client';
@@ -65,7 +72,9 @@ export default function ProfileForm({ user }: { user: any }) {
           className="input-field"
         />
       </div>
-      <button type="submit" className="button-primary">Save Changes</button>
+      <button type="submit" className="button-primary">
+        Save Changes
+      </button>
     </form>
   );
 }

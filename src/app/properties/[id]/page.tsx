@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useUserStore, useFavoritesStore, useUIStore } from '@/lib/store';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Property {
   id: string;
@@ -48,13 +49,7 @@ export default function PropertyDetailPage() {
 
   const propertyId = params.id as string;
 
-  useEffect(() => {
-    if (propertyId) {
-      loadProperty();
-    }
-  }, [propertyId]);
-
-  const loadProperty = async () => {
+  const loadProperty = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -76,11 +71,18 @@ export default function PropertyDetailPage() {
         }
       }
     } catch (error) {
+      console.error('Load property error:', error);
       addToast({ type: 'error', message: 'Failed to load property details' });
     } finally {
       setLoading(false);
     }
-  };
+  }, [propertyId, addToast]);
+
+  useEffect(() => {
+    if (propertyId) {
+      loadProperty();
+    }
+  }, [propertyId, loadProperty]);
 
   const handleFavoriteToggle = async () => {
     if (!user) {
@@ -92,6 +94,7 @@ export default function PropertyDetailPage() {
       await toggleFavorite(propertyId);
       addToast({ type: 'success', message: 'Favorite updated successfully' });
     } catch (error) {
+      console.error('Favorite toggle error:', error);
       addToast({ type: 'error', message: 'Failed to update favorite' });
     }
   };
@@ -204,9 +207,11 @@ export default function PropertyDetailPage() {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
               {property.photos && property.photos.length > 0 ? (
                 <div className="relative">
-                  <img
+                  <Image
                     src={property.photos[0]}
                     alt={property.title}
+                    width={800}
+                    height={256}
                     className="w-full h-64 object-cover"
                   />
                   {property.photos.length > 1 && (
@@ -217,9 +222,11 @@ export default function PropertyDetailPage() {
                 </div>
               ) : (
                 <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                  <img
+                  <Image
                     src="/images/placeholder-property.jpg"
                     alt={property.title}
+                    width={800}
+                    height={256}
                     className="w-full h-64 object-cover"
                   />
                 </div>

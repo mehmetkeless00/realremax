@@ -66,7 +66,7 @@ export default function AdvancedSearchBar({
   className = '',
 }: AdvancedSearchBarProps) {
   const { addToast } = useUIStore();
-  const [isExpanded, setIsExpanded] = useState(false);
+
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
     location: '',

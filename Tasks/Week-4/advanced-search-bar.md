@@ -9,6 +9,7 @@
 **Estimated Effort**: 10 hours
 
 **Acceptance Criteria**:
+
 - Location autocomplete uses Google Maps Places API.
 - Price range slider supports manual input.
 - Dropdown for property types (buy, rent, commercial).
@@ -16,6 +17,7 @@
 - Displays search result count.
 
 **Sample Code**:
+
 ```tsx
 // components/SearchBar.tsx
 'use client';
@@ -50,7 +52,9 @@ export default function SearchBar() {
         value={location}
         onChange={(e) => setLocation(e.target.value)}
       />
-      <button onClick={handleSearch} className="button-primary mt-2">Search</button>
+      <button onClick={handleSearch} className="button-primary mt-2">
+        Search
+      </button>
     </div>
   );
 }

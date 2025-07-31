@@ -16,9 +16,7 @@ export async function GET(request: NextRequest) {
     const sizeMin = searchParams.get('sizeMin');
     const sizeMax = searchParams.get('sizeMax');
     const status = searchParams.get('status');
-    const listingType = searchParams.get('listingType');
     const yearBuilt = searchParams.get('yearBuilt');
-    const amenities = searchParams.getAll('amenities');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
 
@@ -69,6 +67,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    console.error('Search API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

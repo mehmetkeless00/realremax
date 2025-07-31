@@ -1,11 +1,4 @@
 import { supabase } from './supabase';
-import type { Database } from './supabase';
-
-// Type definitions
-type User = Database['public']['Tables']['users']['Row'];
-type Agent = Database['public']['Tables']['agents']['Row'];
-type Property = Database['public']['Tables']['properties']['Row'];
-type Listing = Database['public']['Tables']['listings']['Row'];
 
 // User functions
 export async function createUser(

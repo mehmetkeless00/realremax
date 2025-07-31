@@ -17,18 +17,19 @@ export async function GET(
     const { id } = await context.params;
 
     // Agent'ı getir
-    const { data: agent, error } = await supabase
+    const { data: agent, error: agentError } = await supabase
       .from('agents')
       .select('*')
       .eq('id', id)
       .single();
 
-    if (error || !agent) {
+    if (agentError || !agent) {
       return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
     }
 
     return NextResponse.json(agent);
   } catch (error) {
+    console.error('Agent API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

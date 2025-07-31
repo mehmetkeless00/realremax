@@ -9,17 +9,27 @@
 **Estimated Effort**: 8 hours
 
 **Acceptance Criteria**:
+
 - Map displays property marker with price.
 - Search results page shows clustered markers.
 - Responsive and touch-friendly.
 
 **Sample Code**:
+
 ```tsx
 // components/PropertyMap.tsx
 'use client';
 import { useEffect, useRef } from 'react';
 
-export default function PropertyMap({ lat, lng, price }: { lat: number; lng: number; price: string }) {
+export default function PropertyMap({
+  lat,
+  lng,
+  price,
+}: {
+  lat: number;
+  lng: number;
+  price: string;
+}) {
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

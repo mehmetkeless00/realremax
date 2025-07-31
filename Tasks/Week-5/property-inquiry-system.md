@@ -9,12 +9,14 @@
 **Estimated Effort**: 8 hours
 
 **Acceptance Criteria**:
+
 - Inquiry form sends email to assigned agent.
 - Inquiry is logged in Supabase inquiries table.
 - Users receive confirmation email.
 - Agents can view inquiries in dashboard.
 
 **Sample Code**:
+
 ```ts
 // app/api/inquiry/route.ts
 import { createServerClient } from '@supabase/ssr';
@@ -30,8 +32,16 @@ export async function POST(request: Request) {
     { cookies: () => {} }
   );
   const { propertyId, message, userEmail } = await request.json();
-  const { data: property } = await supabase.from('properties').select('agent_id').eq('id', propertyId).single();
-  const { data: agent } = await supabase.from('agents').select('email').eq('id', property.agent_id).single();
+  const { data: property } = await supabase
+    .from('properties')
+    .select('agent_id')
+    .eq('id', propertyId)
+    .single();
+  const { data: agent } = await supabase
+    .from('agents')
+    .select('email')
+    .eq('id', property.agent_id)
+    .single();
 
   await sendgrid.send({
     to: agent.email,
@@ -40,8 +50,11 @@ export async function POST(request: Request) {
     text: message,
   });
 
-  const { error } = await supabase.from('inquiries').insert([{ property_id: propertyId, user_email: userEmail, message }]);
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  const { error } = await supabase
+    .from('inquiries')
+    .insert([{ property_id: propertyId, user_email: userEmail, message }]);
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ success: true });
 }
 ```

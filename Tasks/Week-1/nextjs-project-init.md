@@ -9,12 +9,14 @@
 **Estimated Effort**: 8 hours
 
 **Acceptance Criteria**:
+
 - Next.js project runs locally with `npm run dev`.
 - Tailwind CSS is integrated and applies styles.
 - ESLint and Prettier enforce consistent code formatting.
 - Basic folder structure: `/app`, `/components`, `/lib`, `/styles`.
 
 **Sample Code**:
+
 ```tsx
 // app/layout.tsx
 import type { Metadata } from 'next';
@@ -22,10 +24,15 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Remax Unified Platform',
-  description: 'Unified real estate platform for property search and management',
+  description:
+    'Unified real estate platform for property search and management',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body className="font-montserrat text-dark-charcoal">{children}</body>
@@ -33,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 ```
+
 ```css
 // styles/globals.css
 @tailwind base;

@@ -9,12 +9,14 @@
 **Estimated Effort**: 10 hours
 
 **Acceptance Criteria**:
+
 - Multi-step wizard for property details, photos, pricing.
 - Drag-and-drop photo upload with preview.
 - Form validation for required fields.
 - Accessible only to authenticated agents.
 
 **Sample Code**:
+
 ```tsx
 // components/ListingForm.tsx
 'use client';
@@ -39,10 +41,18 @@ export default function ListingForm() {
             type="text"
             placeholder="Title"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
             className="input-field"
           />
-          <button type="button" onClick={() => setStep(2)} className="button-primary">Next</button>
+          <button
+            type="button"
+            onClick={() => setStep(2)}
+            className="button-primary"
+          >
+            Next
+          </button>
         </>
       )}
       {step === 2 && (
@@ -51,10 +61,18 @@ export default function ListingForm() {
             type="number"
             placeholder="Price"
             value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+            onChange={(e) =>
+              setFormData({ ...formData, price: Number(e.target.value) })
+            }
             className="input-field"
           />
-          <button type="button" onClick={handleSubmit} className="button-primary">Submit</button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="button-primary"
+          >
+            Submit
+          </button>
         </>
       )}
     </form>

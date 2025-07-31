@@ -9,12 +9,14 @@
 **Estimated Effort**: 10 hours
 
 **Acceptance Criteria**:
+
 - Supabase project is created and connected.
 - Tables created: users, properties, agents, listings.
 - Schema includes necessary fields and relationships.
 - Row-Level Security (RLS) policies are defined for protected access.
 
 **Sample Code**:
+
 ```sql
 -- Schema for properties table
 CREATE TABLE properties (

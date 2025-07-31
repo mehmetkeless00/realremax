@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useUIStore } from '@/lib/store';
-import type { Property } from '@/types/property';
 import PhotoUpload from './PhotoUpload';
 
 interface PropertyFormData {
@@ -670,10 +670,12 @@ export default function PropertyListingForm({
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {formData.photos.slice(0, 4).map((photo, index) => (
-                <img
+                <Image
                   key={index}
                   src={photo}
                   alt={`Property photo ${index + 1}`}
+                  width={150}
+                  height={80}
                   className="w-full h-20 object-cover rounded"
                 />
               ))}

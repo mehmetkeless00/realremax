@@ -6,20 +6,24 @@ Configure SEO and social meta tags for all pages using `next/head`. Add Open Gra
 **Technology Stack:** Next.js, TypeScript
 
 **Folder/File Path Suggestions:**
+
 - `/components/SeoHead.tsx`
 - `/app/property/[id]/page.tsx`
 
 **Dependencies:**
+
 - None
 
 **Estimated Effort:** 2 hours
 
 **Acceptance Criteria:**
+
 - All pages have unique title, description, and meta tags
 - Open Graph and Twitter cards are present
 - Property pages generate dynamic metadata
 
 **Code Example:**
+
 ```tsx
 // components/SeoHead.tsx
 import Head from 'next/head';
@@ -31,7 +35,12 @@ interface SeoHeadProps {
   url?: string;
 }
 
-export default function SeoHead({ title, description, image, url }: SeoHeadProps) {
+export default function SeoHead({
+  title,
+  description,
+  image,
+  url,
+}: SeoHeadProps) {
   return (
     <Head>
       <title>{title}</title>
@@ -48,4 +57,5 @@ export default function SeoHead({ title, description, image, url }: SeoHeadProps
   );
 }
 ```
+
 // Reference: Use in all page components, see also `property-detail-page.md` for dynamic SEO.

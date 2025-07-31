@@ -6,22 +6,26 @@ Optimize all property and user-uploaded images using Next.js `next/image` for re
 **Technology Stack:** Next.js, TypeScript, Supabase Storage, Tailwind CSS
 
 **Folder/File Path Suggestions:**
+
 - `/components/OptimizedImage.tsx`
 - `/lib/storage/`
 
 **Dependencies:**
+
 - Supabase Storage integration
 - Property card and gallery components
 
 **Estimated Effort:** 3 hours
 
 **Acceptance Criteria:**
+
 - All images use `next/image` with proper `alt`, `width`, `height`
 - Lazy loading and blur placeholders are enabled
 - Images from Supabase Storage are optimized
 - No layout shift or broken images
 
 **Code Example:**
+
 ```tsx
 // components/OptimizedImage.tsx
 import Image from 'next/image';
@@ -33,7 +37,12 @@ interface OptimizedImageProps {
   height: number;
 }
 
-export default function OptimizedImage({ src, alt, width, height }: OptimizedImageProps) {
+export default function OptimizedImage({
+  src,
+  alt,
+  width,
+  height,
+}: OptimizedImageProps) {
   return (
     <Image
       src={src}
@@ -48,4 +57,5 @@ export default function OptimizedImage({ src, alt, width, height }: OptimizedIma
   );
 }
 ```
+
 // Reference: Use in `property-card-component.md`, `property-detail-page.md`.

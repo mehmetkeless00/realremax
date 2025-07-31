@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { useUIStore } from '@/lib/store';
 
@@ -65,7 +66,7 @@ export default function PhotoUpload({
             : `temp/${fileName}`;
 
           // Supabase Storage'a yükle
-          const { data, error } = await supabase.storage
+          const { error } = await supabase.storage
             .from('property-photos')
             .upload(filePath, file, {
               cacheControl: '3600',
@@ -230,9 +231,11 @@ export default function PhotoUpload({
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {existingPhotos.map((photo, index) => (
               <div key={index} className="relative group">
-                <img
+                <Image
                   src={photo}
                   alt={`Property photo ${index + 1}`}
+                  width={200}
+                  height={128}
                   className="w-full h-32 object-cover rounded-lg"
                 />
                 <button

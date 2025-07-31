@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import { useFavoritesStore } from '@/lib/store/favoritesStore';
@@ -53,6 +54,7 @@ export default function PropertyCard({
         message: isFavorite ? 'Removed from favorites' : 'Added to favorites!',
       });
     } catch (error) {
+      console.error('Favorite toggle error:', error);
       addToast({
         type: 'error',
         message: 'Failed to update favorites. Please try again.',
@@ -109,9 +111,11 @@ export default function PropertyCard({
           <div className="flex flex-col md:flex-row">
             {/* Image Section */}
             <div className="relative md:w-64 md:h-48 w-full h-48">
-              <img
+              <Image
                 src={imageError ? defaultImage : propertyImage}
                 alt={property.title}
+                width={400}
+                height={300}
                 className="w-full h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
                 onError={() => setImageError(true)}
               />
@@ -327,9 +331,11 @@ export default function PropertyCard({
     >
       <Link href={`/properties/${property.id}`}>
         <div className="relative">
-          <img
+          <Image
             src={imageError ? defaultImage : propertyImage}
             alt={property.title}
+            width={400}
+            height={192}
             className="w-full h-48 object-cover"
             onError={() => setImageError(true)}
           />

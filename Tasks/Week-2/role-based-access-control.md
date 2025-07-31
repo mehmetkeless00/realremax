@@ -9,12 +9,14 @@
 **Estimated Effort**: 6 hours
 
 **Acceptance Criteria**:
+
 - Visitors can read public properties and agents tables.
 - Registered users can read/write to favorites and saved_searches.
 - Agents can read/write to their own listings and inquiries.
 - RLS policies prevent unauthorized access.
 
 **Sample Code**:
+
 ```sql
 -- RLS for registered users
 CREATE POLICY registered_user_favorites ON favorites

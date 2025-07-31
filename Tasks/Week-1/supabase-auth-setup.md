@@ -9,12 +9,14 @@
 **Estimated Effort**: 8 hours
 
 **Acceptance Criteria**:
+
 - Users can register/login with email/password or Google/Facebook.
 - Email verification is required for account activation.
 - JWT tokens are issued and stored securely.
 - User roles (visitor, registered, agent) are assigned.
 
 **Sample Code**:
+
 ```ts
 // lib/supabaseAuth.ts
 import { createClient } from '@supabase/supabase-js';
@@ -24,7 +26,11 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export async function signUpWithEmail(email: string, password: string, role: 'user' | 'agent') {
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  role: 'user' | 'agent'
+) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,

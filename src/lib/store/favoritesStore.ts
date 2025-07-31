@@ -3,7 +3,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
-import { useUIStore } from './uiStore';
 
 export interface Favorite {
   id: string;
