@@ -1,0 +1,299 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useUserStore } from '@/lib/store';
+import { useFavoritesStore } from '@/lib/store/favoritesStore';
+import { useUIStore } from '@/lib/store';
+import PropertyCard from '@/components/PropertyCard';
+import RealtimeDemo from '@/components/RealtimeDemo';
+import Link from 'next/link';
+import type { PropertyWithListing } from '@/types/property';
+
+export default function FavoritesPage() {
+  const { user } = useUserStore();
+  const { favorites, loadFavorites, isLoading } = useFavoritesStore();
+  const { addToast } = useUIStore();
+  const [favoriteProperties, setFavoriteProperties] = useState<
+    PropertyWithListing[]
+  >([]);
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+
+  useEffect(() => {
+    if (user) {
+      loadFavorites();
+    }
+  }, [user, loadFavorites]);
+
+  useEffect(() => {
+    // Load favorite properties data
+    const loadFavoriteProperties = async () => {
+      if (favorites.length === 0) {
+        setFavoriteProperties([]);
+        return;
+      }
+
+      try {
+        // This would typically fetch from your API
+        // For now, we'll use sample data
+        const sampleProperties: PropertyWithListing[] = [
+          {
+            id: '1',
+            title: 'Modern Downtown Apartment',
+            description:
+              'Beautiful 2-bedroom apartment in the heart of downtown with stunning city views.',
+            price: 450000,
+            location: 'Downtown, City Center',
+            type: 'apartment',
+            bedrooms: 2,
+            bathrooms: 2,
+            size: 1200,
+            year_built: 2018,
+            agent_id: 'agent-1',
+            status: 'active',
+            listing_type: 'sale',
+            amenities: ['Balcony', 'Elevator', 'Parking'],
+            address: '123 Main St',
+            city: 'Istanbul',
+            postal_code: '34000',
+            country: 'Turkey',
+            latitude: 41.0082,
+            longitude: 28.9784,
+            created_at: '2024-01-15T10:00:00Z',
+            updated_at: '2024-01-15T10:00:00Z',
+            listing: {
+              id: 'listing-1',
+              property_id: '1',
+              agent_id: 'agent-1',
+              listing_type: 'sale',
+              price: 450000,
+              status: 'active',
+              created_at: '2024-01-15T10:00:00Z',
+              updated_at: '2024-01-15T10:00:00Z',
+            },
+            agent: {
+              id: 'agent-1',
+              name: 'John Smith',
+              company: 'Remax Elite',
+              phone: '+1-555-0123',
+            },
+            photos: [
+              'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500&h=300&fit=crop',
+            ],
+          },
+          {
+            id: '2',
+            title: 'Luxury Family Home',
+            description:
+              'Spacious 4-bedroom family home with large backyard and modern amenities.',
+            price: 850000,
+            location: 'Suburban Heights',
+            type: 'house',
+            bedrooms: 4,
+            bathrooms: 3,
+            size: 2800,
+            year_built: 2012,
+            agent_id: 'agent-2',
+            status: 'active',
+            listing_type: 'sale',
+            amenities: ['Garden', 'Pool', 'Garage'],
+            address: '456 Elm St',
+            city: 'Ankara',
+            postal_code: '06000',
+            country: 'Turkey',
+            latitude: 39.9334,
+            longitude: 32.8597,
+            created_at: '2024-01-14T10:00:00Z',
+            updated_at: '2024-01-14T10:00:00Z',
+            listing: {
+              id: 'listing-2',
+              property_id: '2',
+              agent_id: 'agent-2',
+              listing_type: 'sale',
+              price: 850000,
+              status: 'active',
+              created_at: '2024-01-14T10:00:00Z',
+              updated_at: '2024-01-14T10:00:00Z',
+            },
+            agent: {
+              id: 'agent-2',
+              name: 'Sarah Johnson',
+              company: 'Remax Premier',
+              phone: '+1-555-0456',
+            },
+            photos: [
+              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&h=300&fit=crop',
+            ],
+          },
+        ];
+
+        // Filter to only show properties that are in favorites
+        const filteredProperties = sampleProperties.filter((property) =>
+          favorites.includes(property.id)
+        );
+
+        setFavoriteProperties(filteredProperties);
+      } catch (error) {
+        console.error('Error loading favorite properties:', error);
+        addToast({
+          type: 'error',
+          message: 'Failed to load favorite properties',
+        });
+      }
+    };
+
+    loadFavoriteProperties();
+  }, [favorites, addToast]);
+
+  const handleFavoriteToggle = (propertyId: string, isFavorite: boolean) => {
+    // This will be handled by the PropertyCard component
+    console.log(
+      `Property ${propertyId} ${isFavorite ? 'added to' : 'removed from'} favorites`
+    );
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="max-w-md mx-auto text-center">
+            <div className="bg-white p-8 rounded-lg shadow-sm">
+              <svg
+                className="w-16 h-16 mx-auto text-gray-400 mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+              <h2 className="text-2xl font-bold text-dark-charcoal mb-4">
+                Sign In Required
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Please sign in to view and manage your favorite properties.
+              </p>
+              <Link
+                href="/auth/signin"
+                className="inline-block bg-primary-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Sign In
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-dark-charcoal mb-4">
+            My Favorites
+          </h1>
+
+          {/* Real-time Demo Component */}
+          <RealtimeDemo />
+
+          {/* Controls */}
+          <div className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-gray-700">View:</span>
+              <button
+                onClick={() => setView('grid')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  view === 'grid'
+                    ? 'bg-primary-blue text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Grid
+              </button>
+              <button
+                onClick={() => setView('list')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  view === 'list'
+                    ? 'bg-primary-blue text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                List
+              </button>
+            </div>
+
+            <div className="text-sm text-gray-600">
+              {favorites.length}{' '}
+              {favorites.length === 1 ? 'property' : 'properties'} saved
+            </div>
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+            <p className="mt-2 text-gray-600">Loading your favorites...</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && favorites.length === 0 && (
+          <div className="text-center py-12">
+            <svg
+              className="w-16 h-16 mx-auto text-gray-400 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+            <h3 className="text-xl font-semibold text-dark-charcoal mb-2">
+              No favorites yet
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Start exploring properties and add them to your favorites to see
+              them here.
+            </p>
+            <Link
+              href="/properties"
+              className="inline-block bg-primary-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Browse Properties
+            </Link>
+          </div>
+        )}
+
+        {/* Property Cards */}
+        {!isLoading && favoriteProperties.length > 0 && (
+          <div
+            className={
+              view === 'grid'
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                : 'space-y-6'
+            }
+          >
+            {favoriteProperties.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                view={view}
+                showFavorite={true}
+                onFavoriteToggle={handleFavoriteToggle}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,312 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useUserStore } from '@/lib/store';
+import { useUIStore } from '@/lib/store';
+import Link from 'next/link';
+import PropertyListingForm from '@/components/PropertyListingForm';
+
+interface PropertyFormData {
+  title: string;
+  description: string;
+  price: string;
+  location: string;
+  type: string;
+  bedrooms: string;
+  bathrooms: string;
+  size: string;
+  year_built: string;
+  status: string;
+  listing_type: string;
+  amenities: string[];
+  address: string;
+  city: string;
+  postal_code: string;
+  country: string;
+  latitude: string;
+  longitude: string;
+}
+
+interface Property {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  location: string;
+  type: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  size?: number;
+  year_built?: number;
+  status: string;
+  listing_type?: string;
+  amenities?: string[];
+  address?: string;
+  city?: string;
+  postal_code?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
+  created_at: string;
+}
+
+export default function ListingsPage() {
+  const { user } = useUserStore();
+  const { addToast } = useUIStore();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+
+  useEffect(() => {
+    if (user?.user_metadata?.role !== 'agent') {
+      addToast({
+        type: 'error',
+        message: 'Access denied. Agent role required.',
+      });
+      return;
+    }
+    loadProperties();
+  }, [user]);
+
+  const loadProperties = async () => {
+    try {
+      const response = await fetch('/api/listings');
+      if (!response.ok) throw new Error('Failed to load properties');
+      const data = await response.json();
+      setProperties(data);
+    } catch (error) {
+      addToast({ type: 'error', message: 'Failed to load properties' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFormSubmit = async (formData: PropertyFormData) => {
+    setFormLoading(true);
+
+    try {
+      const url = '/api/listings';
+      const method = editingProperty ? 'PATCH' : 'POST';
+      const body = editingProperty
+        ? { id: editingProperty.id, ...formData }
+        : formData;
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) throw new Error('Failed to save property');
+
+      addToast({
+        type: 'success',
+        message: `Property ${editingProperty ? 'updated' : 'created'} successfully`,
+      });
+      setShowForm(false);
+      setEditingProperty(null);
+      loadProperties();
+    } catch (error) {
+      addToast({ type: 'error', message: 'Failed to save property' });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleEdit = (property: Property) => {
+    setEditingProperty(property);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this property?')) return;
+
+    try {
+      const response = await fetch(`/api/listings?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete property');
+
+      addToast({ type: 'success', message: 'Property deleted successfully' });
+      loadProperties();
+    } catch (error) {
+      addToast({ type: 'error', message: 'Failed to delete property' });
+    }
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingProperty(null);
+  };
+
+  if (user?.user_metadata?.role !== 'agent') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              Access Denied
+            </h1>
+            <p className="text-gray-600 mb-6">
+              You need agent privileges to access this page.
+            </p>
+            <Link
+              href="/dashboard"
+              className="bg-primary-blue text-white px-6 py-2 rounded hover:bg-blue-700"
+            >
+              Back to Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-dark-charcoal">
+            My Properties
+          </h1>
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-primary-blue text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
+          >
+            Add Property
+          </button>
+        </div>
+
+        {showForm && (
+          <div className="mb-8">
+            <PropertyListingForm
+              property={editingProperty}
+              onSubmit={handleFormSubmit}
+              onCancel={handleCancel}
+              loading={formLoading}
+            />
+          </div>
+        )}
+
+        {loading && !showForm ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+            <p className="mt-2 text-gray-600">Loading properties...</p>
+          </div>
+        ) : properties.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-lg shadow">
+            <div className="mb-4">
+              <svg
+                className="w-16 h-16 mx-auto text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No properties yet
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Start by adding your first property listing.
+            </p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-primary-blue text-white px-6 py-2 rounded hover:bg-blue-700"
+            >
+              Add Your First Property
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {properties.map((property) => (
+              <div
+                key={property.id}
+                className="bg-white rounded-lg shadow overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {property.title}
+                    </h3>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        property.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : property.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {property.status}
+                    </span>
+                  </div>
+
+                  <p className="text-gray-600 text-sm mb-2">
+                    {property.location}
+                  </p>
+                  <p className="text-primary-blue font-bold text-lg mb-2">
+                    ${property.price.toLocaleString()}
+                  </p>
+
+                  <div className="flex gap-4 text-sm text-gray-500 mb-4">
+                    {property.bedrooms && <span>{property.bedrooms} beds</span>}
+                    {property.bathrooms && (
+                      <span>{property.bathrooms} baths</span>
+                    )}
+                    {property.size && <span>{property.size}m²</span>}
+                  </div>
+
+                  {property.amenities && property.amenities.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-xs text-gray-500 mb-1">Amenities:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {property.amenities.slice(0, 3).map((amenity) => (
+                          <span
+                            key={amenity}
+                            className="px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded"
+                          >
+                            {amenity}
+                          </span>
+                        ))}
+                        {property.amenities.length > 3 && (
+                          <span className="px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded">
+                            +{property.amenities.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(property)}
+                      className="flex-1 bg-primary-blue text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(property.id)}
+                      className="flex-1 bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,55 @@
+{
+    "rules": [
+      {
+        "match": "**/*.ts",
+        "message": "Only use Next.js (App Router), Supabase, and Tailwind CSS as specified in the updated stack. Do NOT use Express.js, Prisma, or Redux Toolkit.",
+        "severity": "error"
+      },
+      {
+        "match": "**/*.tsx",
+        "message": "Use Tailwind CSS utility classes for styling. Avoid raw CSS or styled-components.",
+        "severity": "error"
+      },
+      {
+        "match": "**/*.tsx",
+        "message": "Ensure all component files follow the folder conventions: 'components/' for UI, 'lib/' for logic (e.g., supabaseClient, email).",
+        "severity": "error"
+      },
+      {
+        "match": "**/*",
+        "message": "Use Zustand for state management. Do not import Redux or Redux Toolkit.",
+        "severity": "error"
+      },
+      {
+        "match": "**/*.ts",
+        "message": "Use Supabase JavaScript SDK for database interactions. Avoid custom Node/Express APIs.",
+        "severity": "error"
+      },
+      {
+        "match": "**/*.ts",
+        "message": "Use `next/image` for all image rendering. Avoid <img> tags unless justified.",
+        "severity": "warning"
+      },
+      {
+        "match": "**/*.ts",
+        "message": "All logic must include inline comments that refer to related PDR sections when applicable.",
+        "severity": "warning"
+      },
+      {
+        "match": "**/*.ts",
+        "message": "All code should be written in clean TypeScript with proper type annotations, meaningful names, and single-responsibility principles.",
+        "severity": "error"
+      },
+      {
+        "match": "**/*.ts",
+        "message": "Always check for environment variables like `process.env.SUPABASE_URL`. Never hardcode credentials.",
+        "severity": "error"
+      },
+      {
+        "match": "**/*.ts",
+        "message": "All MVP features must stay within defined Sprint tasks (auth, listings, search, favorites, profile). Do NOT add post-MVP features like Admin Panel, virtual tours, or CRM integrations.",
+        "severity": "error"
+      }
+    ]
+  }
+  

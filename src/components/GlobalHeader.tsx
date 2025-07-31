@@ -1,0 +1,171 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import Logo from './Logo';
+import UserMenu from './UserMenu';
+import { useUIStore, useUserStore } from '@/lib/store';
+
+export default function GlobalHeader() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { addToast } = useUIStore();
+  const { user } = useUserStore();
+
+  const navigationLinks = [
+    { href: '/properties', label: 'Buy', description: 'Find your dream home' },
+    { href: '/rent', label: 'Rent', description: 'Rental properties' },
+    { href: '/agents', label: 'Agents', description: 'Find agents' },
+    { href: '/services', label: 'Services', description: 'Our services' },
+  ];
+
+  const handleFreeValuation = () => {
+    addToast({
+      type: 'info',
+      message: 'Free valuation feature coming soon!',
+    });
+  };
+
+  return (
+    <header className="bg-white shadow-sm sticky top-0 z-40">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center">
+          {/* Logo */}
+          <Link href="/" className="flex-shrink-0">
+            <Logo size="md" />
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-8">
+            {navigationLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-dark-charcoal hover:text-primary-blue font-medium transition-colors relative group"
+              >
+                {link.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-blue transition-all group-hover:w-full"></span>
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right side - User menu and CTA */}
+          <div className="flex items-center space-x-4">
+            <Link
+              href="/favorites"
+              className="text-dark-charcoal hover:text-primary-red transition-colors p-2 relative"
+              title="My Favorites"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            </Link>
+
+            {user?.user_metadata?.role === 'agent' && (
+              <Link
+                href="/dashboard/listings"
+                className="text-dark-charcoal hover:text-primary-blue transition-colors p-2 relative"
+                title="My Listings"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </Link>
+            )}
+
+            <UserMenu />
+
+            <button
+              onClick={handleFreeValuation}
+              className="hidden sm:block bg-primary-red text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors font-medium"
+            >
+              Free Valuation
+            </button>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-dark-charcoal hover:text-primary-blue focus:outline-none"
+              aria-label="Toggle mobile menu"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {isMobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
+            <nav className="pt-4 space-y-2">
+              {navigationLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="block py-2 px-4 text-dark-charcoal hover:text-primary-blue hover:bg-gray-50 rounded-md transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <div className="font-medium">{link.label}</div>
+                  <div className="text-sm text-gray-500">
+                    {link.description}
+                  </div>
+                </Link>
+              ))}
+
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    handleFreeValuation();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-primary-red text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors font-medium"
+                >
+                  Free Valuation
+                </button>
+              </div>
+            </nav>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
