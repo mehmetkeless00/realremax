@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useUserStore, useFavoritesStore, useUIStore } from '@/lib/store';
 import Link from 'next/link';
-import Image from 'next/image';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface Property {
   id: string;
@@ -207,12 +207,14 @@ export default function PropertyDetailPage() {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
               {property.photos && property.photos.length > 0 ? (
                 <div className="relative">
-                  <Image
+                  <OptimizedImage
                     src={property.photos[0]}
                     alt={property.title}
                     width={800}
                     height={256}
                     className="w-full h-64 object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 66vw, 800px"
+                    priority={true}
                   />
                   {property.photos.length > 1 && (
                     <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
@@ -222,12 +224,13 @@ export default function PropertyDetailPage() {
                 </div>
               ) : (
                 <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                  <Image
-                    src="/images/placeholder-property.jpg"
+                  <OptimizedImage
+                    src="/images/placeholder-property.svg"
                     alt={property.title}
                     width={800}
                     height={256}
                     className="w-full h-64 object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 66vw, 800px"
                   />
                 </div>
               )}

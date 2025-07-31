@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import Image from 'next/image';
+import OptimizedImage from './OptimizedImage';
 import { supabase } from '@/lib/supabase';
 import { useUIStore } from '@/lib/store';
 
@@ -231,12 +231,13 @@ export default function PhotoUpload({
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {existingPhotos.map((photo, index) => (
               <div key={index} className="relative group">
-                <Image
+                <OptimizedImage
                   src={photo}
                   alt={`Property photo ${index + 1}`}
                   width={200}
                   height={128}
                   className="w-full h-32 object-cover rounded-lg"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
                 <button
                   onClick={() => removePhoto(photo, index)}

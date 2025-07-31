@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import OptimizedImage from './OptimizedImage';
 import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import { useFavoritesStore } from '@/lib/store/favoritesStore';
@@ -23,7 +23,7 @@ export default function PropertyCard({
   const isFavorite = favorites.includes(property.id);
 
   // Default image if property image fails to load
-  const defaultImage = '/images/placeholder-property.jpg';
+  const defaultImage = '/images/placeholder-property.svg';
   const propertyImage = property.images?.[0] || defaultImage;
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
@@ -111,12 +111,13 @@ export default function PropertyCard({
           <div className="flex flex-col md:flex-row">
             {/* Image Section */}
             <div className="relative md:w-64 md:h-48 w-full h-48">
-              <Image
+              <OptimizedImage
                 src={imageError ? defaultImage : propertyImage}
                 alt={property.title}
                 width={400}
                 height={300}
                 className="w-full h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                sizes="(max-width: 768px) 100vw, 256px"
                 onError={() => setImageError(true)}
               />
 
@@ -331,12 +332,13 @@ export default function PropertyCard({
     >
       <Link href={`/properties/${property.id}`}>
         <div className="relative">
-          <Image
+          <OptimizedImage
             src={imageError ? defaultImage : propertyImage}
             alt={property.title}
             width={400}
             height={192}
             className="w-full h-48 object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             onError={() => setImageError(true)}
           />
 
