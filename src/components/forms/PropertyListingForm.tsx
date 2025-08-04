@@ -53,7 +53,6 @@ export default function PropertyListingForm() {
     handleSubmit,
     formState: { errors, isDirty, isValid },
     reset,
-    watch,
     setValue,
   } = useForm<PropertyInput>({
     resolver: zodResolver(propertySchema),
@@ -80,9 +79,6 @@ export default function PropertyListingForm() {
       images: [],
     },
   });
-
-  const watchedType = watch('type');
-  const watchedListingType = watch('listing_type');
 
   const handleAmenityToggle = (amenity: string) => {
     const newAmenities = selectedAmenities.includes(amenity)
@@ -356,7 +352,6 @@ export default function PropertyListingForm() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Amenities
           </h3>
-
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {amenitiesList.map((amenity) => (
               <label
@@ -373,8 +368,10 @@ export default function PropertyListingForm() {
               </label>
             ))}
           </div>
-
-          {errors.amenities && <ErrorMessage error={errors.amenities} />}
+          {errors.amenities && (
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            <ErrorMessage error={errors.amenities as any} />
+          )}
         </div>
 
         {/* Form Actions */}

@@ -26,9 +26,7 @@ export const propertySchema = z.object({
     .max(100, 'Location must be less than 100 characters')
     .trim(),
 
-  type: z.enum(['apartment', 'house', 'villa', 'commercial', 'land'], {
-    errorMap: () => ({ message: 'Please select a valid property type' }),
-  }),
+  type: z.enum(['apartment', 'house', 'villa', 'commercial', 'land']),
 
   bedrooms: z
     .number()
@@ -54,13 +52,9 @@ export const propertySchema = z.object({
     .max(new Date().getFullYear() + 1, 'Year built cannot be in the future')
     .optional(),
 
-  status: z.enum(['active', 'pending', 'sold', 'rented'], {
-    errorMap: () => ({ message: 'Please select a valid status' }),
-  }),
+  status: z.enum(['active', 'pending', 'sold', 'rented']),
 
-  listing_type: z.enum(['sale', 'rent'], {
-    errorMap: () => ({ message: 'Please select a valid listing type' }),
-  }),
+  listing_type: z.enum(['sale', 'rent']),
 
   amenities: z
     .array(z.string())
@@ -195,7 +189,6 @@ export const userRegistrationSchema = z
 // User login schema
 export const userLoginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-
   password: z.string().min(1, 'Password is required'),
 });
 

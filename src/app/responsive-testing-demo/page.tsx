@@ -8,25 +8,49 @@ import {
   runResponsiveTest,
   generateResponsiveTestReport,
 } from '@/lib/utils/responsiveTesting';
+import type { PropertyWithListing } from '@/types/property';
+
+// Responsive test sonucu tipi
+type ResponsiveTestResult = {
+  viewport: { name: string; width: number; height: number };
+  passed: boolean;
+  issues: string[];
+  warnings: string[];
+};
 
 // Mock property data
-const mockProperty = {
+const mockProperty: PropertyWithListing = {
   id: '1',
   title: 'Beautiful Modern House',
+  description: 'A beautiful modern house in Amsterdam.',
   price: 500000,
   location: 'Amsterdam, Netherlands',
   type: 'house',
   bedrooms: 3,
   bathrooms: 2,
   size: 150,
+  year_built: 2020,
+  agent_id: 'agent-1',
   status: 'active',
-  images: ['/images/placeholder-property.svg'],
+  listing_type: 'sale',
+  amenities: ['garden', 'garage'],
+  photos: ['/images/placeholder-property.svg'],
+  address: '123 Main St',
+  city: 'Amsterdam',
+  postal_code: '1000 AB',
+  country: 'Netherlands',
+  latitude: 52.3676,
+  longitude: 4.9041,
   created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-02T00:00:00Z',
+  // PropertyWithListing extra fields:
+  images: ['/images/placeholder-property.svg'],
+  isFavorite: false,
 };
 
 export default function ResponsiveTestingDemo() {
   const [currentViewport, setCurrentViewport] = useState(viewportSizes[2]); // Mobile Large
-  const [testResults, setTestResults] = useState<any[]>([]);
+  const [testResults, setTestResults] = useState<ResponsiveTestResult[]>([]);
   const [isRunningTests, setIsRunningTests] = useState(false);
 
   // Simulate viewport change
@@ -48,7 +72,7 @@ export default function ResponsiveTestingDemo() {
 
   const runTests = async () => {
     setIsRunningTests(true);
-    const results = [];
+    const results: ResponsiveTestResult[] = [];
 
     for (const viewport of viewportSizes) {
       setCurrentViewport(viewport);

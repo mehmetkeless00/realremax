@@ -1,16 +1,23 @@
 'use client';
 
 import { forwardRef } from 'react';
-import { UseFormRegister, FieldError } from 'react-hook-form';
+import {
+  UseFormRegister,
+  FieldError,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 import {
   getFieldErrorClass,
   getErrorMessageClass,
   formatErrorMessage,
 } from '@/lib/validation/formUtils';
 
-interface FormFieldProps {
+export interface FormFieldProps<
+  TFieldValues extends FieldValues = FieldValues,
+> {
   label: string;
-  name: string;
+  name: Path<TFieldValues>;
   type?:
     | 'text'
     | 'email'
@@ -25,6 +32,7 @@ interface FormFieldProps {
   disabled?: boolean;
   options?: { value: string; label: string }[];
   error?: FieldError;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<any>;
   className?: string;
   rows?: number;
@@ -33,11 +41,9 @@ interface FormFieldProps {
   step?: number;
 }
 
-const FormField = forwardRef<
-  HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
-  FormFieldProps
->(
-  (
+// 👇 forwardRef ile generic component tanımı
+const FormField = forwardRef(
+  <TFieldValues extends FieldValues = FieldValues>(
     {
       label,
       name,
@@ -53,22 +59,25 @@ const FormField = forwardRef<
       min,
       max,
       step,
-    },
-    ref
+    }: FormFieldProps<TFieldValues>,
+    ref:
+      | React.Ref<HTMLInputElement>
+      | React.Ref<HTMLTextAreaElement>
+      | React.Ref<HTMLSelectElement>
   ) => {
     const fieldId = `field-${name}`;
     const errorClass = getFieldErrorClass(error, className);
     const errorMessageClass = getErrorMessageClass();
 
-    const renderField = () => {
-      const commonProps = {
-        id: fieldId,
-        ...register(name),
-        placeholder,
-        disabled,
-        className: `w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-primary-blue disabled:bg-gray-100 disabled:cursor-not-allowed ${errorClass}`,
-      };
+    const commonProps = {
+      id: fieldId,
+      ...register(name),
+      placeholder,
+      disabled,
+      className: `w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-primary-blue disabled:bg-gray-100 disabled:cursor-not-allowed ${errorClass}`,
+    };
 
+    const renderField = () => {
       switch (type) {
         case 'textarea':
           return (

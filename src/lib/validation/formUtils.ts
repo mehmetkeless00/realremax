@@ -58,13 +58,21 @@ export const formatErrorMessage = (error: FieldError): string => {
     case 'required':
       return errorMessages.required;
     case 'minLength':
-      return errorMessages.minLength(error.ref?.minLength || 0);
+      return errorMessages.minLength(
+        (error.ref as HTMLInputElement)?.minLength || 0
+      );
     case 'maxLength':
-      return errorMessages.maxLength(error.ref?.maxLength || 0);
+      return errorMessages.maxLength(
+        (error.ref as HTMLInputElement)?.maxLength || 0
+      );
     case 'min':
-      return errorMessages.min(error.ref?.min || 0);
+      return errorMessages.min(
+        Number((error.ref as HTMLInputElement)?.min) || 0
+      );
     case 'max':
-      return errorMessages.max(error.ref?.max || 0);
+      return errorMessages.max(
+        Number((error.ref as HTMLInputElement)?.max) || 0
+      );
     case 'pattern':
       return errorMessages.invalidFormat;
     default:
@@ -130,7 +138,7 @@ export const validateFileUpload = (
 };
 
 // Debounce function for search inputs
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
@@ -145,7 +153,7 @@ export const debounce = <T extends (...args: any[]) => any>(
 // Form submission handler with loading state
 export const createFormSubmitHandler = <T>(
   onSubmit: (data: T) => Promise<void>,
-  onError?: (error: any) => void
+  onError?: (error: unknown) => void
 ) => {
   return async (data: T) => {
     try {
@@ -166,7 +174,7 @@ export const resetFormWithDefaults = <T>(
 };
 
 // Check if form is dirty (has changes)
-export const isFormDirty = (dirtyFields: Record<string, any>): boolean => {
+export const isFormDirty = (dirtyFields: Record<string, unknown>): boolean => {
   return Object.keys(dirtyFields).length > 0;
 };
 
@@ -187,7 +195,7 @@ export const getErrorMessageClass = (className?: string): string => {
 };
 
 // Validate required fields
-export const validateRequired = (value: any): boolean => {
+export const validateRequired = (value: unknown): boolean => {
   if (typeof value === 'string') {
     return value.trim().length > 0;
   }

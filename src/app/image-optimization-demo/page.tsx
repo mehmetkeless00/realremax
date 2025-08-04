@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import OptimizedImage from '@/components/OptimizedImage';
 
 const testImages = [
@@ -25,9 +24,6 @@ const testImages = [
 ];
 
 export default function ImageOptimizationDemo() {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [showLoading, setShowLoading] = useState(true);
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
