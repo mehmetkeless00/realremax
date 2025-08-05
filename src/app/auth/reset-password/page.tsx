@@ -84,11 +84,10 @@ function ResetPasswordPage() {
 
     try {
       // Set the session with the tokens
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.setSession({
-          access_token: accessToken!,
-          refresh_token: refreshToken!,
-        });
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: accessToken!,
+        refresh_token: refreshToken!,
+      });
 
       if (sessionError) throw sessionError;
 

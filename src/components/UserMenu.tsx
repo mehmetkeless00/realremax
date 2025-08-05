@@ -56,7 +56,7 @@ export default function UserMenu() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center space-x-2 text-dark-charcoal hover:text-primary-blue focus:outline-none"
       >
-        <div className="w-8 h-8 bg-primary-red rounded-full flex items-center justify-center text-white font-medium">
+        <div className="w-6 h-6 bg-primary-red rounded-full flex items-center justify-center text-white font-medium">
           {profile?.name
             ? profile.name.charAt(0).toUpperCase()
             : user.email?.charAt(0).toUpperCase()}
@@ -65,7 +65,7 @@ export default function UserMenu() {
           {profile?.name || user.email}
         </span>
         <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

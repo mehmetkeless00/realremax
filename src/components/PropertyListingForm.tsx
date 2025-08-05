@@ -676,11 +676,11 @@ export default function PropertyListingForm({
                   alt={`Property photo ${index + 1}`}
                   width={150}
                   height={80}
-                  className="w-full h-20 object-cover rounded"
+                  className="w-full h-16 object-cover rounded"
                 />
               ))}
               {formData.photos.length > 4 && (
-                <div className="w-full h-20 bg-gray-200 rounded flex items-center justify-center text-sm text-gray-500">
+                <div className="w-full h-16 bg-gray-200 rounded flex items-center justify-center text-sm text-gray-500">
                   +{formData.photos.length - 4} more
                 </div>
               )}

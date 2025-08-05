@@ -308,7 +308,7 @@ export default function AdvancedSearchBar({
             className="text-primary-blue hover:text-blue-700 font-medium flex items-center gap-2"
           >
             <svg
-              className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
+              className={`w-3 h-3 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -512,13 +512,13 @@ export default function AdvancedSearchBar({
           >
             {loading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 Searching...
               </>
             ) : (
               <>
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

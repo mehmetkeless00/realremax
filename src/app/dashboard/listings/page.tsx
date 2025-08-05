@@ -172,7 +172,7 @@ export default function ListingsPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-dark-charcoal">
+          <h1 className="text-lg font-bold text-dark-charcoal">
             My Properties
           </h1>
           <button
@@ -203,7 +203,7 @@ export default function ListingsPage() {
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <div className="mb-4">
               <svg
-                className="w-16 h-16 mx-auto text-gray-400"
+                className="w-12 h-12 mx-auto text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

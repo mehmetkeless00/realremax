@@ -76,7 +76,7 @@ function PropertiesPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-dark-charcoal mb-6">
+        <h1 className="text-lg font-bold text-dark-charcoal mb-6">
           Advanced Property Search
         </h1>
         <AdvancedSearchBar onSearch={handleSearch} loading={loading} />

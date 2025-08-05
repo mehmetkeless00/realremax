@@ -55,7 +55,7 @@ export default function RealtimeDemo() {
         </div>
         <div className="bg-gray-50 rounded-md p-4">
           <div className="text-sm text-gray-600 mb-2">Current Favorites:</div>
-          <div className="text-2xl font-bold text-dark-charcoal">
+          <div className="text-base font-bold text-dark-charcoal">
             {favorites.length}
           </div>
         </div>

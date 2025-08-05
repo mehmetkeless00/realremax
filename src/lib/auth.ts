@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { createUser, updateUserRole } from './database';
+import { updateUserRole } from './database';
 
 export interface AuthUser {
   id: string;
@@ -23,14 +23,24 @@ export async function signUpWithEmail(
       },
     });
 
-    if (authError) throw authError;
-    if (authData.user) {
-      await createUser(email, role);
+    if (authError) {
+      console.error('Supabase auth error:', authError);
+      throw new Error(authError.message);
     }
+
+    // Supabase auth zaten kullanıcıyı oluşturuyor, ayrıca createUser çağırmaya gerek yok
+    // RLS policies kullanıcı verilerini otomatik olarak yönetecek
+
     return authData;
   } catch (error) {
     console.error('Sign up error:', error);
-    throw error;
+
+    // Hata mesajını daha kullanıcı dostu hale getir
+    if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error('An unexpected error occurred during sign up');
+    }
   }
 }
 

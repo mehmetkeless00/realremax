@@ -6,10 +6,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="bg-white py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-dark-charcoal mb-6">
+          <h1 className="text-lg md:text-xl font-bold text-dark-charcoal mb-6">
             Find Your Dream Home
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xs text-gray-600 mb-8 max-w-2xl mx-auto">
             Discover the perfect property with Remax Unified Platform. Browse
             thousands of listings, connect with trusted agents, and make
             informed decisions.
@@ -33,7 +33,7 @@ export default function Home() {
           {/* Advanced Search Section */}
           <div className="mt-12 max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-xl p-6">
-              <h3 className="text-xl font-semibold text-dark-charcoal mb-4 text-center">
+              <h3 className="text-xs font-semibold text-dark-charcoal mb-4 text-center">
                 Find Your Perfect Property
               </h3>
               <p className="text-gray-600 text-center mb-6">
@@ -46,7 +46,7 @@ export default function Home() {
                   className="bg-primary-blue text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium inline-flex items-center gap-2"
                 >
                   <svg
-                    className="w-5 h-5"
+                    className="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -69,15 +69,15 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-dark-charcoal mb-12">
+          <h2 className="text-base font-bold text-center text-dark-charcoal mb-12">
             Why Choose Remax Unified Platform?
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="w-16 h-16 bg-primary-blue rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 md:w-10 md:h-10 bg-primary-blue rounded-full flex items-center justify-center mx-auto mb-4 max-w-[60px] max-h-[40vh]">
                 <svg
-                  className="w-8 h-8 text-white"
+                  className="w-5 h-5 md:w-4 md:h-4 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -90,7 +90,7 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Advanced Search</h3>
+              <h3 className="text-xs font-semibold mb-2">Advanced Search</h3>
               <p className="text-gray-600">
                 Find properties with detailed filters and advanced search
                 options.
@@ -98,9 +98,9 @@ export default function Home() {
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="w-16 h-16 bg-primary-red rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 md:w-10 md:h-10 bg-primary-red rounded-full flex items-center justify-center mx-auto mb-4 max-w-[60px] max-h-[40vh]">
                 <svg
-                  className="w-8 h-8 text-white"
+                  className="w-5 h-5 md:w-4 md:h-4 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -113,16 +113,16 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Trusted Agents</h3>
+              <h3 className="text-xs font-semibold mb-2">Trusted Agents</h3>
               <p className="text-gray-600">
                 Connect with verified and experienced real estate professionals.
               </p>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 md:w-10 md:h-10 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 max-w-[60px] max-h-[40vh]">
                 <svg
-                  className="w-8 h-8 text-white"
+                  className="w-5 h-5 md:w-4 md:h-4 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -135,7 +135,7 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Secure Platform</h3>
+              <h3 className="text-xs font-semibold mb-2">Secure Platform</h3>
               <p className="text-gray-600">
                 Your data is protected with enterprise-grade security measures.
               </p>
@@ -147,10 +147,10 @@ export default function Home() {
       {/* CTA Section */}
       <section className="bg-primary-blue py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-base font-bold text-white mb-4">
             Ready to Start Your Journey?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xs text-blue-100 mb-8">
             Join thousands of satisfied customers who found their perfect home
             with us.
           </p>

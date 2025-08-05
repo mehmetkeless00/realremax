@@ -130,7 +130,7 @@ export default function PropertyListingForm() {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-base font-bold text-gray-900 mb-2">
           List Your Property
         </h2>
         <p className="text-gray-600">

@@ -204,7 +204,7 @@ export default function PropertyCardDemo() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-dark-charcoal mb-4">
+          <h1 className="text-lg font-bold text-dark-charcoal mb-4">
             Property Card Component Demo
           </h1>
 
@@ -279,7 +279,7 @@ export default function PropertyCardDemo() {
 
         {/* Info Section */}
         <div className="mt-12 bg-white p-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-semibold text-dark-charcoal mb-4">
+          <h2 className="text-xs font-semibold text-dark-charcoal mb-4">
             Component Features
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

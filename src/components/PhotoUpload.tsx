@@ -236,7 +236,7 @@ export default function PhotoUpload({
                   alt={`Property photo ${index + 1}`}
                   width={200}
                   height={128}
-                  className="w-full h-32 object-cover rounded-lg"
+                  className="w-full h-24 object-cover rounded-lg"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
                 <button

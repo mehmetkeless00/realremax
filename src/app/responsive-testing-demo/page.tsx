@@ -105,13 +105,13 @@ export default function ResponsiveTestingDemo() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          <h1 className="text-lg font-bold text-gray-900 mb-8">
             Responsive Testing Demo
           </h1>
 
           {/* Viewport Selector */}
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Viewport Selector</h2>
+            <h2 className="text-sm font-semibold mb-4">Viewport Selector</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
               {viewportSizes.map((viewport) => (
                 <button
@@ -141,7 +141,7 @@ export default function ResponsiveTestingDemo() {
 
           {/* Test Controls */}
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Test Controls</h2>
+            <h2 className="text-sm font-semibold mb-4">Test Controls</h2>
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={runTests}
@@ -175,7 +175,7 @@ export default function ResponsiveTestingDemo() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* PropertyCard Preview */}
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">
+              <h2 className="text-sm font-semibold mb-4">
                 PropertyCard Component
               </h2>
               <div data-testid="property-card">
@@ -185,16 +185,16 @@ export default function ResponsiveTestingDemo() {
 
             {/* Grid vs List View */}
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Grid vs List View</h2>
+              <h2 className="text-sm font-semibold mb-4">Grid vs List View</h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Grid View</h3>
+                  <h3 className="text-sm font-medium mb-2">Grid View</h3>
                   <div className="w-full">
                     <PropertyCard property={mockProperty} view="grid" />
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium mb-2">List View</h3>
+                  <h3 className="text-sm font-medium mb-2">List View</h3>
                   <div className="w-full">
                     <PropertyCard property={mockProperty} view="list" />
                   </div>
@@ -206,30 +206,30 @@ export default function ResponsiveTestingDemo() {
           {/* Test Results */}
           {testResults.length > 0 && (
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Test Results</h2>
+              <h2 className="text-sm font-semibold mb-4">Test Results</h2>
 
               <div className="mb-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-3 bg-gray-100 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-900">
+                    <div className="text-base font-bold text-gray-900">
                       {testResults.length}
                     </div>
                     <div className="text-sm text-gray-600">Total Tests</div>
                   </div>
                   <div className="text-center p-3 bg-green-100 rounded-lg">
-                    <div className="text-2xl font-bold text-green-900">
+                    <div className="text-base font-bold text-green-900">
                       {testResults.filter((r) => r.passed).length}
                     </div>
                     <div className="text-sm text-green-600">Passed</div>
                   </div>
                   <div className="text-center p-3 bg-red-100 rounded-lg">
-                    <div className="text-2xl font-bold text-red-900">
+                    <div className="text-base font-bold text-red-900">
                       {testResults.filter((r) => !r.passed).length}
                     </div>
                     <div className="text-sm text-red-600">Failed</div>
                   </div>
                   <div className="text-center p-3 bg-blue-100 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-900">
+                    <div className="text-base font-bold text-blue-900">
                       {(
                         (testResults.filter((r) => r.passed).length /
                           testResults.length) *
@@ -305,7 +305,7 @@ export default function ResponsiveTestingDemo() {
 
           {/* Responsive Guidelines */}
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-sm font-semibold mb-4">
               Responsive Design Guidelines
             </h2>
 

@@ -57,11 +57,36 @@ export default function SignUp() {
         formData.password,
         formData.role
       );
+
       if (result.user && !result.session) {
         setSuccess(true);
+        setError(null);
+      } else if (result.user && result.session) {
+        // Kullanıcı otomatik olarak giriş yaptı, yönlendir
+        window.location.href = '/dashboard';
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign up');
+    } catch (err: unknown) {
+      console.error('Signup error details:', err);
+
+      // Supabase hata mesajlarını daha kullanıcı dostu hale getir
+      let errorMessage = 'Failed to sign up';
+
+      if (err && typeof err === 'object' && 'message' in err) {
+        const errorMessageStr = String(err.message);
+        if (errorMessageStr.includes('already registered')) {
+          errorMessage =
+            'This email is already registered. Please try signing in instead.';
+        } else if (errorMessageStr.includes('password')) {
+          errorMessage =
+            'Password is too weak. Please use a stronger password.';
+        } else if (errorMessageStr.includes('email')) {
+          errorMessage = 'Please enter a valid email address.';
+        } else {
+          errorMessage = errorMessageStr;
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -121,7 +146,7 @@ export default function SignUp() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-lg font-extrabold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">

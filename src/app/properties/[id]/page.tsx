@@ -158,7 +158,7 @@ export default function PropertyDetailPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            <h1 className="text-base font-bold text-gray-900 mb-4">
               Property Not Found
             </h1>
             <p className="text-gray-600 mb-6">
@@ -212,7 +212,7 @@ export default function PropertyDetailPage() {
                     alt={property.title}
                     width={800}
                     height={256}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-48 max-h-[50vh] object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 66vw, 800px"
                     priority={true}
                   />
@@ -229,7 +229,7 @@ export default function PropertyDetailPage() {
                     alt={property.title}
                     width={800}
                     height={256}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-48 max-h-[50vh] object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 66vw, 800px"
                   />
                 </div>
@@ -240,13 +240,13 @@ export default function PropertyDetailPage() {
             <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-dark-charcoal mb-2">
+                  <h1 className="text-lg font-bold text-dark-charcoal mb-2">
                     {property.title}
                   </h1>
                   <p className="text-gray-600 text-lg">{property.location}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-primary-blue">
+                  <p className="text-base font-bold text-primary-blue">
                     ${property.price.toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-500">{property.status}</p>
@@ -257,7 +257,7 @@ export default function PropertyDetailPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {property.bedrooms && (
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary-blue">
+                    <div className="text-sm font-bold text-primary-blue">
                       {property.bedrooms}
                     </div>
                     <div className="text-sm text-gray-600">Bedrooms</div>
@@ -265,7 +265,7 @@ export default function PropertyDetailPage() {
                 )}
                 {property.bathrooms && (
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary-blue">
+                    <div className="text-sm font-bold text-primary-blue">
                       {property.bathrooms}
                     </div>
                     <div className="text-sm text-gray-600">Bathrooms</div>
@@ -273,7 +273,7 @@ export default function PropertyDetailPage() {
                 )}
                 {property.size && (
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary-blue">
+                    <div className="text-sm font-bold text-primary-blue">
                       {property.size}m²
                     </div>
                     <div className="text-sm text-gray-600">Size</div>
@@ -281,7 +281,7 @@ export default function PropertyDetailPage() {
                 )}
                 {property.year_built && (
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary-blue">
+                    <div className="text-sm font-bold text-primary-blue">
                       {property.year_built}
                     </div>
                     <div className="text-sm text-gray-600">Year Built</div>
@@ -314,7 +314,7 @@ export default function PropertyDetailPage() {
                 <h3 className="text-lg font-semibold text-dark-charcoal mb-2">
                   Location
                 </h3>
-                <div className="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
+                <div className="bg-gray-200 rounded-lg h-48 max-h-[50vh] flex items-center justify-center">
                   <div className="text-center">
                     <svg
                       className="w-12 h-12 text-gray-400 mx-auto mb-2"
@@ -392,7 +392,7 @@ export default function PropertyDetailPage() {
                   Listed by
                 </h3>
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-primary-blue rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 bg-primary-blue rounded-full flex items-center justify-center mx-auto mb-3">
                     <span className="text-white font-bold text-lg">
                       {agent.name
                         .split(' ')

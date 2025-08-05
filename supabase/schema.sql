@@ -10,6 +10,26 @@ CREATE TABLE users (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Function to handle new user registration
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.users (id, email, role)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'role', 'registered')
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to automatically create user record when auth.users gets a new user
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
 -- Create agents table
 CREATE TABLE agents (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -98,9 +118,8 @@ CREATE INDEX idx_favorites_property_id ON favorites(property_id);
 CREATE INDEX idx_inquiries_property_id ON inquiries(property_id);
 CREATE INDEX idx_inquiries_agent_id ON inquiries(agent_id);
 CREATE INDEX idx_inquiries_user_id ON inquiries(user_id);
-CREATE INDEX idx_inquiries_status ON inquiries(status);
 
--- Enable Row Level Security (RLS)
+-- Enable Row Level Security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
@@ -108,35 +127,42 @@ ALTER TABLE listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies for users table
+-- Basic RLS policies
 CREATE POLICY "Users can view their own profile" ON users
-  FOR SELECT USING (auth.uid()::text = id::text);
+  FOR SELECT TO authenticated
+  USING (auth.uid()::text = id::text);
 
 CREATE POLICY "Users can update their own profile" ON users
-  FOR UPDATE USING (auth.uid()::text = id::text);
+  FOR UPDATE TO authenticated
+  USING (auth.uid()::text = id::text);
 
 CREATE POLICY "Allow public read access to users" ON users
-  FOR SELECT USING (true);
+  FOR SELECT TO anon, authenticated
+  USING (true);
 
--- RLS Policies for agents table
 CREATE POLICY "Agents can view their own profile" ON agents
-  FOR SELECT USING (auth.uid()::text = user_id::text);
+  FOR SELECT TO authenticated
+  USING (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Agents can update their own profile" ON agents
-  FOR UPDATE USING (auth.uid()::text = user_id::text);
+  FOR UPDATE TO authenticated
+  USING (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Allow public read access to agents" ON agents
-  FOR SELECT USING (true);
+  FOR SELECT TO anon, authenticated
+  USING (true);
 
 CREATE POLICY "Agents can insert their own profile" ON agents
-  FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.uid()::text = user_id::text);
 
--- RLS Policies for properties table
 CREATE POLICY "Allow public read access to properties" ON properties
-  FOR SELECT USING (true);
+  FOR SELECT TO anon, authenticated
+  USING (status = 'active');
 
 CREATE POLICY "Agents can insert properties" ON properties
-  FOR INSERT WITH CHECK (
+  FOR INSERT TO authenticated
+  WITH CHECK (
     EXISTS (
       SELECT 1 FROM agents 
       WHERE agents.id = properties.agent_id 
@@ -145,7 +171,8 @@ CREATE POLICY "Agents can insert properties" ON properties
   );
 
 CREATE POLICY "Agents can update their own properties" ON properties
-  FOR UPDATE USING (
+  FOR UPDATE TO authenticated
+  USING (
     EXISTS (
       SELECT 1 FROM agents 
       WHERE agents.id = properties.agent_id 
@@ -154,7 +181,8 @@ CREATE POLICY "Agents can update their own properties" ON properties
   );
 
 CREATE POLICY "Agents can delete their own properties" ON properties
-  FOR DELETE USING (
+  FOR DELETE TO authenticated
+  USING (
     EXISTS (
       SELECT 1 FROM agents 
       WHERE agents.id = properties.agent_id 
@@ -162,12 +190,13 @@ CREATE POLICY "Agents can delete their own properties" ON properties
     )
   );
 
--- RLS Policies for listings table
 CREATE POLICY "Allow public read access to listings" ON listings
-  FOR SELECT USING (true);
+  FOR SELECT TO anon, authenticated
+  USING (status = 'active');
 
-CREATE POLICY "Agents can insert listings" ON listings
-  FOR INSERT WITH CHECK (
+CREATE POLICY "Agents can manage their own listings" ON listings
+  FOR ALL TO authenticated
+  USING (
     EXISTS (
       SELECT 1 FROM agents 
       WHERE agents.id = listings.agent_id 
@@ -175,73 +204,42 @@ CREATE POLICY "Agents can insert listings" ON listings
     )
   );
 
-CREATE POLICY "Agents can update their own listings" ON listings
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM agents 
-      WHERE agents.id = listings.agent_id 
-      AND agents.user_id::text = auth.uid()::text
-    )
-  );
+CREATE POLICY "Users can manage their own favorites" ON favorites
+  FOR ALL TO authenticated
+  USING (auth.uid()::text = user_id::text);
 
-CREATE POLICY "Agents can delete their own listings" ON listings
-  FOR DELETE USING (
-    EXISTS (
-      SELECT 1 FROM agents 
-      WHERE agents.id = listings.agent_id 
-      AND agents.user_id::text = auth.uid()::text
-    )
-  );
+CREATE POLICY "Allow public read access to favorites" ON favorites
+  FOR SELECT TO anon, authenticated
+  USING (true);
 
--- RLS Policies for favorites table
-CREATE POLICY "Users can view their own favorites" ON favorites
-  FOR SELECT USING (auth.uid()::text = user_id::text);
-
-CREATE POLICY "Users can insert their own favorites" ON favorites
-  FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
-
-CREATE POLICY "Users can delete their own favorites" ON favorites
-  FOR DELETE USING (auth.uid()::text = user_id::text);
-
--- RLS Policies for inquiries table
-CREATE POLICY "Users can view their own inquiries" ON inquiries
-  FOR SELECT USING (auth.uid()::text = user_id::text);
-
-CREATE POLICY "Users can insert their own inquiries" ON inquiries
-  FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
+CREATE POLICY "Users can manage their own inquiries" ON inquiries
+  FOR ALL TO authenticated
+  USING (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Agents can view inquiries for their properties" ON inquiries
-  FOR SELECT USING (
+  FOR SELECT TO authenticated
+  USING (
     EXISTS (
       SELECT 1 FROM properties 
       WHERE properties.id = inquiries.property_id 
-      AND properties.agent_id = inquiries.agent_id
       AND properties.agent_id IN (
-        SELECT id FROM agents WHERE user_id::text = auth.uid()::text
+        SELECT id FROM agents WHERE agents.user_id::text = auth.uid()::text
       )
     )
   );
 
-CREATE POLICY "Agents can update inquiries for their properties" ON inquiries
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM properties 
-      WHERE properties.id = inquiries.property_id 
-      AND properties.agent_id = inquiries.agent_id
-      AND properties.agent_id IN (
-        SELECT id FROM agents WHERE user_id::text = auth.uid()::text
-      )
-    )
-  );
+CREATE POLICY "Allow public insert access to inquiries" ON inquiries
+  FOR INSERT TO anon, authenticated
+  WITH CHECK (true);
 
--- Create updated_at trigger function
+-- Function to update updated_at column
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = CURRENT_TIMESTAMP;
   RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 -- Create triggers for updated_at
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users

@@ -110,7 +110,7 @@ export default function PropertyCard({
         <Link href={`/properties/${property.id}`}>
           <div className="flex flex-col md:flex-row">
             {/* Image Section */}
-            <div className="relative md:w-64 md:h-48 w-full h-48">
+            <div className="relative md:w-64 md:h-40 w-full h-40 max-h-[40vh]">
               <OptimizedImage
                 src={imageError ? defaultImage : propertyImage}
                 alt={property.title}
@@ -160,7 +160,7 @@ export default function PropertyCard({
                 >
                   {isSyncing ? (
                     <svg
-                      className="w-5 h-5 animate-spin"
+                      className="w-4 h-4 animate-spin"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -174,7 +174,7 @@ export default function PropertyCard({
                     </svg>
                   ) : (
                     <svg
-                      className="w-5 h-5"
+                      className="w-4 h-4"
                       fill={isFavorite ? 'currentColor' : 'none'}
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -194,11 +194,11 @@ export default function PropertyCard({
             {/* Content Section */}
             <div className="flex-1 p-6">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-xl font-semibold text-dark-charcoal hover:text-primary-blue transition-colors">
+                <h3 className="text-sm font-semibold text-dark-charcoal hover:text-primary-blue transition-colors">
                   {property.title}
                 </h3>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-primary-blue">
+                  <div className="text-base font-bold text-primary-blue">
                     {formatPrice(property.price)}
                   </div>
                   {property.listing && (
@@ -211,7 +211,7 @@ export default function PropertyCard({
 
               <p className="text-gray-600 mb-4 flex items-center">
                 <svg
-                  className="w-4 h-4 mr-1"
+                  className="w-3 h-3 mr-1"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -236,7 +236,7 @@ export default function PropertyCard({
                 {property.bedrooms && (
                   <span className="flex items-center">
                     <svg
-                      className="w-4 h-4 mr-1"
+                      className="w-3 h-3 mr-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -260,7 +260,7 @@ export default function PropertyCard({
                 {property.bathrooms && (
                   <span className="flex items-center">
                     <svg
-                      className="w-4 h-4 mr-1"
+                      className="w-3 h-3 mr-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -278,7 +278,7 @@ export default function PropertyCard({
                 {property.size && (
                   <span className="flex items-center">
                     <svg
-                      className="w-4 h-4 mr-1"
+                      className="w-3 h-3 mr-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -304,7 +304,7 @@ export default function PropertyCard({
               {property.agent && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    <div className="w-6 h-6 bg-primary-blue rounded-full flex items-center justify-center text-white text-sm font-medium">
                       {property.agent.name.charAt(0)}
                     </div>
                     <div className="ml-2">
@@ -337,7 +337,7 @@ export default function PropertyCard({
             alt={property.title}
             width={400}
             height={192}
-            className="w-full h-48 object-cover"
+            className="w-full h-40 max-h-[40vh] object-cover"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             onError={() => setImageError(true)}
           />
@@ -381,7 +381,7 @@ export default function PropertyCard({
             >
               {isSyncing ? (
                 <svg
-                  className="w-5 h-5 animate-spin"
+                  className="w-4 h-4 animate-spin"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -395,7 +395,7 @@ export default function PropertyCard({
                 </svg>
               ) : (
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill={isFavorite ? 'currentColor' : 'none'}
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -414,11 +414,11 @@ export default function PropertyCard({
 
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-lg font-semibold text-dark-charcoal hover:text-primary-blue transition-colors line-clamp-1">
+            <h3 className="text-sm font-semibold text-dark-charcoal hover:text-primary-blue transition-colors line-clamp-1">
               {property.title}
             </h3>
             <div className="text-right">
-              <div className="text-xl font-bold text-primary-blue">
+              <div className="text-base font-bold text-primary-blue">
                 {formatPrice(property.price)}
               </div>
               {property.listing && (
@@ -431,7 +431,7 @@ export default function PropertyCard({
 
           <p className="text-gray-600 text-sm mb-3 flex items-center">
             <svg
-              className="w-4 h-4 mr-1"
+              className="w-3 h-3 mr-1"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -457,7 +457,7 @@ export default function PropertyCard({
               {property.bedrooms && (
                 <span className="flex items-center">
                   <svg
-                    className="w-4 h-4 mr-1"
+                    className="w-3 h-3 mr-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -481,7 +481,7 @@ export default function PropertyCard({
               {property.bathrooms && (
                 <span className="flex items-center">
                   <svg
-                    className="w-4 h-4 mr-1"
+                    className="w-3 h-3 mr-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
