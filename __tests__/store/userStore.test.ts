@@ -244,7 +244,10 @@ describe('UserStore', () => {
 
     // Update only email
     act(() => {
-      result.current.updateUser({ ...initialUser, email: 'updated@example.com' });
+      result.current.updateUser({
+        ...initialUser,
+        email: 'updated@example.com',
+      });
     });
 
     expect(result.current.user?.email).toBe('updated@example.com');
@@ -271,4 +274,4 @@ describe('UserStore', () => {
     expect(result.current.user).toBeNull();
     expect(result.current.isAuthenticated).toBe(false);
   });
-}); 
+});

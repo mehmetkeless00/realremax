@@ -1,26 +1,17 @@
 'use client';
 
 import { FieldError } from 'react-hook-form';
-import {
-  formatErrorMessage,
-  getErrorMessageClass,
-} from '@/lib/validation/formUtils';
 
-interface ErrorMessageProps {
+export interface ErrorMessageProps {
   error?: FieldError;
   className?: string;
 }
 
-const ErrorMessage = ({ error, className }: ErrorMessageProps) => {
-  if (!error) return null;
-
-  const errorClass = getErrorMessageClass(className);
-
+export function ErrorMessage({ error, className = '' }: ErrorMessageProps) {
+  if (!error || !error.message) return null;
   return (
-    <p className={errorClass} role="alert">
-      {formatErrorMessage(error)}
+    <p className={`text-red-600 text-sm mt-1 ${className}`.trim()}>
+      {error.message}
     </p>
   );
-};
-
-export default ErrorMessage;
+}

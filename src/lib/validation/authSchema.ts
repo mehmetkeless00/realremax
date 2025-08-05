@@ -8,7 +8,7 @@ export const userRegistrationSchema = z
       .email('Please enter a valid email address')
       .max(100, 'Email must be less than 100 characters')
       .trim(),
-    
+
     password: z
       .string()
       .min(8, 'Password must be at least 8 characters')
@@ -17,36 +17,37 @@ export const userRegistrationSchema = z
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
         'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
       ),
-    
+
     confirmPassword: z.string(),
-    
+
     firstName: z
       .string()
       .min(2, 'First name must be at least 2 characters')
       .max(50, 'First name must be less than 50 characters')
       .trim(),
-    
+
     lastName: z
       .string()
       .min(2, 'Last name must be at least 2 characters')
       .max(50, 'Last name must be less than 50 characters')
       .trim(),
-    
+
     role: z.enum(['registered', 'agent']).default('registered'),
-    
+
     phone: z
       .string()
       .regex(/^[\+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number')
       .trim()
       .optional(),
-    
+
     agreeToTerms: z
       .boolean()
-      .refine((val) => val === true, 'You must agree to the terms and conditions'),
-    
-    marketingEmails: z
-      .boolean()
-      .default(false),
+      .refine(
+        (val) => val === true,
+        'You must agree to the terms and conditions'
+      ),
+
+    marketingEmails: z.boolean().default(false),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -55,26 +56,16 @@ export const userRegistrationSchema = z
 
 // User login schema
 export const userLoginSchema = z.object({
-  email: z
-    .string()
-    .email('Please enter a valid email address')
-    .trim(),
-  
-  password: z
-    .string()
-    .min(1, 'Password is required'),
-  
-  rememberMe: z
-    .boolean()
-    .default(false),
+  email: z.string().email('Please enter a valid email address').trim(),
+
+  password: z.string().min(1, 'Password is required'),
+
+  rememberMe: z.boolean().default(false),
 });
 
 // Password reset request schema
 export const passwordResetRequestSchema = z.object({
-  email: z
-    .string()
-    .email('Please enter a valid email address')
-    .trim(),
+  email: z.string().email('Please enter a valid email address').trim(),
 });
 
 // New password schema
@@ -88,7 +79,7 @@ export const newPasswordSchema = z
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
         'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
       ),
-    
+
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -103,37 +94,36 @@ export const profileUpdateSchema = z.object({
     .min(2, 'First name must be at least 2 characters')
     .max(50, 'First name must be less than 50 characters')
     .trim(),
-  
+
   lastName: z
     .string()
     .min(2, 'Last name must be at least 2 characters')
     .max(50, 'Last name must be less than 50 characters')
     .trim(),
-  
+
   phone: z
     .string()
     .regex(/^[\+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number')
     .trim()
     .optional(),
-  
+
   bio: z
     .string()
     .max(500, 'Bio must be less than 500 characters')
     .trim()
     .optional(),
-  
-  avatar: z
-    .string()
-    .url('Must be a valid URL')
+
+  avatar: z.string().url('Must be a valid URL').optional(),
+
+  preferences: z
+    .object({
+      emailNotifications: z.boolean().default(true),
+      smsNotifications: z.boolean().default(false),
+      marketingEmails: z.boolean().default(false),
+      language: z.enum(['en', 'tr', 'nl']).default('en'),
+      currency: z.enum(['USD', 'EUR', 'TRY']).default('EUR'),
+    })
     .optional(),
-  
-  preferences: z.object({
-    emailNotifications: z.boolean().default(true),
-    smsNotifications: z.boolean().default(false),
-    marketingEmails: z.boolean().default(false),
-    language: z.enum(['en', 'tr', 'nl']).default('en'),
-    currency: z.enum(['USD', 'EUR', 'TRY']).default('EUR'),
-  }).optional(),
 });
 
 // Agent profile schema
@@ -143,34 +133,34 @@ export const agentProfileSchema = z.object({
     .min(5, 'License number must be at least 5 characters')
     .max(50, 'License number must be less than 50 characters')
     .trim(),
-  
+
   company: z
     .string()
     .min(2, 'Company name must be at least 2 characters')
     .max(100, 'Company name must be less than 100 characters')
     .trim(),
-  
+
   experience: z
     .number()
     .min(0, 'Experience cannot be negative')
     .max(50, 'Experience cannot exceed 50 years')
     .optional(),
-  
+
   specializations: z
     .array(z.string())
     .max(10, 'Cannot select more than 10 specializations')
     .optional(),
-  
+
   languages: z
     .array(z.enum(['en', 'tr', 'nl', 'de', 'fr', 'es']))
     .min(1, 'At least one language must be selected')
     .max(5, 'Cannot select more than 5 languages'),
-  
+
   serviceAreas: z
     .array(z.string())
     .min(1, 'At least one service area must be selected')
     .max(20, 'Cannot select more than 20 service areas'),
-  
+
   commission: z
     .number()
     .min(0, 'Commission cannot be negative')
@@ -181,10 +171,8 @@ export const agentProfileSchema = z.object({
 // Password change schema
 export const passwordChangeSchema = z
   .object({
-    currentPassword: z
-      .string()
-      .min(1, 'Current password is required'),
-    
+    currentPassword: z.string().min(1, 'Current password is required'),
+
     newPassword: z
       .string()
       .min(8, 'Password must be at least 8 characters')
@@ -193,7 +181,7 @@ export const passwordChangeSchema = z
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
         'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
       ),
-    
+
     confirmNewPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
@@ -207,9 +195,7 @@ export const passwordChangeSchema = z
 
 // Email verification schema
 export const emailVerificationSchema = z.object({
-  token: z
-    .string()
-    .min(1, 'Verification token is required'),
+  token: z.string().min(1, 'Verification token is required'),
 });
 
 // Two-factor authentication schema
@@ -229,7 +215,9 @@ export const socialLoginSchema = z.object({
 // Type exports
 export type UserRegistrationInput = z.infer<typeof userRegistrationSchema>;
 export type UserLoginInput = z.infer<typeof userLoginSchema>;
-export type PasswordResetRequestInput = z.infer<typeof passwordResetRequestSchema>;
+export type PasswordResetRequestInput = z.infer<
+  typeof passwordResetRequestSchema
+>;
 export type NewPasswordInput = z.infer<typeof newPasswordSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 export type AgentProfileInput = z.infer<typeof agentProfileSchema>;
@@ -239,7 +227,9 @@ export type TwoFactorAuthInput = z.infer<typeof twoFactorAuthSchema>;
 export type SocialLoginInput = z.infer<typeof socialLoginSchema>;
 
 // Validation helpers
-export const validateUserRegistration = (data: unknown): UserRegistrationInput => {
+export const validateUserRegistration = (
+  data: unknown
+): UserRegistrationInput => {
   return userRegistrationSchema.parse(data);
 };
 
@@ -247,7 +237,9 @@ export const validateUserLogin = (data: unknown): UserLoginInput => {
   return userLoginSchema.parse(data);
 };
 
-export const validatePasswordResetRequest = (data: unknown): PasswordResetRequestInput => {
+export const validatePasswordResetRequest = (
+  data: unknown
+): PasswordResetRequestInput => {
   return passwordResetRequestSchema.parse(data);
 };
 
@@ -267,7 +259,9 @@ export const validatePasswordChange = (data: unknown): PasswordChangeInput => {
   return passwordChangeSchema.parse(data);
 };
 
-export const validateEmailVerification = (data: unknown): EmailVerificationInput => {
+export const validateEmailVerification = (
+  data: unknown
+): EmailVerificationInput => {
   return emailVerificationSchema.parse(data);
 };
 
@@ -326,4 +320,4 @@ export const safeValidateAgentProfile = (data: unknown) => {
   } catch (error) {
     return { success: false, error: error as z.ZodError };
   }
-}; 
+};

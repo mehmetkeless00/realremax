@@ -73,7 +73,7 @@ describe('Authentication Flow', () => {
 
     it('should validate email format', async () => {
       const invalidEmail = 'invalid-email';
-      
+
       try {
         await signInWithEmail(invalidEmail, 'password123');
       } catch (error) {
@@ -103,7 +103,11 @@ describe('Authentication Flow', () => {
         error: null,
       });
 
-      const result = await signUpWithEmail('newuser@example.com', 'password123', 'registered');
+      const result = await signUpWithEmail(
+        'newuser@example.com',
+        'password123',
+        'registered'
+      );
 
       expect(result.data.user).toEqual(mockUser);
       expect(result.error).toBeNull();
@@ -122,7 +126,7 @@ describe('Authentication Flow', () => {
 
     it('should validate password strength', async () => {
       const weakPassword = '123';
-      
+
       try {
         await signUpWithEmail('test@example.com', weakPassword);
       } catch (error) {
@@ -142,7 +146,11 @@ describe('Authentication Flow', () => {
         error: null,
       });
 
-      const result = await signUpWithEmail('agent@example.com', 'password123', 'agent');
+      const result = await signUpWithEmail(
+        'agent@example.com',
+        'password123',
+        'agent'
+      );
 
       expect(result.data.user.role).toBe('agent');
     });
@@ -174,7 +182,7 @@ describe('Authentication Flow', () => {
 
     it('should validate email format for password reset', async () => {
       const invalidEmail = 'invalid-email';
-      
+
       try {
         await resetPassword(invalidEmail);
       } catch (error) {
@@ -200,7 +208,7 @@ describe('Authentication Flow', () => {
 
       // Simulate page reload
       const store = useUserStore();
-      
+
       expect(store.user).toEqual(mockUser);
       expect(store.isAuthenticated).toBe(true);
     });
@@ -214,7 +222,7 @@ describe('Authentication Flow', () => {
       });
 
       const store = useUserStore();
-      
+
       expect(store.user).toBeNull();
       expect(store.isAuthenticated).toBe(false);
     });
@@ -229,7 +237,7 @@ describe('Authentication Flow', () => {
       });
 
       const store = useUserStore();
-      
+
       expect(store.role).toBe('visitor');
     });
 
@@ -247,7 +255,7 @@ describe('Authentication Flow', () => {
       });
 
       const store = useUserStore();
-      
+
       expect(store.role).toBe('registered');
     });
 
@@ -265,7 +273,7 @@ describe('Authentication Flow', () => {
       });
 
       const store = useUserStore();
-      
+
       expect(store.role).toBe('agent');
     });
   });
@@ -304,4 +312,4 @@ describe('Authentication Flow', () => {
       }
     });
   });
-}); 
+});

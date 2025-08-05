@@ -195,7 +195,11 @@ describe('Image Optimization Utils', () => {
       const originalHeight = 1080;
       const maxWidth = 800;
 
-      const dimensions = getImageDimensions(originalWidth, originalHeight, maxWidth);
+      const dimensions = getImageDimensions(
+        originalWidth,
+        originalHeight,
+        maxWidth
+      );
 
       const aspectRatio = originalWidth / originalHeight;
       const newAspectRatio = dimensions.width / dimensions.height;
@@ -233,7 +237,7 @@ describe('Image Optimization Utils', () => {
   describe('Integration Tests', () => {
     it('should work together for complete image optimization workflow', () => {
       const file = new File(['test'], 'test-image.jpg', { type: 'image/jpeg' });
-      
+
       // Validate file
       const validation = validateImageFile(file);
       expect(validation.isValid).toBe(true);
@@ -253,14 +257,19 @@ describe('Image Optimization Utils', () => {
       expect(dimensions.height).toBe(450);
 
       // Get placeholder
-      const placeholder = getImagePlaceholder(dimensions.width, dimensions.height);
+      const placeholder = getImagePlaceholder(
+        dimensions.width,
+        dimensions.height
+      );
       expect(placeholder).toContain('width="800"');
       expect(placeholder).toContain('height="450"');
     });
 
     it('should handle error cases gracefully', () => {
       // Invalid file
-      const invalidFile = new File(['test'], 'test.exe', { type: 'application/x-msdownload' });
+      const invalidFile = new File(['test'], 'test.exe', {
+        type: 'application/x-msdownload',
+      });
       const validation = validateImageFile(invalidFile);
       expect(validation.isValid).toBe(false);
 
@@ -275,4 +284,4 @@ describe('Image Optimization Utils', () => {
       expect(dimensions.height).toBe(600);
     });
   });
-}); 
+});

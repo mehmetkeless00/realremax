@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
@@ -5,8 +6,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { propertySchema, PropertyInput } from '@/lib/validation/propertySchema';
 import { useUIStore } from '@/lib/store';
-import FormField from './FormField';
-import ErrorMessage from './ErrorMessage';
 
 const propertyTypes = [
   { value: 'apartment', label: 'Apartment' },
@@ -55,20 +54,20 @@ export default function PropertyListingForm() {
     reset,
     setValue,
   } = useForm<PropertyInput>({
-    resolver: zodResolver(propertySchema),
+    resolver: zodResolver(propertySchema) as any,
     mode: 'onChange',
     defaultValues: {
       title: '',
       description: '',
-      price: 0,
+      price: 1,
       location: '',
       type: 'apartment',
+      listing_type: 'sale',
+      status: 'active',
       bedrooms: 0,
       bathrooms: 0,
-      size: 0,
+      size: 1,
       year_built: new Date().getFullYear(),
-      status: 'active',
-      listing_type: 'sale',
       amenities: [],
       address: '',
       city: '',
@@ -76,7 +75,7 @@ export default function PropertyListingForm() {
       country: 'Netherlands',
       latitude: 0,
       longitude: 0,
-      images: [],
+      photos: [],
     },
   });
 
@@ -97,18 +96,15 @@ export default function PropertyListingForm() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       console.log('Form data:', data);
-
       addToast({
         type: 'success',
         message: 'Property listed successfully!',
       });
 
-      // Reset form
       reset();
       setSelectedAmenities([]);
     } catch (error) {
       console.error('Error submitting form:', error);
-
       addToast({
         type: 'error',
         message: 'Failed to list property. Please try again.',
@@ -119,245 +115,386 @@ export default function PropertyListingForm() {
   };
 
   const handleReset = () => {
-    reset();
-    setSelectedAmenities([]);
-    addToast({
-      type: 'info',
-      message: 'Form has been reset',
-    });
+    if (window.confirm('Are you sure you want to reset the form?')) {
+      reset();
+      setSelectedAmenities([]);
+      addToast({
+        type: 'info',
+        message: 'Form has been reset.',
+      });
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <div className="mb-6">
-        <h2 className="text-base font-bold text-gray-900 mb-2">
-          List Your Property
-        </h2>
-        <p className="text-gray-600">
-          Fill out the form below to list your property. All fields marked with
-          * are required.
-        </p>
-      </div>
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">
+        List Your Property
+      </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Basic Information */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Basic Information
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label="Property Title"
-              name="title"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Property Title *
+            </label>
+            <input
+              {...register('title')}
               type="text"
               placeholder="Enter property title"
-              required
-              register={register}
-              error={errors.title}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.title ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
-
-            <FormField
-              label="Price"
-              name="price"
-              type="number"
-              placeholder="Enter price"
-              required
-              min={1}
-              max={10000000}
-              step={1000}
-              register={register}
-              error={errors.price}
-            />
-
-            <FormField
-              label="Location"
-              name="location"
-              type="text"
-              placeholder="Enter location"
-              required
-              register={register}
-              error={errors.location}
-            />
-
-            <FormField
-              label="Property Type"
-              name="type"
-              type="select"
-              required
-              options={propertyTypes}
-              register={register}
-              error={errors.type}
-            />
-
-            <FormField
-              label="Listing Type"
-              name="listing_type"
-              type="select"
-              required
-              options={listingTypes}
-              register={register}
-              error={errors.listing_type}
-            />
-
-            <FormField
-              label="Status"
-              name="status"
-              type="select"
-              required
-              options={statusOptions}
-              register={register}
-              error={errors.status}
-            />
+            {errors.title && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.title.message}
+              </p>
+            )}
           </div>
 
-          <div className="mt-4">
-            <FormField
-              label="Description"
-              name="description"
-              type="textarea"
-              placeholder="Describe your property..."
-              rows={4}
-              register={register}
-              error={errors.description}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Price *
+            </label>
+            <input
+              {...register('price', { valueAsNumber: true })}
+              type="number"
+              placeholder="Enter price"
+              min="1"
+              max="10000000"
+              step="0.01"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.price ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {errors.price && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.price.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Location *
+            </label>
+            <input
+              {...register('location')}
+              type="text"
+              placeholder="Enter location"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.location ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.location && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.location.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Property Type *
+            </label>
+            <select
+              {...register('type')}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.type ? 'border-red-500' : 'border-gray-300'
+              }`}
+            >
+              <option value="">Select property type</option>
+              {propertyTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+            {errors.type && (
+              <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Listing Type *
+            </label>
+            <select
+              {...register('listing_type')}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.listing_type ? 'border-red-500' : 'border-gray-300'
+              }`}
+            >
+              <option value="">Select listing type</option>
+              {listingTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+            {errors.listing_type && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.listing_type.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status *
+            </label>
+            <select
+              {...register('status')}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.status ? 'border-red-500' : 'border-gray-300'
+              }`}
+            >
+              <option value="">Select status</option>
+              {statusOptions.map((status) => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
+            {errors.status && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.status.message}
+              </p>
+            )}
           </div>
         </div>
 
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Description
+          </label>
+          <textarea
+            {...register('description')}
+            rows={4}
+            placeholder="Describe your property..."
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+              errors.description ? 'border-red-500' : 'border-gray-300'
+            }`}
+          />
+          {errors.description && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.description.message}
+            </p>
+          )}
+        </div>
+
         {/* Property Details */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Property Details
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormField
-              label="Bedrooms"
-              name="bedrooms"
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Bedrooms
+            </label>
+            <input
+              {...register('bedrooms', { valueAsNumber: true })}
               type="number"
-              min={0}
-              max={20}
-              register={register}
-              error={errors.bedrooms}
+              min="0"
+              max="20"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.bedrooms ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {errors.bedrooms && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.bedrooms.message}
+              </p>
+            )}
+          </div>
 
-            <FormField
-              label="Bathrooms"
-              name="bathrooms"
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Bathrooms
+            </label>
+            <input
+              {...register('bathrooms', { valueAsNumber: true })}
               type="number"
-              min={0}
-              max={10}
-              step={0.5}
-              register={register}
-              error={errors.bathrooms}
+              min="0"
+              max="20"
+              step="0.5"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.bathrooms ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {errors.bathrooms && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.bathrooms.message}
+              </p>
+            )}
+          </div>
 
-            <FormField
-              label="Size (sq ft)"
-              name="size"
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Size (sq ft)
+            </label>
+            <input
+              {...register('size', { valueAsNumber: true })}
               type="number"
-              min={1}
-              max={10000}
-              register={register}
-              error={errors.size}
+              min="1"
+              max="10000"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.size ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {errors.size && (
+              <p className="mt-1 text-sm text-red-600">{errors.size.message}</p>
+            )}
+          </div>
 
-            <FormField
-              label="Year Built"
-              name="year_built"
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Year Built
+            </label>
+            <input
+              {...register('year_built', { valueAsNumber: true })}
               type="number"
-              min={1800}
-              max={new Date().getFullYear() + 1}
-              register={register}
-              error={errors.year_built}
+              min="1900"
+              max={new Date().getFullYear()}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.year_built ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {errors.year_built && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.year_built.message}
+              </p>
+            )}
           </div>
         </div>
 
         {/* Address Information */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Address Information
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label="Address"
-              name="address"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Address
+            </label>
+            <input
+              {...register('address')}
               type="text"
-              placeholder="Enter full address"
-              required
-              register={register}
-              error={errors.address}
+              placeholder="Enter address"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.address ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
-
-            <FormField
-              label="City"
-              name="city"
-              type="text"
-              placeholder="Enter city"
-              required
-              register={register}
-              error={errors.city}
-            />
-
-            <FormField
-              label="Postal Code"
-              name="postal_code"
-              type="text"
-              placeholder="Enter postal code"
-              required
-              register={register}
-              error={errors.postal_code}
-            />
-
-            <FormField
-              label="Country"
-              name="country"
-              type="text"
-              placeholder="Enter country"
-              required
-              register={register}
-              error={errors.country}
-            />
+            {errors.address && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.address.message}
+              </p>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <FormField
-              label="Latitude"
-              name="latitude"
-              type="number"
-              min={-90}
-              max={90}
-              step={0.000001}
-              register={register}
-              error={errors.latitude}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              City
+            </label>
+            <input
+              {...register('city')}
+              type="text"
+              placeholder="Enter city"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.city ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {errors.city && (
+              <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
+            )}
+          </div>
 
-            <FormField
-              label="Longitude"
-              name="longitude"
-              type="number"
-              min={-180}
-              max={180}
-              step={0.000001}
-              register={register}
-              error={errors.longitude}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Postal Code
+            </label>
+            <input
+              {...register('postal_code')}
+              type="text"
+              placeholder="Enter postal code"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.postal_code ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {errors.postal_code && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.postal_code.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Country
+            </label>
+            <input
+              {...register('country')}
+              type="text"
+              placeholder="Enter country"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.country ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.country && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.country.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Coordinates */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Latitude
+            </label>
+            <input
+              {...register('latitude', { valueAsNumber: true })}
+              type="number"
+              step="any"
+              placeholder="Enter latitude"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.latitude ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.latitude && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.latitude.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Longitude
+            </label>
+            <input
+              {...register('longitude', { valueAsNumber: true })}
+              type="number"
+              step="any"
+              placeholder="Enter longitude"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue sm:text-sm ${
+                errors.longitude ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.longitude && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.longitude.message}
+              </p>
+            )}
           </div>
         </div>
 
         {/* Amenities */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Amenities
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          </label>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {amenitiesList.map((amenity) => (
-              <label
-                key={amenity}
-                className="flex items-center space-x-2 cursor-pointer"
-              >
+              <label key={amenity} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={selectedAmenities.includes(amenity)}
@@ -369,67 +506,43 @@ export default function PropertyListingForm() {
             ))}
           </div>
           {errors.amenities && (
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            <ErrorMessage error={errors.amenities as any} />
+            <p className="mt-1 text-sm text-red-600">
+              {errors.amenities.message}
+            </p>
           )}
         </div>
 
         {/* Form Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-end">
+        <div className="flex justify-end space-x-4 pt-6 border-t">
           <button
             type="button"
             onClick={handleReset}
-            disabled={isSubmitting}
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue"
           >
-            Reset Form
+            Reset
           </button>
-
           <button
             type="submit"
-            disabled={isSubmitting || !isValid || !isDirty}
-            className="px-6 py-2 bg-primary-blue text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            disabled={isSubmitting || !isValid}
+            className="px-4 py-2 text-sm font-medium text-white bg-primary-blue border border-transparent rounded-md hover:bg-primary-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Submitting...
-              </>
-            ) : (
-              'List Property'
-            )}
+            {isSubmitting ? 'Listing Property...' : 'List Property'}
           </button>
         </div>
 
-        {/* Form Status */}
-        <div className="text-sm text-gray-600">
-          <p>Form Status: {isDirty ? 'Modified' : 'Unchanged'}</p>
-          <p>Validation: {isValid ? 'Valid' : 'Invalid'}</p>
-          {Object.keys(errors).length > 0 && (
-            <p className="text-red-600">
-              Errors: {Object.keys(errors).length} field(s) have errors
-            </p>
-          )}
-        </div>
+        {/* Debug Information (Development Only) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-6 p-4 bg-gray-100 rounded-md">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">
+              Debug Info:
+            </h3>
+            <div className="text-xs text-gray-600 space-y-1">
+              <p>Form is dirty: {isDirty ? 'Yes' : 'No'}</p>
+              <p>Form is valid: {isValid ? 'Yes' : 'No'}</p>
+              <p>Errors: {Object.keys(errors).length}</p>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

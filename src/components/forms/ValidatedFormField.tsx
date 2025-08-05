@@ -1,13 +1,28 @@
 'use client';
 
 import React from 'react';
-import { FieldError, UseFormRegister, Path, FieldValues } from 'react-hook-form';
+import {
+  FieldError,
+  UseFormRegister,
+  Path,
+  FieldValues,
+} from 'react-hook-form';
 import { cn } from '@/lib/utils';
 
 interface ValidatedFormFieldProps<T extends FieldValues> {
   label: string;
   name: Path<T>;
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'textarea' | 'select' | 'checkbox' | 'radio';
+  type?:
+    | 'text'
+    | 'email'
+    | 'password'
+    | 'number'
+    | 'tel'
+    | 'url'
+    | 'textarea'
+    | 'select'
+    | 'checkbox'
+    | 'radio';
   placeholder?: string;
   register: UseFormRegister<T>;
   error?: FieldError;
@@ -27,7 +42,7 @@ interface ValidatedFormFieldProps<T extends FieldValues> {
   autoFocus?: boolean;
   readOnly?: boolean;
   value?: string | number;
-  onChange?: (value: any) => void;
+  onChange?: (value: string | number | boolean) => void;
   onBlur?: () => void;
   onFocus?: () => void;
   helpText?: string;
@@ -39,7 +54,7 @@ interface ValidatedFormFieldProps<T extends FieldValues> {
     min?: number;
     max?: number;
     pattern?: RegExp;
-    validate?: (value: any) => boolean | string;
+    validate?: (value: string | number | boolean) => boolean | string;
   };
 }
 
@@ -97,10 +112,7 @@ export function ValidatedFormField<T extends FieldValues>({
     labelClassName
   );
 
-  const baseErrorClasses = cn(
-    'mt-1 text-sm text-red-600',
-    errorClassName
-  );
+  const baseErrorClasses = cn('mt-1 text-sm text-red-600', errorClassName);
 
   const renderField = () => {
     const commonProps = {
@@ -112,7 +124,11 @@ export function ValidatedFormField<T extends FieldValues>({
       autoComplete,
       autoFocus,
       readOnly,
-      'aria-describedby': error ? `${name}-error` : helpText ? `${name}-help` : undefined,
+      'aria-describedby': error
+        ? `${name}-error`
+        : helpText
+          ? `${name}-help`
+          : undefined,
     };
 
     switch (type) {
@@ -150,7 +166,10 @@ export function ValidatedFormField<T extends FieldValues>({
             <input
               {...commonProps}
               type="checkbox"
-              className={cn(baseInputClasses, 'w-4 h-4 text-primary-blue focus:ring-primary-blue border-gray-300 rounded')}
+              className={cn(
+                baseInputClasses,
+                'w-4 h-4 text-primary-blue focus:ring-primary-blue border-gray-300 rounded'
+              )}
             />
             <label htmlFor={name} className={cn(baseLabelClasses, 'ml-2 mb-0')}>
               {label}
@@ -167,9 +186,15 @@ export function ValidatedFormField<T extends FieldValues>({
                   {...commonProps}
                   type="radio"
                   value={option.value}
-                  className={cn(baseInputClasses, 'w-4 h-4 text-primary-blue focus:ring-primary-blue border-gray-300')}
+                  className={cn(
+                    baseInputClasses,
+                    'w-4 h-4 text-primary-blue focus:ring-primary-blue border-gray-300'
+                  )}
                 />
-                <label htmlFor={`${name}-${option.value}`} className={cn(baseLabelClasses, 'ml-2 mb-0')}>
+                <label
+                  htmlFor={`${name}-${option.value}`}
+                  className={cn(baseLabelClasses, 'ml-2 mb-0')}
+                >
                   {option.label}
                 </label>
               </div>
@@ -234,42 +259,62 @@ export function ValidatedFormField<T extends FieldValues>({
 }
 
 // Specialized form field components
-export function TextField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function TextField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="text" />;
 }
 
-export function EmailField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function EmailField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="email" />;
 }
 
-export function PasswordField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function PasswordField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="password" />;
 }
 
-export function NumberField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function NumberField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="number" />;
 }
 
-export function PhoneField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function PhoneField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="tel" />;
 }
 
-export function UrlField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function UrlField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="url" />;
 }
 
-export function TextAreaField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function TextAreaField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="textarea" />;
 }
 
-export function SelectField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function SelectField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="select" />;
 }
 
-export function CheckboxField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function CheckboxField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="checkbox" />;
 }
 
-export function RadioField<T extends FieldValues>(props: Omit<ValidatedFormFieldProps<T>, 'type'>) {
+export function RadioField<T extends FieldValues>(
+  props: Omit<ValidatedFormFieldProps<T>, 'type'>
+) {
   return <ValidatedFormField<T> {...props} type="radio" />;
-} 
+}

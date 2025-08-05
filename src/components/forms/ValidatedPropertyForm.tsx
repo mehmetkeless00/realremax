@@ -1,10 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { propertySchema, PropertyInput } from '@/lib/validation/propertySchema';
-import { ValidatedFormField, TextField, NumberField, SelectField, TextAreaField } from './ValidatedFormField';
+import {
+  TextField,
+  NumberField,
+  SelectField,
+  TextAreaField,
+} from './ValidatedFormField';
 import { useUIStore } from '@/lib/store';
 
 const propertyTypeOptions = [
@@ -58,7 +64,7 @@ export function ValidatedPropertyForm({
     reset,
     watch,
   } = useForm<PropertyInput>({
-    resolver: zodResolver(propertySchema),
+    resolver: zodResolver(propertySchema) as any,
     mode: 'onBlur',
     defaultValues: {
       status: 'active',
@@ -81,7 +87,8 @@ export function ValidatedPropertyForm({
     } catch (error) {
       addToast({
         type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to create property',
+        message:
+          error instanceof Error ? error.message : 'Failed to create property',
       });
     } finally {
       setIsSubmitting(false);
@@ -90,7 +97,9 @@ export function ValidatedPropertyForm({
 
   const handleCancel = () => {
     if (isDirty) {
-      if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
+      if (
+        confirm('Are you sure you want to cancel? All changes will be lost.')
+      ) {
         reset();
         onCancel?.();
       }
@@ -102,15 +111,21 @@ export function ValidatedPropertyForm({
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Property Information</h2>
-        <p className="text-gray-600 mt-1">Fill in the details below to create a new property listing.</p>
+        <h2 className="text-2xl font-bold text-gray-900">
+          Property Information
+        </h2>
+        <p className="text-gray-600 mt-1">
+          Fill in the details below to create a new property listing.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         {/* Basic Information */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Basic Information</h3>
-          
+          <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+            Basic Information
+          </h3>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TextField
               label="Title"
@@ -177,8 +192,10 @@ export function ValidatedPropertyForm({
 
         {/* Property Details */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Property Details</h3>
-          
+          <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+            Property Details
+          </h3>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <NumberField
               label="Bedrooms"
@@ -226,8 +243,10 @@ export function ValidatedPropertyForm({
 
         {/* Address Information */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Address Information</h3>
-          
+          <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+            Address Information
+          </h3>
+
           <TextField
             label="Address"
             name="address"
@@ -270,8 +289,10 @@ export function ValidatedPropertyForm({
 
         {/* Description */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Description</h3>
-          
+          <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+            Description
+          </h3>
+
           <TextAreaField
             label="Description"
             name="description"
@@ -327,20 +348,26 @@ export function ValidatedPropertyForm({
       {/* Debug Information (Development Only) */}
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-          <h4 className="font-semibold text-gray-900 mb-2">Debug Information</h4>
+          <h4 className="font-semibold text-gray-900 mb-2">
+            Debug Information
+          </h4>
           <div className="text-sm text-gray-600 space-y-1">
             <p>Form Valid: {isValid ? 'Yes' : 'No'}</p>
             <p>Form Dirty: {isDirty ? 'Yes' : 'No'}</p>
             <p>Error Count: {Object.keys(errors).length}</p>
             <details className="mt-2">
-              <summary className="cursor-pointer font-medium">Current Values</summary>
+              <summary className="cursor-pointer font-medium">
+                Current Values
+              </summary>
               <pre className="mt-2 text-xs bg-white p-2 rounded overflow-auto">
                 {JSON.stringify(watchedValues, null, 2)}
               </pre>
             </details>
             {Object.keys(errors).length > 0 && (
               <details className="mt-2">
-                <summary className="cursor-pointer font-medium text-red-600">Errors</summary>
+                <summary className="cursor-pointer font-medium text-red-600">
+                  Errors
+                </summary>
                 <pre className="mt-2 text-xs bg-red-50 p-2 rounded overflow-auto text-red-600">
                   {JSON.stringify(errors, null, 2)}
                 </pre>
@@ -351,4 +378,4 @@ export function ValidatedPropertyForm({
       )}
     </div>
   );
-} 
+}

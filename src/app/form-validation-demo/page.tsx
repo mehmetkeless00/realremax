@@ -8,9 +8,9 @@ export default function FormValidationDemoPage() {
   const handleSubmit = async (data: PropertyInput) => {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    
+
     console.log('Form submitted with data:', data);
-    
+
     // Simulate success
     return Promise.resolve();
   };
@@ -28,7 +28,8 @@ export default function FormValidationDemoPage() {
               Form Validation Demo
             </h1>
             <p className="text-gray-600">
-              This page demonstrates the Zod + React Hook Form validation system with comprehensive form validation.
+              This page demonstrates the Zod + React Hook Form validation system
+              with comprehensive form validation.
             </p>
           </div>
 
@@ -123,7 +124,8 @@ export default function FormValidationDemoPage() {
                 </h3>
                 <div className="space-y-2 text-sm text-gray-600">
                   <div>
-                    <strong>Empty Form:</strong> Submit without filling required fields
+                    <strong>Empty Form:</strong> Submit without filling required
+                    fields
                   </div>
                   <div>
                     <strong>Invalid Price:</strong> Enter 0 or negative numbers
@@ -138,7 +140,8 @@ export default function FormValidationDemoPage() {
                     <strong>Future Year:</strong> Enter year after current year
                   </div>
                   <div>
-                    <strong>Character Limits:</strong> Test max length validations
+                    <strong>Character Limits:</strong> Test max length
+                    validations
                   </div>
                 </div>
               </div>
@@ -148,4 +151,4 @@ export default function FormValidationDemoPage() {
       </div>
     </div>
   );
-} 
+}

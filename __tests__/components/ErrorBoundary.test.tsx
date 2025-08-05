@@ -11,7 +11,13 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
 };
 
 // Error fallback component
-const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
+const ErrorFallback = ({
+  error,
+  resetErrorBoundary,
+}: {
+  error: Error;
+  resetErrorBoundary: () => void;
+}) => (
   <div role="alert">
     <h2>Something went wrong:</h2>
     <pre>{error.message}</pre>
@@ -55,7 +61,7 @@ describe('Error Boundary', () => {
 
   it('calls resetErrorBoundary when try again button is clicked', () => {
     const mockReset = jest.fn();
-    
+
     render(
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <ThrowError shouldThrow={true} />
@@ -99,7 +105,9 @@ describe('Error Boundary', () => {
   });
 
   it('logs error to console', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
     render(
       <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -125,11 +133,19 @@ describe('Error Boundary', () => {
     );
 
     expect(screen.getByText('First error')).toBeInTheDocument();
-    expect(screen.queryByText('This should not render')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('This should not render')
+    ).not.toBeInTheDocument();
   });
 
   it('provides error information to fallback component', () => {
-    const CustomErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
+    const CustomErrorFallback = ({
+      error,
+      resetErrorBoundary,
+    }: {
+      error: Error;
+      resetErrorBoundary: () => void;
+    }) => (
       <div role="alert">
         <h2>Custom Error Handler</h2>
         <p>Error name: {error.name}</p>
@@ -235,4 +251,4 @@ describe('Error Boundary', () => {
 
     expect(screen.getByText('useEffect error')).toBeInTheDocument();
   });
-}); 
+});
