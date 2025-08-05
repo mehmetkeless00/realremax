@@ -1,252 +1,307 @@
-import { FieldError } from 'react-hook-form';
+import { z } from 'zod';
+import { useForm, UseFormProps, FieldValues, Path, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-// Error message component props
-export interface ErrorMessageProps {
-  error?: FieldError;
-  className?: string;
+// Generic form hook with Zod validation
+export function useValidatedForm<T extends FieldValues>(
+  schema: z.ZodSchema<T>,
+  options?: Omit<UseFormProps<T>, 'resolver'>
+): UseFormReturn<T> {
+  return useForm<T>({
+    resolver: zodResolver(schema as any),
+    mode: 'onBlur', // Validate on blur for better UX
+    ...options,
+  });
 }
 
-// Form field props
-export interface FormFieldProps {
-  label: string;
-  name: string;
-  type?:
-    | 'text'
-    | 'email'
-    | 'password'
-    | 'number'
-    | 'tel'
-    | 'url'
-    | 'textarea'
-    | 'select';
-  placeholder?: string;
-  required?: boolean;
-  disabled?: boolean;
-  options?: { value: string; label: string }[];
-  className?: string;
-  error?: FieldError;
+// Form validation helpers
+export function createFormValidator<T extends FieldValues>(schema: z.ZodSchema<T>) {
+  return {
+    validate: (data: unknown): T => schema.parse(data),
+    validateSafe: (data: unknown) => {
+      try {
+        return { success: true, data: schema.parse(data) };
+      } catch (error) {
+        return { success: false, error: error as z.ZodError };
+      }
+    },
+    validatePartial: (data: unknown) => {
+      try {
+        return { success: true, data: schema.partial().parse(data) };
+      } catch (error) {
+        return { success: false, error: error as z.ZodError };
+      }
+    },
+  };
 }
 
-// Common form validation patterns
-export const validationPatterns = {
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^[\+]?[1-9][\d]{0,15}$/,
-  password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-  url: /^https?:\/\/.+/,
-  postalCode: /^[A-Za-z0-9\s\-]{4,10}$/,
-};
+// Field validation helpers
+export function createFieldValidator<T extends FieldValues>(
+  schema: z.ZodSchema<T>,
+  fieldName: Path<T>
+) {
+  return {
+    validateField: (value: unknown) => {
+      try {
+        const fieldSchema = schema.shape[fieldName as keyof z.infer<typeof schema>];
+        if (fieldSchema) {
+          fieldSchema.parse(value);
+          return { success: true };
+        }
+        return { success: false, error: new Error('Field not found in schema') };
+      } catch (error) {
+        return { success: false, error: error as z.ZodError };
+      }
+    },
+  };
+}
 
-// Common error messages
-export const errorMessages = {
-  required: 'This field is required',
-  email: 'Please enter a valid email address',
-  minLength: (min: number) => `Must be at least ${min} characters`,
-  maxLength: (max: number) => `Must be less than ${max} characters`,
-  min: (min: number) => `Must be at least ${min}`,
-  max: (max: number) => `Must be less than ${max}`,
-  invalidFormat: 'Invalid format',
-  passwordsDontMatch: "Passwords don't match",
-};
+// Form submission helpers
+export function createFormSubmitHandler<T extends FieldValues>(
+  schema: z.ZodSchema<T>,
+  onSubmit: (data: T) => Promise<void> | void,
+  onError?: (error: z.ZodError) => void
+) {
+  return async (data: unknown) => {
+    try {
+      const validatedData = schema.parse(data);
+      await onSubmit(validatedData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        onError?.(error);
+      } else {
+        throw error;
+      }
+    }
+  };
+}
 
-// Format validation error message
-export const formatErrorMessage = (error: FieldError): string => {
-  if (error.message) {
-    return error.message;
+// Async validation helpers
+export function createAsyncValidator<T extends FieldValues>(
+  schema: z.ZodSchema<T>,
+  asyncValidations: Record<string, (value: any) => Promise<boolean | string>>
+) {
+  return {
+    validateAsync: async (data: unknown): Promise<T> => {
+      // First validate with Zod schema
+      const validatedData = schema.parse(data);
+      
+      // Then run async validations
+      for (const [field, validator] of Object.entries(asyncValidations)) {
+        const value = validatedData[field as keyof T];
+        const result = await validator(value);
+        if (result !== true) {
+          throw new z.ZodError([
+            {
+              code: 'custom',
+              path: [field],
+              message: typeof result === 'string' ? result : 'Validation failed',
+            },
+          ]);
+        }
+      }
+      
+      return validatedData;
+    },
+  };
+}
+
+// Form state helpers
+export function getFormErrors<T extends FieldValues>(
+  form: UseFormReturn<T>
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+  
+  Object.keys(form.formState.errors).forEach((key) => {
+    const error = form.formState.errors[key as Path<T>];
+    if (error?.message) {
+      errors[key] = error.message;
+    }
+  });
+  
+  return errors;
+}
+
+export function hasFormErrors<T extends FieldValues>(
+  form: UseFormReturn<T>
+): boolean {
+  return Object.keys(form.formState.errors).length > 0;
+}
+
+export function isFormValid<T extends FieldValues>(
+  form: UseFormReturn<T>
+): boolean {
+  return form.formState.isValid && !hasFormErrors(form);
+}
+
+// Form reset helpers
+export function resetFormWithData<T extends FieldValues>(
+  form: UseFormReturn<T>,
+  data: Partial<T>
+) {
+  form.reset(data as T);
+}
+
+export function clearFormErrors<T extends FieldValues>(
+  form: UseFormReturn<T>
+) {
+  form.clearErrors();
+}
+
+// Field focus helpers
+export function focusField<T extends FieldValues>(
+  form: UseFormReturn<T>,
+  fieldName: Path<T>
+) {
+  const element = document.getElementById(fieldName);
+  if (element) {
+    element.focus();
   }
+}
 
-  switch (error.type) {
-    case 'required':
-      return errorMessages.required;
-    case 'minLength':
-      return errorMessages.minLength(
-        (error.ref as HTMLInputElement)?.minLength || 0
-      );
-    case 'maxLength':
-      return errorMessages.maxLength(
-        (error.ref as HTMLInputElement)?.maxLength || 0
-      );
-    case 'min':
-      return errorMessages.min(
-        Number((error.ref as HTMLInputElement)?.min) || 0
-      );
-    case 'max':
-      return errorMessages.max(
-        Number((error.ref as HTMLInputElement)?.max) || 0
-      );
-    case 'pattern':
-      return errorMessages.invalidFormat;
-    default:
-      return 'Invalid input';
+export function focusFirstError<T extends FieldValues>(
+  form: UseFormReturn<T>
+) {
+  const firstError = Object.keys(form.formState.errors)[0];
+  if (firstError) {
+    focusField(form, firstError as Path<T>);
   }
-};
+}
 
-// Format currency
-export const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+// Form validation modes
+export const VALIDATION_MODES = {
+  ON_BLUR: 'onBlur',
+  ON_CHANGE: 'onChange',
+  ON_SUBMIT: 'onSubmit',
+  ON_TOUCH: 'onTouched',
+  ALL: 'all',
+} as const;
 
-// Parse currency string to number
-export const parseCurrency = (value: string): number => {
-  return parseFloat(value.replace(/[$,]/g, '')) || 0;
-};
+// Common validation patterns
+export const VALIDATION_PATTERNS = {
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  PHONE: /^[\+]?[1-9][\d]{0,15}$/,
+  POSTAL_CODE: /^[A-Z0-9\s-]{3,10}$/i,
+  PASSWORD: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+  URL: /^https?:\/\/.+/,
+  ALPHA_NUMERIC: /^[a-zA-Z0-9]+$/,
+  ALPHA_ONLY: /^[a-zA-Z\s]+$/,
+  NUMERIC_ONLY: /^[0-9]+$/,
+  DECIMAL: /^\d+(\.\d{1,2})?$/,
+} as const;
 
-// Format phone number
-export const formatPhoneNumber = (value: string): string => {
-  const cleaned = value.replace(/\D/g, '');
-  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-  if (match) {
-    return `(${match[1]}) ${match[2]}-${match[3]}`;
-  }
-  return value;
-};
+// Common validation messages
+export const VALIDATION_MESSAGES = {
+  REQUIRED: 'This field is required',
+  EMAIL: 'Please enter a valid email address',
+  PHONE: 'Please enter a valid phone number',
+  MIN_LENGTH: (min: number) => `Must be at least ${min} characters`,
+  MAX_LENGTH: (max: number) => `Must be less than ${max} characters`,
+  MIN_VALUE: (min: number) => `Must be at least ${min}`,
+  MAX_VALUE: (max: number) => `Must be less than ${max}`,
+  PATTERN: 'Please enter a valid value',
+  PASSWORD_MATCH: "Passwords don't match",
+  UNIQUE: 'This value already exists',
+  INVALID_FORMAT: 'Invalid format',
+} as const;
 
-// Parse phone number
-export const parsePhoneNumber = (value: string): string => {
-  return value.replace(/\D/g, '');
-};
-
-// Validate file upload
-export const validateFileUpload = (
-  file: File,
-  maxSize: number = 5 * 1024 * 1024, // 5MB
-  allowedTypes: string[] = ['image/jpeg', 'image/png', 'image/webp']
-): { isValid: boolean; error?: string } => {
-  if (!file) {
-    return { isValid: false, error: 'No file selected' };
-  }
-
-  if (file.size > maxSize) {
-    return {
-      isValid: false,
-      error: `File size must be less than ${maxSize / 1024 / 1024}MB`,
-    };
-  }
-
-  if (!allowedTypes.includes(file.type)) {
-    return {
-      isValid: false,
-      error: `File type must be one of: ${allowedTypes.join(', ')}`,
-    };
-  }
-
-  return { isValid: true };
-};
-
-// Debounce function for search inputs
-export const debounce = <T extends (...args: unknown[]) => unknown>(
+// Form validation utilities
+export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
-): ((...args: Parameters<T>) => void) => {
+): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
-
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
-};
+}
 
-// Form submission handler with loading state
-export const createFormSubmitHandler = <T>(
-  onSubmit: (data: T) => Promise<void>,
-  onError?: (error: unknown) => void
-) => {
-  return async (data: T) => {
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean;
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+}
+
+// Form data transformation helpers
+export function transformFormData<T extends FieldValues>(
+  data: T,
+  transformers: Record<string, (value: any) => any>
+): T {
+  const transformed = { ...data };
+  
+  Object.entries(transformers).forEach(([key, transformer]) => {
+    if (key in transformed) {
+      transformed[key as keyof T] = transformer(transformed[key as keyof T]);
+    }
+  });
+  
+  return transformed;
+}
+
+export function sanitizeFormData<T extends FieldValues>(
+  data: T,
+  fieldsToSanitize: (keyof T)[]
+): T {
+  const sanitized = { ...data };
+  
+  fieldsToSanitize.forEach((field) => {
+    if (typeof sanitized[field] === 'string') {
+      sanitized[field] = (sanitized[field] as string).trim() as T[keyof T];
+    }
+  });
+  
+  return sanitized;
+}
+
+// Form validation hooks
+export function useFormValidation<T extends FieldValues>(
+  schema: z.ZodSchema<T>,
+  options?: {
+    mode?: 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched' | 'all';
+    reValidateMode?: 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched' | 'all';
+    criteriaMode?: 'firstError' | 'all';
+  }
+) {
+  const form = useValidatedForm(schema, options);
+  
+  return {
+    ...form,
+    isValid: isFormValid(form),
+    hasErrors: hasFormErrors(form),
+    errors: getFormErrors(form),
+    focusFirstError: () => focusFirstError(form),
+    clearErrors: () => clearFormErrors(form),
+    resetWithData: (data: Partial<T>) => resetFormWithData(form, data),
+  };
+}
+
+// Form submission hooks
+export function useFormSubmission<T extends FieldValues>(
+  schema: z.ZodSchema<T>,
+  onSubmit: (data: T) => Promise<void> | void,
+  onError?: (error: z.ZodError | Error) => void
+) {
+  const form = useValidatedForm(schema);
+  
+  const handleSubmit = async (data: T) => {
     try {
       await onSubmit(data);
     } catch (error) {
-      console.error('Form submission error:', error);
-      onError?.(error);
+      onError?.(error as Error);
     }
   };
-};
-
-// Reset form with default values
-export const resetFormWithDefaults = <T>(
-  reset: (values?: T) => void,
-  defaultValues: T
-) => {
-  reset(defaultValues);
-};
-
-// Check if form is dirty (has changes)
-export const isFormDirty = (dirtyFields: Record<string, unknown>): boolean => {
-  return Object.keys(dirtyFields).length > 0;
-};
-
-// Get field error class
-export const getFieldErrorClass = (
-  error?: FieldError,
-  className?: string
-): string => {
-  const baseClass = className || '';
-  return error
-    ? `${baseClass} border-red-500 focus:border-red-500 focus:ring-red-500`.trim()
-    : baseClass;
-};
-
-// Get error message class
-export const getErrorMessageClass = (className?: string): string => {
-  return `text-red-600 text-sm mt-1 ${className || ''}`.trim();
-};
-
-// Validate required fields
-export const validateRequired = (value: unknown): boolean => {
-  if (typeof value === 'string') {
-    return value.trim().length > 0;
-  }
-  if (typeof value === 'number') {
-    return value !== 0;
-  }
-  if (Array.isArray(value)) {
-    return value.length > 0;
-  }
-  return !!value;
-};
-
-// Validate email format
-export const validateEmail = (email: string): boolean => {
-  return validationPatterns.email.test(email);
-};
-
-// Validate phone format
-export const validatePhone = (phone: string): boolean => {
-  return validationPatterns.phone.test(phone);
-};
-
-// Validate password strength
-export const validatePasswordStrength = (
-  password: string
-): {
-  isValid: boolean;
-  score: number;
-  feedback: string[];
-} => {
-  const feedback: string[] = [];
-  let score = 0;
-
-  if (password.length >= 8) score++;
-  else feedback.push('At least 8 characters');
-
-  if (/[a-z]/.test(password)) score++;
-  else feedback.push('At least one lowercase letter');
-
-  if (/[A-Z]/.test(password)) score++;
-  else feedback.push('At least one uppercase letter');
-
-  if (/\d/.test(password)) score++;
-  else feedback.push('At least one number');
-
-  if (/[@$!%*?&]/.test(password)) score++;
-  else feedback.push('At least one special character');
-
+  
   return {
-    isValid: score >= 4,
-    score,
-    feedback,
+    ...form,
+    handleSubmit: form.handleSubmit(handleSubmit),
   };
-};
+}
