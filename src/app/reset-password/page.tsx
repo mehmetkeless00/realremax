@@ -22,20 +22,158 @@ function ResetPasswordPage() {
     score: 0,
     feedback: '',
   });
+  const [tokensValid, setTokensValid] = useState(false);
+  const [validatingTokens, setValidatingTokens] = useState(true);
 
+  // Get tokens from URL parameters
   const accessToken = searchParams.get('access_token');
   const refreshToken = searchParams.get('refresh_token');
 
   useEffect(() => {
-    if (!accessToken || !refreshToken) {
-      addToast({
-        type: 'error',
-        message:
-          'Invalid or missing reset token. Please request a new password reset.',
-      });
-      router.push('/auth/forgot-password');
-    }
-  }, [accessToken, refreshToken, router, addToast]);
+    const validateTokens = async () => {
+      setValidatingTokens(true);
+      
+      // Debug logging
+      console.log('Reset password page loaded');
+      console.log('Access token present:', !!accessToken);
+      console.log('Refresh token present:', !!refreshToken);
+      console.log('URL search params:', searchParams.toString());
+      console.log('Full URL:', window.location.href);
+
+      // Try multiple ways to get tokens
+      let finalAccessToken = accessToken;
+      let finalRefreshToken = refreshToken;
+
+      if (!finalAccessToken || !finalRefreshToken) {
+        console.log('Missing tokens, checking for hash fragment...');
+        
+        // Check if tokens are in hash fragment (some browsers/redirects might put them there)
+        const hash = window.location.hash;
+        if (hash) {
+          const hashParams = new URLSearchParams(hash.substring(1));
+          const hashAccessToken = hashParams.get('access_token');
+          const hashRefreshToken = hashParams.get('refresh_token');
+          
+          if (hashAccessToken && hashRefreshToken) {
+            console.log('Found tokens in hash fragment');
+            finalAccessToken = hashAccessToken;
+            finalRefreshToken = hashRefreshToken;
+            // Update URL to include tokens in search params
+            const newUrl = `${window.location.pathname}?access_token=${hashAccessToken}&refresh_token=${hashRefreshToken}`;
+            window.history.replaceState({}, '', newUrl);
+          }
+        }
+
+        // If still no tokens, check if we can get them from the session
+        if (!finalAccessToken || !finalRefreshToken) {
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token && session?.refresh_token) {
+              console.log('Found tokens in existing session');
+              finalAccessToken = session.access_token;
+              finalRefreshToken = session.refresh_token;
+            }
+          } catch (error) {
+            console.error('Error checking session:', error);
+          }
+        }
+
+        // If still no tokens, check if they're in the URL as different parameter names
+        if (!finalAccessToken || !finalRefreshToken) {
+          const allParams = Object.fromEntries(searchParams.entries());
+          console.log('All URL parameters:', allParams);
+          
+          // Check for common variations
+          finalAccessToken = finalAccessToken || allParams['access_token'] || allParams['token'] || allParams['auth_token'];
+          finalRefreshToken = finalRefreshToken || allParams['refresh_token'] || allParams['refresh'] || allParams['refreshToken'];
+        }
+
+        // If still no tokens, check if we're in a password recovery flow
+        if (!finalAccessToken || !finalRefreshToken) {
+          try {
+            // Try to get the current session and see if we're in a recovery flow
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+              console.log('Found existing session, checking if user needs password update');
+              // Check if this is a password recovery session
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user && user.app_metadata?.provider === 'email') {
+                console.log('User found in recovery flow');
+                setTokensValid(true);
+                setValidatingTokens(false);
+                return;
+              }
+            }
+          } catch (error) {
+            console.error('Error checking recovery flow:', error);
+          }
+        }
+      }
+
+      if (!finalAccessToken || !finalRefreshToken) {
+        console.log('No valid tokens found after all attempts');
+        
+        // In production, show a more helpful error message
+        if (process.env.NODE_ENV === 'production') {
+          addToast({
+            type: 'error',
+            message: 'Password reset link appears to be invalid or expired. Please request a new password reset.',
+          });
+        } else {
+          addToast({
+            type: 'error',
+            message: 'Invalid or missing reset token. Please request a new password reset.',
+          });
+        }
+        
+        router.push('/auth/forgot-password');
+        return;
+      }
+
+      // Validate tokens by trying to set the session
+      try {
+        console.log('Attempting to validate tokens...');
+        const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+          access_token: finalAccessToken,
+          refresh_token: finalRefreshToken,
+        });
+
+        if (sessionError) {
+          console.error('Session validation error:', sessionError);
+          throw sessionError;
+        }
+
+        if (sessionData.session) {
+          console.log('Tokens validated successfully');
+          setTokensValid(true);
+        } else {
+          throw new Error('No session created from tokens');
+        }
+      } catch (error) {
+        console.error('Token validation failed:', error);
+        
+        // In production, show a more helpful error message
+        if (process.env.NODE_ENV === 'production') {
+          addToast({
+            type: 'error',
+            message: 'Password reset link has expired or is invalid. Please request a new password reset.',
+          });
+        } else {
+          addToast({
+            type: 'error',
+            message: 'Invalid reset token. Please request a new password reset.',
+          });
+        }
+        
+        router.push('/auth/forgot-password');
+        return;
+      } finally {
+        setValidatingTokens(false);
+      }
+    };
+
+    validateTokens();
+  }, [accessToken, refreshToken, router, addToast, searchParams]);
 
   const validatePassword = (password: string) => {
     const minLength = password.length >= 8;
@@ -83,14 +221,14 @@ function ResetPasswordPage() {
     }
 
     try {
-      // Set the session with the tokens
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.setSession({
-          access_token: accessToken!,
-          refresh_token: refreshToken!,
-        });
-
-      if (sessionError) throw sessionError;
+      // Ensure we have a valid session before updating password
+      if (!tokensValid) {
+        // Final fallback: check if we have a session that allows password update
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('No valid session found');
+        }
+      }
 
       // Update password
       await updatePassword(formData.password);
@@ -101,6 +239,7 @@ function ResetPasswordPage() {
       });
       router.push('/auth/signin');
     } catch (error) {
+      console.error('Password update error:', error);
       addToast({
         type: 'error',
         message:
@@ -120,6 +259,43 @@ function ResetPasswordPage() {
   const getPasswordStrengthWidth = () => {
     return `${(passwordStrength.score / 5) * 100}%`;
   };
+
+  // Show loading state while validating tokens
+  if (validatingTokens) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <h2 className="mt-6 text-lg font-extrabold text-gray-900">
+              Validating Reset Link
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Please wait while we validate your password reset link...
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+          </div>
+          
+          {/* Debug info for production troubleshooting */}
+          {process.env.NODE_ENV === 'production' && (
+            <div className="mt-4 p-4 bg-gray-100 rounded text-xs">
+              <p><strong>Debug Info:</strong></p>
+              <p>URL: {typeof window !== 'undefined' ? window.location.href : 'N/A'}</p>
+              <p>Search Params: {searchParams.toString()}</p>
+              <p>Access Token: {accessToken ? 'Present' : 'Missing'}</p>
+              <p>Refresh Token: {refreshToken ? 'Present' : 'Missing'}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the form if tokens are not valid
+  if (!tokensValid) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
