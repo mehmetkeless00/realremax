@@ -58,19 +58,22 @@ export default function AuthCallback() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <main className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="mt-6 text-lg font-bold text-gray-900">
+          <h1 className="mt-6 text-3xl font-bold text-gray-900">
             Authentication
-          </h2>
+          </h1>
           <p className="mt-2 text-sm text-gray-600">{message}</p>
         </div>
 
         <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+          <div
+            className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"
+            aria-label="Processing authentication"
+          ></div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

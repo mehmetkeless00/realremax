@@ -25,15 +25,15 @@ const testImages = [
 
 export default function ImageOptimizationDemo() {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <main className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-lg font-bold text-gray-900 mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">
             Image Optimization Demo
           </h1>
 
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-xs font-semibold mb-4">
+            <h2 className="text-xl font-semibold mb-4">
               Optimized Image Component
             </h2>
 
@@ -56,18 +56,48 @@ export default function ImageOptimizationDemo() {
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xs font-semibold mb-4">Performance Features</h2>
+            <h2 className="text-xl font-semibold mb-4">Performance Features</h2>
             <ul className="space-y-2 text-gray-700">
-              <li>✅ Lazy loading for non-priority images</li>
-              <li>✅ Blur placeholder during loading</li>
-              <li>✅ WebP/AVIF format optimization</li>
-              <li>✅ Responsive image sizes</li>
-              <li>✅ Error handling with fallback</li>
-              <li>✅ Loading skeleton animation</li>
+              <li className="flex items-center">
+                <span className="text-green-500 mr-2" aria-hidden="true">
+                  ✅
+                </span>
+                Lazy loading for non-priority images
+              </li>
+              <li className="flex items-center">
+                <span className="text-green-500 mr-2" aria-hidden="true">
+                  ✅
+                </span>
+                Blur placeholder during loading
+              </li>
+              <li className="flex items-center">
+                <span className="text-green-500 mr-2" aria-hidden="true">
+                  ✅
+                </span>
+                WebP/AVIF format optimization
+              </li>
+              <li className="flex items-center">
+                <span className="text-green-500 mr-2" aria-hidden="true">
+                  ✅
+                </span>
+                Responsive image sizes
+              </li>
+              <li className="flex items-center">
+                <span className="text-green-500 mr-2" aria-hidden="true">
+                  ✅
+                </span>
+                Error handling with fallback
+              </li>
+              <li className="flex items-center">
+                <span className="text-green-500 mr-2" aria-hidden="true">
+                  ✅
+                </span>
+                Loading skeleton animation
+              </li>
             </ul>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

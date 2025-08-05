@@ -41,9 +41,9 @@ export default function TestResetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Test Password Reset</h1>
+        <h1 className="text-3xl font-bold mb-6">Test Password Reset</h1>
 
         <div className="bg-white rounded-lg shadow p-6">
           <form onSubmit={handleTestReset} className="space-y-4">
@@ -75,7 +75,7 @@ export default function TestResetPage() {
           </form>
 
           <div className="mt-6 p-4 bg-gray-100 rounded text-sm">
-            <h3 className="font-semibold mb-2">Debug Information:</h3>
+            <h2 className="text-lg font-semibold mb-2">Debug Information:</h2>
             <p>
               <strong>Environment:</strong> {process.env.NODE_ENV}
             </p>
@@ -92,6 +92,6 @@ export default function TestResetPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -121,12 +121,12 @@ function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-lg font-extrabold text-gray-900">
+          <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Reset Your Password
-          </h2>
+          </h1>
           <p className="mt-2 text-center text-sm text-gray-600">
             Enter your new password below
           </p>
@@ -166,6 +166,7 @@ function ResetPasswordPage() {
                     <div
                       className={`h-2 rounded-full ${getPasswordStrengthColor()}`}
                       style={{ width: getPasswordStrengthWidth() }}
+                      aria-label={`Password strength: ${passwordStrength.score} out of 5`}
                     />
                   </div>
                 </div>
@@ -192,7 +193,7 @@ function ResetPasswordPage() {
               />
               {formData.confirmPassword &&
                 formData.password !== formData.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">
+                  <p className="mt-1 text-sm text-red-600" role="alert">
                     Passwords do not match
                   </p>
                 )}
@@ -223,7 +224,7 @@ function ResetPasswordPage() {
           </div>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
 

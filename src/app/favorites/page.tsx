@@ -7,6 +7,7 @@ import { useUIStore } from '@/lib/store';
 import PropertyCard from '@/components/PropertyCard';
 import RealtimeDemo from '@/components/RealtimeDemo';
 import Link from 'next/link';
+import { BreadcrumbStructuredData } from '@/components/StructuredData';
 import type { PropertyWithListing } from '@/types/property';
 
 export default function FavoritesPage() {
@@ -151,9 +152,16 @@ export default function FavoritesPage() {
     );
   };
 
+  const breadcrumbData = {
+    items: [
+      { name: 'Home', url: 'https://realremax-kvpi.vercel.app' },
+      { name: 'Favorites', url: 'https://realremax-kvpi.vercel.app/favorites' },
+    ],
+  };
+
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <main className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto text-center">
             <div className="bg-white p-8 rounded-lg shadow-sm">
@@ -162,6 +170,7 @@ export default function FavoritesPage() {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -170,9 +179,9 @@ export default function FavoritesPage() {
                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                 />
               </svg>
-              <h2 className="text-2xl font-bold text-dark-charcoal mb-4">
+              <h1 className="text-3xl font-bold text-dark-charcoal mb-4">
                 Sign In Required
-              </h2>
+              </h1>
               <p className="text-gray-600 mb-6">
                 Please sign in to view and manage your favorite properties.
               </p>
@@ -185,15 +194,16 @@ export default function FavoritesPage() {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <main className="min-h-screen bg-gray-50 py-8">
+      <BreadcrumbStructuredData data={breadcrumbData} />
       <div className="container mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-lg font-bold text-dark-charcoal mb-4">
+          <h1 className="text-3xl font-bold text-dark-charcoal mb-4">
             My Favorites
           </h1>
 
@@ -211,6 +221,7 @@ export default function FavoritesPage() {
                     ? 'bg-primary-blue text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
+                aria-label="Grid view"
               >
                 Grid
               </button>
@@ -221,6 +232,7 @@ export default function FavoritesPage() {
                     ? 'bg-primary-blue text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
+                aria-label="List view"
               >
                 List
               </button>
@@ -236,7 +248,10 @@ export default function FavoritesPage() {
         {/* Loading State */}
         {isLoading && (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+            <div
+              className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"
+              aria-label="Loading favorites"
+            ></div>
             <p className="mt-2 text-gray-600">Loading your favorites...</p>
           </div>
         )}
@@ -249,6 +264,7 @@ export default function FavoritesPage() {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -257,9 +273,9 @@ export default function FavoritesPage() {
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               />
             </svg>
-            <h3 className="text-sm font-semibold text-dark-charcoal mb-2">
+            <h2 className="text-xl font-semibold text-dark-charcoal mb-2">
               No favorites yet
-            </h3>
+            </h2>
             <p className="text-gray-600 mb-6">
               Start exploring properties and add them to your favorites to see
               them here.
@@ -294,6 +310,6 @@ export default function FavoritesPage() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

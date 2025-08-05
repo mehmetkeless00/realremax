@@ -5,6 +5,7 @@ import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import Link from 'next/link';
 import PropertyListingForm from '@/components/PropertyListingForm';
+import { BreadcrumbStructuredData } from '@/components/StructuredData';
 
 interface PropertyFormData {
   title: string;
@@ -145,12 +146,23 @@ export default function ListingsPage() {
     setEditingProperty(null);
   };
 
+  const breadcrumbData = {
+    items: [
+      { name: 'Home', url: 'https://realremax-kvpi.vercel.app' },
+      { name: 'Dashboard', url: 'https://realremax-kvpi.vercel.app/dashboard' },
+      {
+        name: 'My Listings',
+        url: 'https://realremax-kvpi.vercel.app/dashboard/listings',
+      },
+    ],
+  };
+
   if (user?.user_metadata?.role !== 'agent') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <main className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
               Access Denied
             </h1>
             <p className="text-gray-600 mb-6">
@@ -164,15 +176,16 @@ export default function ListingsPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <main className="min-h-screen bg-gray-50 py-8">
+      <BreadcrumbStructuredData data={breadcrumbData} />
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-lg font-bold text-dark-charcoal">
+          <h1 className="text-3xl font-bold text-dark-charcoal">
             My Properties
           </h1>
           <button
@@ -196,7 +209,10 @@ export default function ListingsPage() {
 
         {loading && !showForm ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+            <div
+              className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"
+              aria-label="Loading properties"
+            ></div>
             <p className="mt-2 text-gray-600">Loading properties...</p>
           </div>
         ) : properties.length === 0 ? (
@@ -207,6 +223,7 @@ export default function ListingsPage() {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -216,9 +233,9 @@ export default function ListingsPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
               No properties yet
-            </h3>
+            </h2>
             <p className="text-gray-600 mb-6">
               Start by adding your first property listing.
             </p>
@@ -258,7 +275,7 @@ export default function ListingsPage() {
                     {property.location}
                   </p>
                   <p className="text-primary-blue font-bold text-lg mb-2">
-                    ${property.price.toLocaleString()}
+                    €{property.price.toLocaleString()}
                   </p>
 
                   <div className="flex gap-4 text-sm text-gray-500 mb-4">
@@ -310,6 +327,6 @@ export default function ListingsPage() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

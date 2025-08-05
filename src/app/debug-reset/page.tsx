@@ -44,12 +44,12 @@ function DebugResetContent() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Password Reset Debug Info</h1>
+        <h1 className="text-3xl font-bold mb-6">Password Reset Debug Info</h1>
 
         <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h2 className="text-lg font-semibold">URL Information</h2>
+          <h2 className="text-xl font-semibold">URL Information</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -85,7 +85,7 @@ function DebugResetContent() {
             </div>
           </div>
 
-          <h2 className="text-lg font-semibold mt-6">Token Information</h2>
+          <h2 className="text-xl font-semibold mt-6">Token Information</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -107,7 +107,7 @@ function DebugResetContent() {
             </div>
           </div>
 
-          <h2 className="text-lg font-semibold mt-6">All URL Parameters</h2>
+          <h2 className="text-xl font-semibold mt-6">All URL Parameters</h2>
           <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
             {JSON.stringify(debugInfo.allParams, null, 2)}
           </pre>
@@ -122,7 +122,7 @@ function DebugResetContent() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -130,12 +130,15 @@ export default function DebugResetPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <main className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <div
+              className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"
+              aria-label="Loading debug information"
+            ></div>
             <p>Loading debug information...</p>
           </div>
-        </div>
+        </main>
       }
     >
       <DebugResetContent />

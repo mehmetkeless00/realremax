@@ -48,21 +48,24 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
-      </div>
+      <main className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div
+          className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"
+          aria-label="Loading dashboard"
+        ></div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <div className="flex justify-between items-center mb-8">
                 <div>
-                  <h1 className="text-base font-bold text-gray-900">
+                  <h1 className="text-3xl font-bold text-gray-900">
                     Welcome to Remax Unified Platform
                   </h1>
                   <p className="mt-1 text-sm text-gray-600">
@@ -79,14 +82,14 @@ export default function Dashboard() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     User Profile
                   </h2>
                   <UserProfile />
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Quick Actions
                   </h2>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -130,7 +133,7 @@ export default function Dashboard() {
               </div>
 
               <div className="mt-8">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Inquiry Management
                 </h2>
                 <InquiryManagement />
@@ -139,6 +142,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

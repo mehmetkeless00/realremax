@@ -20,7 +20,7 @@ export default function FormValidationDemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <main className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
@@ -47,49 +47,65 @@ export default function FormValidationDemoPage() {
             {/* Documentation */}
             <div className="space-y-6">
               <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Features Demonstrated
-                </h3>
+                </h2>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-start">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-green-500 mr-2" aria-hidden="true">
+                      ✓
+                    </span>
                     Zod schema validation
                   </li>
                   <li className="flex items-start">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-green-500 mr-2" aria-hidden="true">
+                      ✓
+                    </span>
                     Real-time validation
                   </li>
                   <li className="flex items-start">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-green-500 mr-2" aria-hidden="true">
+                      ✓
+                    </span>
                     Inline error messages
                   </li>
                   <li className="flex items-start">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-green-500 mr-2" aria-hidden="true">
+                      ✓
+                    </span>
                     TypeScript integration
                   </li>
                   <li className="flex items-start">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-green-500 mr-2" aria-hidden="true">
+                      ✓
+                    </span>
                     Character counting
                   </li>
                   <li className="flex items-start">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-green-500 mr-2" aria-hidden="true">
+                      ✓
+                    </span>
                     Form state management
                   </li>
                   <li className="flex items-start">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-green-500 mr-2" aria-hidden="true">
+                      ✓
+                    </span>
                     Loading states
                   </li>
                   <li className="flex items-start">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-green-500 mr-2" aria-hidden="true">
+                      ✓
+                    </span>
                     Accessibility features
                   </li>
                 </ul>
               </div>
 
               <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Validation Rules
-                </h3>
+                </h2>
                 <div className="space-y-3 text-sm text-gray-600">
                   <div>
                     <strong>Title:</strong> 3-100 characters, required
@@ -119,9 +135,9 @@ export default function FormValidationDemoPage() {
               </div>
 
               <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Try These Tests
-                </h3>
+                </h2>
                 <div className="space-y-2 text-sm text-gray-600">
                   <div>
                     <strong>Empty Form:</strong> Submit without filling required
@@ -149,6 +165,6 @@ export default function FormValidationDemoPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
