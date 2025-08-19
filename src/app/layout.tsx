@@ -22,9 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${montserrat.variable} font-montserrat text-dark-charcoal antialiased`}
-      >
+      <body className={`${montserrat.variable} font-sans text-fg antialiased`}>
         <GlobalHeader />
         <main>{children}</main>
         <ToastContainer />

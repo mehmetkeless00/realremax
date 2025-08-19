@@ -129,10 +129,10 @@ export default function SignUp() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-3xl font-extrabold text-fg">
               Check your email
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-muted">
               We&apos;ve sent you a confirmation link to verify your email
               address.
             </p>
@@ -146,22 +146,16 @@ export default function SignUp() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-lg font-extrabold text-gray-900">
-            Create your account
+          <h2 className="mt-6 text-lg font-extrabold text-fg">
+            Sign up with email
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link
-              href="/auth/signin"
-              className="font-medium text-primary-blue hover:text-blue-500"
-            >
-              sign in to your existing account
-            </Link>
+          <p className="mt-2 text-center text-sm text-muted">
+            Or continue with email
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-danger/10 border border-danger/20 text-danger px-4 py-3 rounded">
             {error}
           </div>
         )}
@@ -180,7 +174,7 @@ export default function SignUp() {
                 required
                 value={formData.email}
                 onChange={handleInputChange}
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-border placeholder-muted text-fg focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />
             </div>
@@ -196,7 +190,7 @@ export default function SignUp() {
                 required
                 value={formData.password}
                 onChange={handleInputChange}
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-border placeholder-muted text-fg focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
             </div>
@@ -212,7 +206,7 @@ export default function SignUp() {
                 required
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-border placeholder-muted text-fg focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
                 placeholder="Confirm Password"
               />
             </div>
@@ -230,7 +224,7 @@ export default function SignUp() {
                     role: e.target.value as 'registered' | 'agent',
                   }))
                 }
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-border placeholder-muted text-fg focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
               >
                 <option value="registered">Registered User</option>
                 <option value="agent">Real Estate Agent</option>
@@ -254,7 +248,7 @@ export default function SignUp() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-50 text-gray-500">
+                <span className="px-2 bg-muted/20 text-muted">
                   Or continue with
                 </span>
               </div>
@@ -265,7 +259,7 @@ export default function SignUp() {
                 type="button"
                 onClick={handleGoogleSignUp}
                 disabled={loading}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                className="w-full inline-flex justify-center py-2 px-4 border border-border rounded-md shadow-sm bg-white text-sm font-medium text-muted hover:bg-muted/20 disabled:opacity-50"
               >
                 <svg
                   className="w-5 h-5"
@@ -295,7 +289,7 @@ export default function SignUp() {
                 type="button"
                 onClick={handleFacebookSignUp}
                 disabled={loading}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                className="w-full inline-flex justify-center py-2 px-4 border border-border rounded-md shadow-sm bg-white text-sm font-medium text-muted hover:bg-muted/20 disabled:opacity-50"
               >
                 <svg
                   className="w-5 h-5"

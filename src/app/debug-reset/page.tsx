@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface DebugInfo {
   url: string;
@@ -113,12 +114,11 @@ function DebugResetContent() {
           </pre>
 
           <div className="mt-6">
-            <a
-              href="/reset-password"
-              className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Go to Reset Password Page
-            </a>
+            <Button asChild variant="secondary" size="md">
+              <a href="/reset-password">
+                <span>Go to Reset Password Page</span>
+              </a>
+            </Button>
           </div>
         </div>
       </div>

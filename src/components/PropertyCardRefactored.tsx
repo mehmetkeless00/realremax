@@ -7,8 +7,11 @@ import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import { useFavoritesStore } from '@/lib/store/favoritesStore';
 import type { PropertyCardProps } from '@/types/property';
+import { Card, CardContent } from './ui/card';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 
-export default function PropertyCard({
+export default function PropertyCardRefactored({
   property,
   view = 'grid',
   showFavorite = true,
@@ -76,37 +79,36 @@ export default function PropertyCard({
     return `${size} sq ft`;
   };
 
-  const getPropertyStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
+  const getPropertyStatusVariant = (status: string) => {
+    switch (status) {
       case 'active':
-        return 'badge-success';
+        return 'success';
       case 'pending':
-        return 'badge-warning';
+        return 'warning';
       case 'sold':
+        return 'danger';
       case 'rented':
-        return 'badge-primary';
-      case 'inactive':
-        return 'badge-danger';
+        return 'default';
       default:
-        return 'badge-outline';
+        return 'outline';
     }
   };
 
-  const getListingTypeColor = (listingType: string) => {
-    switch (listingType.toLowerCase()) {
+  const getListingTypeVariant = (type: string) => {
+    switch (type) {
       case 'sale':
-        return 'badge-primary';
+        return 'danger';
       case 'rent':
-        return 'badge-success';
+        return 'default';
       default:
-        return 'badge-outline';
+        return 'outline';
     }
   };
 
   if (view === 'list') {
     return (
-      <div
-        className={`card hover:shadow-lg transition-all duration-300 ${className}`}
+      <Card
+        className={`hover:shadow-lg transition-all duration-300 ${className}`}
       >
         <Link href={`/properties/${property.id}`}>
           <div className="flex flex-col md:flex-row">
@@ -124,32 +126,34 @@ export default function PropertyCard({
 
               {/* Status Badge */}
               <div className="absolute top-2 left-2">
-                <span className={getPropertyStatusColor(property.status)}>
+                <Badge variant={getPropertyStatusVariant(property.status)}>
                   {property.status}
-                </span>
+                </Badge>
               </div>
 
               {/* Listing Type Badge */}
               {property.listing && (
                 <div className="absolute top-2 right-2">
-                  <span
-                    className={getListingTypeColor(
+                  <Badge
+                    variant={getListingTypeVariant(
                       property.listing.listing_type
                     )}
                   >
                     {property.listing.listing_type === 'sale'
                       ? 'For Sale'
                       : 'For Rent'}
-                  </span>
+                  </Badge>
                 </div>
               )}
 
               {/* Favorite Button */}
               {showFavorite && (
-                <button
+                <Button
                   onClick={handleFavoriteToggle}
                   disabled={isSyncing}
-                  className={`absolute bottom-2 right-2 p-2 rounded-full shadow-lg transition-all duration-200 ${
+                  variant={isFavorite ? 'primary' : 'ghost'}
+                  size="icon"
+                  className={`absolute bottom-2 right-2 shadow-lg ${
                     isFavorite
                       ? 'bg-red-600 text-white'
                       : 'bg-white text-gray-500 hover:text-red-600'
@@ -184,14 +188,14 @@ export default function PropertyCard({
                       />
                     </svg>
                   )}
-                </button>
+                </Button>
               )}
             </div>
 
             {/* Content Section */}
-            <div className="flex-1 p-6">
+            <CardContent className="flex-1 p-6">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-sm font-semibold text-dark-charcoal hover:text-primary-blue transition-colors">
+                <h3 className="text-sm font-semibold text-fg hover:text-primary-blue transition-colors">
                   {property.title}
                 </h3>
                 <div className="text-right">
@@ -199,7 +203,7 @@ export default function PropertyCard({
                     {formatPrice(property.price)}
                   </div>
                   {property.listing && (
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-muted">
                       {property.listing.listing_type === 'rent' ? '/month' : ''}
                     </div>
                   )}
@@ -297,35 +301,17 @@ export default function PropertyCard({
                   {property.description}
                 </p>
               )}
-
-              {property.agent && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 bg-primary-blue rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      {property.agent.name.charAt(0)}
-                    </div>
-                    <div className="ml-2">
-                      <div className="text-sm font-medium text-fg">
-                        {property.agent.name}
-                      </div>
-                      <div className="text-xs text-muted">
-                        {property.agent.company}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            </CardContent>
           </div>
         </Link>
-      </div>
+      </Card>
     );
   }
 
-  // Grid View (default)
+  // Grid view (default)
   return (
-    <div
-      className={`card hover:shadow-lg transition-all duration-300 overflow-hidden ${className}`}
+    <Card
+      className={`hover:shadow-lg transition-all duration-300 ${className}`}
     >
       <Link href={`/properties/${property.id}`}>
         <div className="relative">
@@ -333,38 +319,40 @@ export default function PropertyCard({
             src={imageError ? defaultImage : propertyImage}
             alt={property.title}
             width={400}
-            height={192}
-            className="w-full h-40 max-h-[40vh] object-cover"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            height={300}
+            className="w-full h-40 object-cover rounded-t-lg"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             onError={() => setImageError(true)}
           />
 
           {/* Status Badge */}
           <div className="absolute top-2 left-2">
-            <span className={getPropertyStatusColor(property.status)}>
+            <Badge variant={getPropertyStatusVariant(property.status)}>
               {property.status}
-            </span>
+            </Badge>
           </div>
 
           {/* Listing Type Badge */}
           {property.listing && (
             <div className="absolute top-2 right-2">
-              <span
-                className={getListingTypeColor(property.listing.listing_type)}
+              <Badge
+                variant={getListingTypeVariant(property.listing.listing_type)}
               >
                 {property.listing.listing_type === 'sale'
                   ? 'For Sale'
                   : 'For Rent'}
-              </span>
+              </Badge>
             </div>
           )}
 
           {/* Favorite Button */}
           {showFavorite && (
-            <button
+            <Button
               onClick={handleFavoriteToggle}
               disabled={isSyncing}
-              className={`absolute bottom-2 right-2 p-2 rounded-full shadow-lg transition-all duration-200 ${
+              variant={isFavorite ? 'primary' : 'ghost'}
+              size="icon"
+              className={`absolute bottom-2 right-2 shadow-lg ${
                 isFavorite
                   ? 'bg-red-600 text-white'
                   : 'bg-white text-gray-500 hover:text-red-600'
@@ -399,11 +387,11 @@ export default function PropertyCard({
                   />
                 </svg>
               )}
-            </button>
+            </Button>
           )}
         </div>
 
-        <div className="p-4">
+        <CardContent className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-sm font-semibold text-fg hover:text-primary-blue transition-colors line-clamp-1">
               {property.title}
@@ -492,8 +480,8 @@ export default function PropertyCard({
               <span className="text-muted">{formatSize(property.size)}</span>
             )}
           </div>
-        </div>
+        </CardContent>
       </Link>
-    </div>
+    </Card>
   );
 }

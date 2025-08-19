@@ -1,0 +1,17 @@
+Eksikler / İyileştirme Alanları
+
+Tipografi markalaşması eksik: Montserrat var ama Gotham sadece fallback olarak adlandırılmış; gerçek font dosyası/servisi yok. Gotham kullanılacaksa lisans + yükleme gerekli.
+
+SEO & Meta: Global metadata, Open Graph, Twitter card, yapılandırılmış veri (Schema.org) eklenmeli.
+
+Analytics/Email yapılandırma: gtag ve @sendgrid/mail için ENV’ler doğru tanımlanmalı; prod/test anahtar ayrımı yapılmalı.
+
+Test kapsamı: Jest kurulu ama kapsam belirsiz. Kritik akışlar (auth, ilan oluşturma, arama) için temel testler eklenmeli.
+
+UI tutarlılığı: Renk paleti tanımlı; ancak spacing, border-radius, shadow, icon ölçüleri, buton varyantları gibi tasarım sistemi kuralları dokümante edilip (tokens + components) komponentlere yayılmalı.
+
+Erişilebilirlik (a11y): Form label’ları, aria-* öznitelikleri, odak stilleri gözden geçirilmeli.
+
+Performans: Görsel optimizasyonu için next/image kullanımı denetlenmeli; ağır listelerde pagination/virtualization düşünülmeli.
+
+Hata durumları: Auth/Network hataları için kullanıcıya net geri bildirim veren toast/modal akışları standardize edilebilir.

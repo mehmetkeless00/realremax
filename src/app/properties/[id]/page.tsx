@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useUserStore, useFavoritesStore, useUIStore } from '@/lib/store';
 import Link from 'next/link';
 import OptimizedImage from '@/components/OptimizedImage';
+import { Button } from '@/components/ui/button';
 
 interface Property {
   id: string;
@@ -146,7 +147,7 @@ export default function PropertyDetailPage() {
         <div className="container mx-auto px-4">
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
-            <p className="mt-2 text-gray-600">Loading property details...</p>
+            <p className="mt-2 text-muted">Loading property details...</p>
           </div>
         </div>
       </div>
@@ -158,18 +159,17 @@ export default function PropertyDetailPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="text-center py-12">
-            <h1 className="text-base font-bold text-gray-900 mb-4">
+            <h1 className="text-base font-bold text-fg mb-4">
               Property Not Found
             </h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-muted mb-6">
               The property you&apos;re looking for doesn&apos;t exist.
             </p>
-            <Link
-              href="/properties"
-              className="bg-primary-blue text-white px-6 py-2 rounded hover:bg-blue-700"
-            >
-              Back to Properties
-            </Link>
+            <Button asChild variant="secondary" size="md">
+              <Link href="/properties">
+                <span>Back to Properties</span>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -183,7 +183,7 @@ export default function PropertyDetailPage() {
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-gray-500">
+          <ol className="flex items-center space-x-2 text-sm text-muted">
             <li>
               <Link href="/" className="hover:text-primary-blue">
                 Home
@@ -196,7 +196,7 @@ export default function PropertyDetailPage() {
               </Link>
             </li>
             <li>/</li>
-            <li className="text-gray-900">{property.title}</li>
+            <li className="text-fg">{property.title}</li>
           </ol>
         </nav>
 
@@ -243,13 +243,13 @@ export default function PropertyDetailPage() {
                   <h1 className="text-lg font-bold text-dark-charcoal mb-2">
                     {property.title}
                   </h1>
-                  <p className="text-gray-600 text-lg">{property.location}</p>
+                  <p className="text-muted text-lg">{property.location}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-base font-bold text-primary-blue">
                     ${property.price.toLocaleString()}
                   </p>
-                  <p className="text-sm text-gray-500">{property.status}</p>
+                  <p className="text-sm text-muted">{property.status}</p>
                 </div>
               </div>
 
@@ -260,7 +260,7 @@ export default function PropertyDetailPage() {
                     <div className="text-sm font-bold text-primary-blue">
                       {property.bedrooms}
                     </div>
-                    <div className="text-sm text-gray-600">Bedrooms</div>
+                    <div className="text-sm text-muted">Bedrooms</div>
                   </div>
                 )}
                 {property.bathrooms && (
@@ -268,7 +268,7 @@ export default function PropertyDetailPage() {
                     <div className="text-sm font-bold text-primary-blue">
                       {property.bathrooms}
                     </div>
-                    <div className="text-sm text-gray-600">Bathrooms</div>
+                    <div className="text-sm text-muted">Bathrooms</div>
                   </div>
                 )}
                 {property.size && (
@@ -276,7 +276,7 @@ export default function PropertyDetailPage() {
                     <div className="text-sm font-bold text-primary-blue">
                       {property.size}m²
                     </div>
-                    <div className="text-sm text-gray-600">Size</div>
+                    <div className="text-sm text-muted">Size</div>
                   </div>
                 )}
                 {property.year_built && (
@@ -284,7 +284,7 @@ export default function PropertyDetailPage() {
                     <div className="text-sm font-bold text-primary-blue">
                       {property.year_built}
                     </div>
-                    <div className="text-sm text-gray-600">Year Built</div>
+                    <div className="text-sm text-muted">Year Built</div>
                   </div>
                 )}
               </div>
@@ -303,7 +303,7 @@ export default function PropertyDetailPage() {
                   <h3 className="text-lg font-semibold text-dark-charcoal mb-2">
                     Description
                   </h3>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-fg leading-relaxed">
                     {property.description}
                   </p>
                 </div>
@@ -317,7 +317,7 @@ export default function PropertyDetailPage() {
                 <div className="bg-gray-200 rounded-lg h-48 max-h-[50vh] flex items-center justify-center">
                   <div className="text-center">
                     <svg
-                      className="w-12 h-12 text-gray-400 mx-auto mb-2"
+                      className="w-12 h-12 text-muted mx-auto mb-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -335,8 +335,8 @@ export default function PropertyDetailPage() {
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
-                    <p className="text-gray-500">Interactive Map Coming Soon</p>
-                    <p className="text-sm text-gray-400">{property.location}</p>
+                    <p className="text-muted">Interactive Map Coming Soon</p>
+                    <p className="text-sm text-muted">{property.location}</p>
                   </div>
                 </div>
               </div>
@@ -372,16 +372,18 @@ export default function PropertyDetailPage() {
                   {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
                 </button>
 
-                <button
+                <Button
                   onClick={() => setShowContactForm(true)}
-                  className="w-full bg-primary-blue text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  variant="secondary"
+                  size="lg"
+                  className="w-full"
                 >
                   Contact Agent
-                </button>
+                </Button>
 
-                <button className="w-full bg-primary-red text-white px-4 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors">
+                <Button variant="primary" size="lg" className="w-full">
                   Schedule Viewing
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -392,7 +394,7 @@ export default function PropertyDetailPage() {
                   Listed by
                 </h3>
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-primary-blue rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-3">
                     <span className="text-white font-bold text-lg">
                       {agent.name
                         .split(' ')
@@ -404,7 +406,7 @@ export default function PropertyDetailPage() {
                     {agent.name}
                   </h4>
                   <p className="text-gray-600 text-sm mb-2">{agent.company}</p>
-                  <p className="text-primary-blue font-medium">{agent.phone}</p>
+                  <p className="text-blue-800 font-medium">{agent.phone}</p>
                 </div>
               </div>
             )}
@@ -417,8 +419,8 @@ export default function PropertyDetailPage() {
                 </h3>
                 <form onSubmit={handleContactSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name
+                    <label className="block text-sm font-medium text-fg mb-1">
+                      Name *
                     </label>
                     <input
                       type="text"
@@ -434,8 +436,8 @@ export default function PropertyDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
+                    <label className="block text-sm font-medium text-fg mb-1">
+                      Email *
                     </label>
                     <input
                       type="email"
@@ -451,7 +453,7 @@ export default function PropertyDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-fg mb-1">
                       Phone
                     </label>
                     <input
@@ -467,8 +469,8 @@ export default function PropertyDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Message
+                    <label className="block text-sm font-medium text-fg mb-1">
+                      Message *
                     </label>
                     <textarea
                       value={contactForm.message}
@@ -485,19 +487,22 @@ export default function PropertyDetailPage() {
                     />
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       type="submit"
-                      className="flex-1 bg-primary-blue text-white px-4 py-2 rounded font-medium hover:bg-blue-700"
+                      variant="secondary"
+                      size="md"
+                      className="flex-1"
                     >
                       Send Message
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => setShowContactForm(false)}
-                      className="px-4 py-2 border border-gray-300 rounded font-medium hover:bg-gray-50"
+                      variant="outline"
+                      size="md"
                     >
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 </form>
               </div>

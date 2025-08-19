@@ -126,10 +126,10 @@ export default function InquiryManagement() {
   if (error) {
     return (
       <div className="bg-red-50 p-4 rounded-lg">
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-danger">{error}</p>
         <button
           onClick={loadInquiries}
-          className="mt-2 text-sm text-red-700 hover:text-red-800 underline"
+          className="mt-2 text-sm text-danger hover:text-danger/80 underline"
         >
           Try again
         </button>

@@ -214,11 +214,11 @@ export default function PropertyListingForm({
 
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
+      <h3 className="text-lg font-semibold text-fg">Basic Information</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Title *
           </label>
           <input
@@ -232,7 +232,7 @@ export default function PropertyListingForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Price *
           </label>
           <input
@@ -247,7 +247,7 @@ export default function PropertyListingForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Location *
           </label>
           <input
@@ -261,7 +261,7 @@ export default function PropertyListingForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Property Type *
           </label>
           <select
@@ -280,7 +280,7 @@ export default function PropertyListingForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Listing Type *
           </label>
           <select
@@ -298,8 +298,8 @@ export default function PropertyListingForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
+          <label className="block text-sm font-medium text-fg mb-1">
+            Status *
           </label>
           <select
             value={formData.status}
@@ -316,7 +316,7 @@ export default function PropertyListingForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-fg mb-1">
           Description
         </label>
         <textarea
@@ -332,11 +332,11 @@ export default function PropertyListingForm({
 
   const renderStep2 = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">Property Details</h3>
+      <h3 className="text-lg font-semibold text-fg">Property Details</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Bedrooms
           </label>
           <input
@@ -350,7 +350,7 @@ export default function PropertyListingForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Bathrooms
           </label>
           <input
@@ -365,7 +365,7 @@ export default function PropertyListingForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Size (m²)
           </label>
           <input
@@ -379,7 +379,7 @@ export default function PropertyListingForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg mb-1">
             Year Built
           </label>
           <input
@@ -395,13 +395,11 @@ export default function PropertyListingForm({
       </div>
 
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">
-          Address Information
-        </h4>
+        <h4 className="text-md font-medium text-fg">Address Information</h4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Address *
             </label>
             <input
@@ -415,7 +413,7 @@ export default function PropertyListingForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               City *
             </label>
             <input
@@ -429,7 +427,7 @@ export default function PropertyListingForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Postal Code
             </label>
             <input
@@ -442,7 +440,7 @@ export default function PropertyListingForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Country
             </label>
             <input
@@ -455,7 +453,7 @@ export default function PropertyListingForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Latitude
             </label>
             <input
@@ -469,7 +467,7 @@ export default function PropertyListingForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Longitude
             </label>
             <input
@@ -488,12 +486,10 @@ export default function PropertyListingForm({
 
   const renderStep3 = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">
-        Amenities & Features
-      </h3>
+      <h3 className="text-lg font-semibold text-fg">Amenities & Features</h3>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+        <label className="block text-sm font-medium text-fg mb-3">
           Select Available Amenities
         </label>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -508,7 +504,7 @@ export default function PropertyListingForm({
                 onChange={() => handleAmenityToggle(amenity)}
                 className="rounded border-gray-300 text-primary-blue focus:ring-primary-blue"
               />
-              <span className="text-sm text-gray-700">{amenity}</span>
+              <span className="text-sm text-fg">{amenity}</span>
             </label>
           ))}
         </div>
@@ -516,7 +512,7 @@ export default function PropertyListingForm({
 
       {formData.amenities.length > 0 && (
         <div className="bg-gray-50 p-4 rounded-md">
-          <h4 className="text-sm font-medium text-gray-900 mb-2">
+          <h4 className="text-sm font-medium text-fg mb-2">
             Selected Amenities:
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -537,12 +533,10 @@ export default function PropertyListingForm({
   const renderStep4 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Property Photos
-        </h3>
-        <p className="text-sm text-gray-600 mb-6">
-          Upload high-quality photos of your property. You can upload up to 10
-          photos.
+        <h3 className="text-lg font-semibold text-fg mb-4">Property Photos</h3>
+        <p className="text-sm text-muted mb-6">
+          Upload photos of your property. You can drag and drop images here or
+          click to browse.
         </p>
 
         <PhotoUpload
@@ -557,14 +551,12 @@ export default function PropertyListingForm({
 
   const renderStep5 = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">Review & Submit</h3>
+      <h3 className="text-lg font-semibold text-fg">Review & Submit</h3>
 
       <div className="bg-gray-50 p-6 rounded-lg">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">
-              Basic Information
-            </h4>
+            <h4 className="font-medium text-fg mb-3">Basic Information</h4>
             <dl className="space-y-2 text-sm">
               <div>
                 <dt className="font-medium text-gray-700">Title:</dt>
@@ -604,7 +596,7 @@ export default function PropertyListingForm({
           </div>
 
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Property Details</h4>
+            <h4 className="font-medium text-fg mb-3">Property Details</h4>
             <dl className="space-y-2 text-sm">
               <div>
                 <dt className="font-medium text-gray-700">Location:</dt>
@@ -642,7 +634,7 @@ export default function PropertyListingForm({
 
         {formData.amenities.length > 0 && (
           <div className="mt-6">
-            <h4 className="font-medium text-gray-900 mb-2">Amenities</h4>
+            <h4 className="font-medium text-fg mb-2">Amenities</h4>
             <div className="flex flex-wrap gap-2">
               {formData.amenities.map((amenity) => (
                 <span
@@ -658,14 +650,14 @@ export default function PropertyListingForm({
 
         {formData.description && (
           <div className="mt-6">
-            <h4 className="font-medium text-gray-900 mb-2">Description</h4>
+            <h4 className="font-medium text-fg mb-2">Description</h4>
             <p className="text-sm text-gray-700">{formData.description}</p>
           </div>
         )}
 
         {formData.photos.length > 0 && (
           <div className="mt-6">
-            <h4 className="font-medium text-gray-900 mb-2">
+            <h4 className="font-medium text-fg mb-2">
               Photos ({formData.photos.length})
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -680,7 +672,7 @@ export default function PropertyListingForm({
                 />
               ))}
               {formData.photos.length > 4 && (
-                <div className="w-full h-16 bg-gray-200 rounded flex items-center justify-center text-sm text-gray-500">
+                <div className="w-full h-16 bg-muted/20 rounded flex items-center justify-center text-sm text-muted">
                   +{formData.photos.length - 4} more
                 </div>
               )}
@@ -716,7 +708,7 @@ export default function PropertyListingForm({
           <h2 className="text-2xl font-bold text-dark-charcoal">
             {property ? 'Edit Property' : 'Add New Property'}
           </h2>
-          <span className="text-sm text-gray-500">Step {currentStep} of 5</span>
+          <span className="text-sm text-muted">Step {currentStep} of 5</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
@@ -724,7 +716,7 @@ export default function PropertyListingForm({
             style={{ width: `${(currentStep / 5) * 100}%` }}
           ></div>
         </div>
-        <div className="flex justify-between mt-2 text-xs text-gray-500">
+        <div className="flex justify-between mt-2 text-xs text-muted">
           <span>Basic Info</span>
           <span>Details</span>
           <span>Amenities</span>
@@ -742,7 +734,7 @@ export default function PropertyListingForm({
             type="button"
             onClick={handlePrevious}
             disabled={currentStep === 1}
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 border border-border rounded-md text-fg hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -771,7 +763,7 @@ export default function PropertyListingForm({
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="px-6 py-2 border border-border rounded-md text-fg hover:bg-black/5"
             >
               Cancel
             </button>

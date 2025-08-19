@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useUserStore } from '@/lib/store';
 import { signOut } from '@/lib/auth';
+import { Button } from '@/components/ui/button';
 
 export default function UserMenu() {
   const { user, profile, signOut: signOutFromStore } = useUserStore();
@@ -40,12 +41,11 @@ export default function UserMenu() {
         >
           Sign In
         </Link>
-        <Link
-          href="/auth/signup"
-          className="bg-primary-red text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-        >
-          Sign Up
-        </Link>
+        <Button asChild variant="primary" size="sm">
+          <Link href="/auth/signup">
+            <span>Sign Up</span>
+          </Link>
+        </Button>
       </div>
     );
   }
@@ -81,48 +81,41 @@ export default function UserMenu() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-          <div className="px-4 py-2 border-b border-gray-100">
-            <p className="text-sm font-medium text-gray-900">
-              {profile?.name || 'User'}
-            </p>
-            <p className="text-xs text-gray-500">{user.email}</p>
-            <p className="text-xs text-gray-500 capitalize">
-              {profile?.role || 'visitor'}
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-sm font-medium text-fg">Signed in as</p>
+            <p className="text-xs text-muted">{user.email}</p>
+            <p className="text-xs text-muted capitalize">
+              {user.role || 'visitor'}
             </p>
           </div>
 
-          <Link
-            href="/dashboard"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            onClick={() => setIsOpen(false)}
-          >
-            Dashboard
-          </Link>
-
-          <Link
-            href="/profile"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            onClick={() => setIsOpen(false)}
-          >
-            Profile Settings
-          </Link>
-
-          {profile?.role === 'agent' && (
+          <div className="py-1">
             <Link
-              href="/agent/dashboard"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => setIsOpen(false)}
+              href="/profile"
+              className="block px-4 py-2 text-sm text-fg hover:bg-black/5"
             >
-              Agent Dashboard
+              Profile
             </Link>
-          )}
+            <Link
+              href="/dashboard"
+              className="block px-4 py-2 text-sm text-fg hover:bg-black/5"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/favorites"
+              className="block px-4 py-2 text-sm text-fg hover:bg-black/5"
+            >
+              Favorites
+            </Link>
+          </div>
 
-          <div className="border-t border-gray-100">
+          <div className="py-1 border-t border-border">
             <button
               onClick={handleSignOut}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="block w-full text-left px-4 py-2 text-sm text-fg hover:bg-black/5"
             >
-              Sign Out
+              Sign out
             </button>
           </div>
         </div>

@@ -28,7 +28,7 @@ export default function ImageOptimizationDemo() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-lg font-bold text-gray-900 mb-8">
+          <h1 className="text-lg font-bold text-fg mb-8">
             Image Optimization Demo
           </h1>
 
@@ -49,7 +49,7 @@ export default function ImageOptimizationDemo() {
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority={index === 0}
                   />
-                  <p className="text-sm text-gray-600">{image.alt}</p>
+                  <p className="text-sm text-muted">{image.alt}</p>
                 </div>
               ))}
             </div>
@@ -57,7 +57,7 @@ export default function ImageOptimizationDemo() {
 
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-xs font-semibold mb-4">Performance Features</h2>
-            <ul className="space-y-2 text-gray-700">
+            <ul className="space-y-2 text-fg">
               <li>✅ Lazy loading for non-priority images</li>
               <li>✅ Blur placeholder during loading</li>
               <li>✅ WebP/AVIF format optimization</li>

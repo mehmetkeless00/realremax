@@ -7,6 +7,7 @@ import { useUIStore } from '@/lib/store';
 import PropertyCard from '@/components/PropertyCard';
 import RealtimeDemo from '@/components/RealtimeDemo';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import type { PropertyWithListing } from '@/types/property';
 
 export default function FavoritesPage() {
@@ -158,7 +159,7 @@ export default function FavoritesPage() {
           <div className="max-w-md mx-auto text-center">
             <div className="bg-white p-8 rounded-lg shadow-sm">
               <svg
-                className="w-16 h-16 mx-auto text-gray-400 mb-4"
+                className="w-16 h-16 mx-auto text-muted mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -176,12 +177,11 @@ export default function FavoritesPage() {
               <p className="text-gray-600 mb-6">
                 Please sign in to view and manage your favorite properties.
               </p>
-              <Link
-                href="/auth/signin"
-                className="inline-block bg-primary-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                Sign In
-              </Link>
+              <Button asChild variant="secondary" size="lg">
+                <Link href="/auth/signin">
+                  <span>Sign In</span>
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -203,13 +203,13 @@ export default function FavoritesPage() {
           {/* Controls */}
           <div className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-lg shadow-sm">
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">View:</span>
+              <span className="text-sm font-medium text-fg">View:</span>
               <button
                 onClick={() => setView('grid')}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   view === 'grid'
                     ? 'bg-primary-blue text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    : 'bg-muted/20 text-fg hover:bg-muted/40'
                 }`}
               >
                 Grid
@@ -219,14 +219,14 @@ export default function FavoritesPage() {
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   view === 'list'
                     ? 'bg-primary-blue text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    : 'bg-muted/20 text-fg hover:bg-muted/40'
                 }`}
               >
                 List
               </button>
             </div>
 
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-muted">
               {favorites.length}{' '}
               {favorites.length === 1 ? 'property' : 'properties'} saved
             </div>
@@ -237,7 +237,7 @@ export default function FavoritesPage() {
         {isLoading && (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
-            <p className="mt-2 text-gray-600">Loading your favorites...</p>
+            <p className="mt-2 text-muted">Loading your favorites...</p>
           </div>
         )}
 
@@ -245,7 +245,7 @@ export default function FavoritesPage() {
         {!isLoading && favorites.length === 0 && (
           <div className="text-center py-12">
             <svg
-              className="w-12 h-12 mx-auto text-gray-400 mb-4"
+              className="w-12 h-12 mx-auto text-muted mb-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -260,16 +260,14 @@ export default function FavoritesPage() {
             <h3 className="text-sm font-semibold text-dark-charcoal mb-2">
               No favorites yet
             </h3>
-            <p className="text-gray-600 mb-6">
-              Start exploring properties and add them to your favorites to see
-              them here.
+            <p className="text-muted mb-6">
+              You haven&apos;t added any properties to your favorites yet.
             </p>
-            <Link
-              href="/properties"
-              className="inline-block bg-primary-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Browse Properties
-            </Link>
+            <Button asChild variant="secondary" size="lg">
+              <Link href="/properties">
+                <span>Browse Properties</span>
+              </Link>
+            </Button>
           </div>
         )}
 

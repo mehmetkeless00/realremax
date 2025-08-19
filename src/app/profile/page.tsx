@@ -35,8 +35,8 @@ export default async function ProfilePage() {
             <h1 className="text-lg font-bold text-dark-charcoal">
               Profile Settings
             </h1>
-            <p className="mt-2 text-gray-600">
-              Manage your personal information and preferences
+            <p className="mt-2 text-muted">
+              Manage your account settings and preferences.
             </p>
           </div>
 

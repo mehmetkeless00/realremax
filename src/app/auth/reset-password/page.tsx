@@ -124,11 +124,11 @@ function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-lg font-extrabold text-gray-900">
-            Reset Your Password
+          <h2 className="mt-6 text-center text-lg font-extrabold text-fg">
+            Reset your password
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your new password below
+          <p className="mt-2 text-center text-sm text-muted">
+            Enter your new password below.
           </p>
         </div>
 
@@ -138,7 +138,7 @@ function ResetPasswordPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-fg"
               >
                 New Password
               </label>
@@ -158,7 +158,7 @@ function ResetPasswordPage() {
                     <span className={getPasswordStrengthColor()}>
                       {passwordStrength.feedback}
                     </span>
-                    <span className="text-gray-500">
+                    <span className="text-muted">
                       {passwordStrength.score}/5
                     </span>
                   </div>
@@ -176,9 +176,9 @@ function ResetPasswordPage() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-fg"
               >
-                Confirm New Password
+                Confirm Password
               </label>
               <input
                 id="confirmPassword"

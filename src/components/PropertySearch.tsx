@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface PropertySearchProps {
   onSearch: (params: Record<string, string | number | undefined>) => void;
@@ -143,13 +144,9 @@ export default function PropertySearch({
           min={0}
         />
       </div>
-      <button
-        type="submit"
-        className="bg-primary-blue text-white px-6 py-2 rounded font-medium hover:bg-blue-700 transition-colors"
-        disabled={loading}
-      >
+      <Button type="submit" variant="secondary" size="md" disabled={loading}>
         {loading ? 'Searching...' : 'Search'}
-      </button>
+      </Button>
     </form>
   );
 }

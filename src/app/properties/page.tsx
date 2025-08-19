@@ -84,10 +84,10 @@ function PropertiesPageContent() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
-              <p className="mt-2 text-gray-600">Loading properties...</p>
+              <p className="mt-2 text-muted">Loading properties...</p>
             </div>
           ) : properties.length === 0 ? (
-            <div className="text-center py-12 text-gray-600">
+            <div className="text-center py-12 text-muted">
               No properties found.
             </div>
           ) : (

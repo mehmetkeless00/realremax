@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useUIStore } from '@/lib/store';
+import { Button } from '@/components/ui/button';
 
 interface AdvancedSearchBarProps {
   onSearch: (
@@ -208,7 +209,7 @@ export default function AdvancedSearchBar({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Location with Autocomplete */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Location
             </label>
             <input
@@ -239,7 +240,7 @@ export default function AdvancedSearchBar({
 
           {/* Property Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Property Type
             </label>
             <select
@@ -260,7 +261,7 @@ export default function AdvancedSearchBar({
 
           {/* Listing Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Listing Type
             </label>
             <select
@@ -281,7 +282,7 @@ export default function AdvancedSearchBar({
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-fg mb-1">
               Status
             </label>
             <select
@@ -305,7 +306,7 @@ export default function AdvancedSearchBar({
           <button
             type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="text-primary-blue hover:text-blue-700 font-medium flex items-center gap-2"
+            className="text-muted hover:text-fg text-sm"
           >
             <svg
               className={`w-3 h-3 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
@@ -345,8 +346,8 @@ export default function AdvancedSearchBar({
             {/* Price Range */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price Range
+                <label className="block text-sm font-medium text-fg mb-1">
+                  Min Price
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -378,8 +379,8 @@ export default function AdvancedSearchBar({
 
               {/* Size Range */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Size Range (m²)
+                <label className="block text-sm font-medium text-fg mb-1">
+                  Min Size (m²)
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -413,7 +414,7 @@ export default function AdvancedSearchBar({
             {/* Bedrooms, Bathrooms, Year Built */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-fg mb-1">
                   Bedrooms
                 </label>
                 <select
@@ -436,7 +437,7 @@ export default function AdvancedSearchBar({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-fg mb-1">
                   Bathrooms
                 </label>
                 <select
@@ -458,7 +459,7 @@ export default function AdvancedSearchBar({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-fg mb-1">
                   Year Built
                 </label>
                 <input
@@ -480,7 +481,7 @@ export default function AdvancedSearchBar({
 
             {/* Amenities */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-fg mb-2">
                 Amenities
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -495,7 +496,7 @@ export default function AdvancedSearchBar({
                       onChange={() => handleAmenityToggle(amenity)}
                       className="rounded border-gray-300 text-primary-blue focus:ring-primary-blue"
                     />
-                    <span className="text-sm text-gray-700">{amenity}</span>
+                    <span className="text-sm text-fg">{amenity}</span>
                   </label>
                 ))}
               </div>
@@ -505,10 +506,12 @@ export default function AdvancedSearchBar({
 
         {/* Search Button */}
         <div className="flex justify-center mt-6">
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="bg-primary-blue text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            variant="secondary"
+            size="lg"
+            className="flex items-center gap-2"
           >
             {loading ? (
               <>
@@ -533,7 +536,7 @@ export default function AdvancedSearchBar({
                 Search Properties
               </>
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

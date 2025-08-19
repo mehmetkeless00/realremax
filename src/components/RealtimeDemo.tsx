@@ -54,13 +54,13 @@ export default function RealtimeDemo() {
           </button>
         </div>
         <div className="bg-gray-50 rounded-md p-4">
-          <div className="text-sm text-gray-600 mb-2">Current Favorites:</div>
+          <div className="text-sm text-muted mb-2">Current Favorites:</div>
           <div className="text-base font-bold text-dark-charcoal">
             {favorites.length}
           </div>
         </div>
         {lastUpdate && (
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-muted">
             Last updated: {lastUpdate.toLocaleTimeString()}
           </div>
         )}

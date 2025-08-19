@@ -6,6 +6,7 @@ import { getCurrentUser, signOut } from '@/lib/auth';
 import { useUserStore } from '@/lib/store';
 import UserProfile from '@/components/UserProfile';
 import InquiryManagement from '@/components/InquiryManagement';
+import { Button } from '@/components/ui/button';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -62,31 +63,62 @@ export default function Dashboard() {
             <div className="px-4 py-5 sm:p-6">
               <div className="flex justify-between items-center mb-8">
                 <div>
-                  <h1 className="text-base font-bold text-gray-900">
-                    Welcome to Remax Unified Platform
+                  <h1 className="text-base font-bold text-fg">
+                    Welcome back, {user?.email}
                   </h1>
-                  <p className="mt-1 text-sm text-gray-600">
-                    {user?.email} - {user?.user_metadata?.role || 'User'}
+                  <p className="mt-1 text-sm text-muted">
+                    Here&apos;s what&apos;s happening with your account
                   </p>
                 </div>
-                <button
-                  onClick={handleSignOut}
-                  className="bg-primary-red text-white px-4 py-2 rounded-md hover:bg-red-700"
-                >
+                <Button onClick={handleSignOut} variant="danger" size="md">
                   Sign Out
-                </button>
+                </Button>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">
-                    User Profile
+                  <h2 className="text-lg font-medium text-fg mb-4">
+                    Recent Activity
                   </h2>
-                  <UserProfile />
+                  <div className="bg-blue-50 p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-blue-900">
+                      Properties
+                    </h3>
+                    <p className="mt-2 text-sm text-blue-700">
+                      Browse and search for properties
+                    </p>
+                  </div>
+
+                  <div className="bg-green-50 p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-green-900">
+                      Listings
+                    </h3>
+                    <p className="mt-2 text-sm text-green-700">
+                      View active property listings
+                    </p>
+                  </div>
+
+                  <div className="bg-purple-50 p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-purple-900">
+                      Agents
+                    </h3>
+                    <p className="mt-2 text-sm text-purple-700">
+                      Connect with real estate agents
+                    </p>
+                  </div>
+
+                  <div className="bg-orange-50 p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-orange-900">
+                      Favorites
+                    </h3>
+                    <p className="mt-2 text-sm text-orange-700">
+                      View your saved properties
+                    </p>
+                  </div>
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900 mb-4">
+                  <h2 className="text-lg font-medium text-fg mb-4">
                     Quick Actions
                   </h2>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -130,8 +162,8 @@ export default function Dashboard() {
               </div>
 
               <div className="mt-8">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">
-                  Inquiry Management
+                <h2 className="text-lg font-medium text-fg mb-4">
+                  Account Overview
                 </h2>
                 <InquiryManagement />
               </div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import PropertyListingForm from '@/components/PropertyListingForm';
 
 interface PropertyFormData {
@@ -150,18 +151,15 @@ export default function ListingsPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Access Denied
-            </h1>
-            <p className="text-gray-600 mb-6">
+            <h1 className="text-2xl font-bold text-fg mb-4">Access Denied</h1>
+            <p className="text-muted mb-6">
               You need agent privileges to access this page.
             </p>
-            <Link
-              href="/dashboard"
-              className="bg-primary-blue text-white px-6 py-2 rounded hover:bg-blue-700"
-            >
-              Back to Dashboard
-            </Link>
+            <Button asChild variant="secondary" size="md">
+              <Link href="/dashboard">
+                <span>Back to Dashboard</span>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -172,15 +170,16 @@ export default function ListingsPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-lg font-bold text-dark-charcoal">
-            My Properties
+          <h1 className="text-2xl font-bold text-fg mb-4">
+            My Property Listings
           </h1>
-          <button
+          <Button
             onClick={() => setShowForm(true)}
-            className="bg-primary-blue text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
+            variant="secondary"
+            size="md"
           >
             Add Property
-          </button>
+          </Button>
         </div>
 
         {showForm && (
@@ -197,13 +196,13 @@ export default function ListingsPage() {
         {loading && !showForm ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
-            <p className="mt-2 text-gray-600">Loading properties...</p>
+            <p className="mt-2 text-muted">Loading properties...</p>
           </div>
         ) : properties.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <div className="mb-4">
               <svg
-                className="w-12 h-12 mx-auto text-gray-400"
+                className="w-12 h-12 mx-auto text-muted"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -216,18 +215,19 @@ export default function ListingsPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No properties yet
+            <h3 className="text-lg font-semibold text-fg mb-2">
+              No Listings Found
             </h3>
-            <p className="text-gray-600 mb-6">
-              Start by adding your first property listing.
+            <p className="text-muted mb-6">
+              You haven&apos;t created any property listings yet.
             </p>
-            <button
+            <Button
               onClick={() => setShowForm(true)}
-              className="bg-primary-blue text-white px-6 py-2 rounded hover:bg-blue-700"
+              variant="secondary"
+              size="md"
             >
               Add Your First Property
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -238,7 +238,7 @@ export default function ListingsPage() {
               >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-fg">
                       {property.title}
                     </h3>
                     <span
@@ -247,21 +247,19 @@ export default function ListingsPage() {
                           ? 'bg-green-100 text-green-800'
                           : property.status === 'pending'
                             ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-800'
+                            : 'bg-muted/20 text-fg'
                       }`}
                     >
                       {property.status}
                     </span>
                   </div>
 
-                  <p className="text-gray-600 text-sm mb-2">
-                    {property.location}
-                  </p>
+                  <p className="text-muted text-sm mb-2">{property.location}</p>
                   <p className="text-primary-blue font-bold text-lg mb-2">
                     ${property.price.toLocaleString()}
                   </p>
 
-                  <div className="flex gap-4 text-sm text-gray-500 mb-4">
+                  <div className="flex gap-4 text-sm text-muted mb-4">
                     {property.bedrooms && <span>{property.bedrooms} beds</span>}
                     {property.bathrooms && (
                       <span>{property.bathrooms} baths</span>
@@ -271,18 +269,18 @@ export default function ListingsPage() {
 
                   {property.amenities && property.amenities.length > 0 && (
                     <div className="mb-4">
-                      <p className="text-xs text-gray-500 mb-1">Amenities:</p>
+                      <p className="text-xs text-muted mb-1">Amenities:</p>
                       <div className="flex flex-wrap gap-1">
                         {property.amenities.slice(0, 3).map((amenity) => (
                           <span
                             key={amenity}
-                            className="px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded"
+                            className="px-2 py-1 bg-muted/20 text-xs text-fg rounded"
                           >
                             {amenity}
                           </span>
                         ))}
                         {property.amenities.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded">
+                          <span className="px-2 py-1 bg-muted/20 text-xs text-fg rounded">
                             +{property.amenities.length - 3} more
                           </span>
                         )}
@@ -291,18 +289,22 @@ export default function ListingsPage() {
                   )}
 
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => handleEdit(property)}
-                      className="flex-1 bg-primary-blue text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1"
                     >
                       Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleDelete(property.id)}
-                      className="flex-1 bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 transition-colors"
+                      variant="danger"
+                      size="sm"
+                      className="flex-1"
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

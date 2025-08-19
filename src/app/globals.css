@@ -1,50 +1,141 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Design System tokens must come AFTER tailwind layers so they can override */
+@import '../design-system/tokens.css';
 
-/* Custom utilities */
+/* Design System Components Layer */
+@layer components {
+  /* Button System */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-sm {
+    @apply h-8 px-3 text-sm;
+  }
+
+  .btn-md {
+    @apply h-10 px-4 text-sm;
+  }
+
+  .btn-lg {
+    @apply h-12 px-5 text-base;
+  }
+
+  .btn-primary {
+    @apply bg-red-600 text-white hover:opacity-90 focus-visible:ring-red-600;
+  }
+
+  .btn-secondary {
+    @apply bg-blue-800 text-white hover:opacity-90 focus-visible:ring-blue-800;
+  }
+
+  .btn-outline {
+    @apply border border-gray-200 text-gray-900 hover:bg-gray-50 focus-visible:ring-gray-200;
+  }
+
+  .btn-ghost {
+    @apply text-gray-900 hover:bg-gray-50;
+  }
+
+  .btn-outline-on-primary {
+    @apply border border-white text-white hover:bg-white hover:text-blue-800 focus-visible:ring-white;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:opacity-90 focus-visible:ring-red-600;
+  }
+
+  /* Card System */
+  .card {
+    @apply bg-white rounded-lg shadow-md;
+  }
+
+  .card-header {
+    @apply p-4 border-b border-gray-200;
+  }
+
+  .card-content {
+    @apply p-4;
+  }
+
+  .card-footer {
+    @apply p-4 border-t border-gray-200;
+  }
+
+  /* Badge System */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-blue-800 text-white;
+  }
+
+  .badge-success {
+    @apply bg-green-600 text-white;
+  }
+
+  .badge-warning {
+    @apply bg-amber-500 text-white;
+  }
+
+  .badge-danger {
+    @apply bg-red-600 text-white;
+  }
+
+  .badge-outline {
+    @apply border border-gray-200 text-gray-900 bg-transparent;
+  }
+
+  /* Layout Components */
+  .container-page {
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section {
+    @apply py-12;
+  }
+
+  .section-sm {
+    @apply py-8;
+  }
+
+  .section-lg {
+    @apply py-16;
+  }
+
+  .section-xl {
+    @apply py-20;
+  }
+}
+
+/* Custom utilities (keep existing, but add standard property too) */
 @layer utilities {
   .line-clamp-1 {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
+    line-clamp: 1; /* standard for editor warning */
   }
-
   .line-clamp-2 {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
-
   .line-clamp-3 {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
   }
 }
 
-:root {
-  --primary-red: #ff1200;
-  --primary-blue: #0043ff;
-  --dark-charcoal: #232323;
-  --white: #ffffff;
-}
-
-@theme inline {
-  --color-primary-red: var(--primary-red);
-  --color-primary-blue: var(--primary-blue);
-  --color-dark-charcoal: var(--dark-charcoal);
-  --color-white: var(--white);
-  --font-sans: var(--font-montserrat);
-}
-
+/* Base styles - only essential overrides that can't be handled by Tailwind */
 body {
-  background: var(--white);
-  color: var(--dark-charcoal);
-  font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }

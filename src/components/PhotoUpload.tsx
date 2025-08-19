@@ -175,7 +175,7 @@ export default function PhotoUpload({
         <input {...getInputProps()} />
         <div className="space-y-2">
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-12 w-12 text-muted"
             stroke="currentColor"
             fill="none"
             viewBox="0 0 48 48"
@@ -187,7 +187,7 @@ export default function PhotoUpload({
               strokeLinejoin="round"
             />
           </svg>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-muted">
             {isDragActive ? (
               <p>Drop the photos here...</p>
             ) : (
@@ -198,10 +198,10 @@ export default function PhotoUpload({
                 or drag and drop
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted mt-1">
               PNG, JPG, GIF up to 5MB each
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted">
               {existingPhotos.length}/{maxFiles} photos uploaded
             </p>
           </div>
@@ -211,7 +211,7 @@ export default function PhotoUpload({
       {/* Upload Progress */}
       {uploading && (
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-sm text-muted">
             <span>Uploading...</span>
             <span>{Math.round(uploadProgress)}%</span>
           </div>
@@ -227,7 +227,7 @@ export default function PhotoUpload({
       {/* Existing Photos */}
       {existingPhotos.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Uploaded Photos</h3>
+          <h3 className="text-lg font-medium text-fg">Uploaded Photos</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {existingPhotos.map((photo, index) => (
               <div key={index} className="relative group">

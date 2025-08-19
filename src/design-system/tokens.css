@@ -1,0 +1,77 @@
+:root {
+  /* Base Colors */
+  --color-bg: #ffffff;
+  --color-fg: #232323;
+  --color-muted: #6b7280; /* gray-500 */
+  --color-border: #e5e7eb; /* gray-200 */
+  --color-white: #ffffff;
+  --color-charcoal: #232323;
+
+  /* Brand Colors */
+  --color-primary-red: #ff1200; /* keep your brand red */
+  --color-primary-blue: #1e40af; /* blue-800 */
+
+  /* State Colors */
+  --color-success: #16a34a; /* green-600 */
+  --color-warning: #f59e0b; /* amber-500 */
+  --color-danger: #dc2626; /* red-600 */
+
+  /* Typography */
+  --font-montserrat: 'Montserrat', Arial, Helvetica, sans-serif;
+  --font-sans: var(
+    --font-montserrat,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    'Apple Color Emoji',
+    'Segoe UI Emoji'
+  );
+  --font-display: var(
+    --font-montserrat,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    'Apple Color Emoji',
+    'Segoe UI Emoji'
+  );
+
+  /* Font Sizes (Type Scale: 1.25) */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Spacing (8px grid) */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* Radii & Shadows */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  /* Z-index */
+  --z-nav: 50;
+  --z-modal: 100;
+  --z-toast: 110;
+}

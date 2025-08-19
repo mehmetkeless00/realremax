@@ -30,11 +30,11 @@ export default function ForgotPassword() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h2 className="mt-6 text-lg font-extrabold text-gray-900">
+            <h2 className="mt-6 text-lg font-extrabold text-fg">
               Check your email
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              We&apos;ve sent you a password reset link.
+            <p className="mt-2 text-sm text-muted">
+              We&apos;ve sent a password reset link to your email address.
             </p>
           </div>
           <div className="text-center">
@@ -54,10 +54,10 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-lg font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-lg font-extrabold text-fg">
             Reset your password
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-muted">
             Enter your email address and we&apos;ll send you a link to reset
             your password.
           </p>
@@ -75,13 +75,13 @@ export default function ForgotPassword() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
+              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-border placeholder-muted text-fg focus:outline-none focus:ring-primary-blue focus:border-primary-blue focus:z-10 sm:text-sm"
               placeholder="Email address"
             />
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
+            <div className="text-danger text-sm text-center">{error}</div>
           )}
 
           <div>

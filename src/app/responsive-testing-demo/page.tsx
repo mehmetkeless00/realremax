@@ -9,6 +9,7 @@ import {
   generateResponsiveTestReport,
 } from '@/lib/utils/responsiveTesting';
 import type { PropertyWithListing } from '@/types/property';
+import { Button } from '@/components/ui/button';
 
 // Responsive test sonucu tipi
 type ResponsiveTestResult = {
@@ -105,7 +106,7 @@ export default function ResponsiveTestingDemo() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-lg font-bold text-gray-900 mb-8">
+          <h1 className="text-lg font-bold text-fg mb-8">
             Responsive Testing Demo
           </h1>
 
@@ -124,7 +125,7 @@ export default function ResponsiveTestingDemo() {
                   }`}
                 >
                   <div className="text-sm font-medium">{viewport.name}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted">
                     {viewport.width}x{viewport.height}
                   </div>
                 </button>
@@ -143,16 +144,17 @@ export default function ResponsiveTestingDemo() {
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 className="text-sm font-semibold mb-4">Test Controls</h2>
             <div className="flex flex-wrap gap-4">
-              <button
+              <Button
                 onClick={runTests}
                 disabled={isRunningTests}
-                className="bg-primary-blue text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="secondary"
+                size="md"
               >
                 {isRunningTests ? 'Running Tests...' : 'Run Responsive Tests'}
-              </button>
+              </Button>
 
               {testResults.length > 0 && (
-                <button
+                <Button
                   onClick={() => {
                     const report = generateReport();
                     const blob = new Blob([report], { type: 'text/markdown' });
@@ -163,10 +165,12 @@ export default function ResponsiveTestingDemo() {
                     a.click();
                     URL.revokeObjectURL(url);
                   }}
-                  className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700"
+                  variant="outline"
+                  size="md"
+                  className="bg-green-600 text-white hover:bg-green-700"
                 >
                   Download Report
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -211,10 +215,10 @@ export default function ResponsiveTestingDemo() {
               <div className="mb-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-3 bg-gray-100 rounded-lg">
-                    <div className="text-base font-bold text-gray-900">
+                    <div className="text-base font-bold text-fg">
                       {testResults.length}
                     </div>
-                    <div className="text-sm text-gray-600">Total Tests</div>
+                    <div className="text-sm text-muted">Total Tests</div>
                   </div>
                   <div className="text-center p-3 bg-green-100 rounded-lg">
                     <div className="text-base font-bold text-green-900">

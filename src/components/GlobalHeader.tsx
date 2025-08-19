@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Logo from './Logo';
 import UserMenu from './UserMenu';
 import { useUIStore, useUserStore } from '@/lib/store';
+import { Button } from '@/components/ui/button';
 
 export default function GlobalHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -94,12 +95,14 @@ export default function GlobalHeader() {
 
             <UserMenu />
 
-            <button
+            <Button
               onClick={handleFreeValuation}
-              className="hidden sm:block bg-primary-red text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors font-medium"
+              variant="primary"
+              size="md"
+              className="hidden sm:block"
             >
               Free Valuation
-            </button>
+            </Button>
 
             {/* Mobile menu button */}
             <button
@@ -145,22 +148,22 @@ export default function GlobalHeader() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <div className="font-medium">{link.label}</div>
-                  <div className="text-sm text-gray-500">
-                    {link.description}
-                  </div>
+                  <div className="text-sm text-muted">{link.description}</div>
                 </Link>
               ))}
 
               <div className="pt-2">
-                <button
+                <Button
                   onClick={() => {
                     handleFreeValuation();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full bg-primary-red text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors font-medium"
+                  variant="primary"
+                  size="md"
+                  className="w-full"
                 >
                   Free Valuation
-                </button>
+                </Button>
               </div>
             </nav>
           </div>

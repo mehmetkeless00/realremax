@@ -5,6 +5,7 @@ import { useUserStore, useUIStore } from '@/lib/store';
 import { updateUserRoleById } from '@/lib/auth';
 import type { User } from '@supabase/supabase-js';
 import ChangePasswordModal from './ChangePasswordModal';
+import { Button } from '@/components/ui/button';
 
 interface ProfileFormProps {
   user: User;
@@ -282,13 +283,14 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             </div>
 
             <div className="flex justify-end">
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="bg-primary-blue text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue disabled:opacity-50"
+                variant="secondary"
+                size="md"
               >
                 {loading ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -376,13 +378,14 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             </div>
 
             <div className="flex justify-end">
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="bg-primary-blue text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue disabled:opacity-50"
+                variant="secondary"
+                size="md"
               >
                 {loading ? 'Saving...' : 'Save Preferences'}
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -397,13 +400,14 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               <p className="text-sm text-gray-500 mb-4">
                 Update your password to keep your account secure
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={() => setShowChangePasswordModal(true)}
-                className="bg-primary-red text-white px-6 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-red"
+                variant="danger"
+                size="md"
               >
                 Change Password
-              </button>
+              </Button>
             </div>
 
             <div className="border-t border-gray-200 pt-6">
@@ -420,12 +424,9 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                       Add an extra layer of security to your account
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    className="bg-white text-primary-blue border border-primary-blue px-4 py-2 rounded-md hover:bg-blue-50"
-                  >
+                  <Button type="button" variant="outline" size="sm">
                     Enable
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -437,12 +438,9 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                       View recent login activity
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    className="bg-white text-primary-blue border border-primary-blue px-4 py-2 rounded-md hover:bg-blue-50"
-                  >
+                  <Button type="button" variant="outline" size="sm">
                     View
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

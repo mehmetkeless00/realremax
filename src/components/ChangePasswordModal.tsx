@@ -113,7 +113,7 @@ export default function ChangePasswordModal({
   };
 
   const getPasswordStrengthColor = () => {
-    if (passwordStrength.score < 3) return 'text-red-500';
+    if (passwordStrength.score < 3) return 'text-danger';
     if (passwordStrength.score < 4) return 'text-yellow-500';
     return 'text-green-500';
   };
@@ -285,7 +285,7 @@ export default function ChangePasswordModal({
               />
               {formData.confirmPassword &&
                 formData.newPassword !== formData.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">
+                  <p className="mt-1 text-sm text-danger">
                     Passwords do not match
                   </p>
                 )}

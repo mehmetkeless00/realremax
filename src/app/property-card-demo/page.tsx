@@ -211,13 +211,13 @@ export default function PropertyCardDemo() {
           {/* Controls */}
           <div className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-lg shadow-sm">
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">View:</span>
+              <span className="text-sm font-medium text-fg">View:</span>
               <button
                 onClick={() => setView('grid')}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   view === 'grid'
                     ? 'bg-primary-blue text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    : 'bg-muted/20 text-fg hover:bg-muted/40'
                 }`}
               >
                 Grid
@@ -227,7 +227,7 @@ export default function PropertyCardDemo() {
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   view === 'list'
                     ? 'bg-primary-blue text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    : 'bg-muted/20 text-fg hover:bg-muted/40'
                 }`}
               >
                 List
@@ -235,9 +235,7 @@ export default function PropertyCardDemo() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">
-                Favorites:
-              </span>
+              <span className="text-sm font-medium text-fg">Favorites:</span>
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -245,13 +243,13 @@ export default function PropertyCardDemo() {
                   onChange={(e) => setShowFavorites(e.target.checked)}
                   className="rounded border-gray-300 text-primary-blue focus:ring-primary-blue"
                 />
-                <span className="ml-2 text-sm text-gray-700">
+                <span className="ml-2 text-sm text-fg">
                   Show favorite buttons
                 </span>
               </label>
             </div>
 
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-muted">
               {favorites.length}{' '}
               {favorites.length === 1 ? 'property' : 'properties'} in favorites
             </div>
@@ -284,8 +282,8 @@ export default function PropertyCardDemo() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-medium text-gray-900 mb-2">Grid View</h3>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <h3 className="font-medium text-fg mb-2">Grid View</h3>
+              <ul className="text-sm text-muted space-y-1">
                 <li>• Compact card layout</li>
                 <li>• Image with status badges</li>
                 <li>• Price and basic info</li>
@@ -293,8 +291,8 @@ export default function PropertyCardDemo() {
               </ul>
             </div>
             <div>
-              <h3 className="font-medium text-gray-900 mb-2">List View</h3>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <h3 className="font-medium text-fg mb-2">List View</h3>
+              <ul className="text-sm text-muted space-y-1">
                 <li>• Horizontal layout</li>
                 <li>• Detailed property information</li>
                 <li>• Agent information</li>

@@ -61,14 +61,15 @@ export default function AuthCallback() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="mt-6 text-lg font-bold text-gray-900">
-            Authentication
+          <h2 className="mt-6 text-lg font-bold text-fg">
+            Authentication{' '}
+            {message.includes('successful') ? 'Successful' : 'Processing...'}
           </h2>
-          <p className="mt-2 text-sm text-gray-600">{message}</p>
+          <p className="mt-2 text-sm text-muted">{message}</p>
         </div>
 
         <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-800"></div>
         </div>
       </div>
     </div>
