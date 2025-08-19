@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const sizeMax = searchParams.get('sizeMax');
     const status = searchParams.get('status');
     const yearBuilt = searchParams.get('yearBuilt');
+    const agent = searchParams.get('agent');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
 
@@ -41,6 +42,7 @@ export async function GET(request: NextRequest) {
     if (sizeMax) query = query.lte('size', sizeMax);
     if (status) query = query.eq('status', status);
     if (yearBuilt) query = query.gte('year_built', yearBuilt);
+    if (agent) query = query.eq('agent_id', agent);
 
     // Note: Amenities filtering would require a separate amenities table
     // For now, we'll skip amenities filtering in the API
