@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, signOut } from '@/lib/auth';
 import { useUserStore } from '@/lib/store';
-import UserProfile from '@/components/UserProfile';
 import InquiryManagement from '@/components/InquiryManagement';
 import { Button } from '@/components/ui/button';
 

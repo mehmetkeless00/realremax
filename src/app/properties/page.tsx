@@ -77,7 +77,9 @@ function PropertiesPageContent() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <h1 className="text-lg font-bold text-dark-charcoal mb-6">
-          Advanced Property Search
+          {searchParams.get('agent')
+            ? 'Agent Properties'
+            : 'Advanced Property Search'}
         </h1>
         <AdvancedSearchBar onSearch={handleSearch} loading={loading} />
         <div className="mt-8">
