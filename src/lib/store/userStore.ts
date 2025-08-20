@@ -32,6 +32,7 @@ interface UserState {
   // Auth actions
   signIn: (user: User, session: unknown) => void;
   signOut: () => void;
+  reset: () => void;
 
   // Profile actions
   updateProfile: (updates: Partial<UserProfile>) => void;
@@ -62,6 +63,14 @@ export const useUserStore = create<UserState>()(
         }),
 
       signOut: () =>
+        set({
+          user: null,
+          session: null,
+          profile: null,
+          isLoading: false,
+        }),
+
+      reset: () =>
         set({
           user: null,
           session: null,

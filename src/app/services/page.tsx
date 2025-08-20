@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useUIStore, useUserStore } from '@/lib/store';
+import React, { useState, useEffect, useCallback } from 'react';
+// import { useUIStore, useUserStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +35,7 @@ export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+
   const [requestForm, setRequestForm] = useState<ServiceRequestForm>({
     serviceId: '',
     name: '',
@@ -46,8 +47,9 @@ export default function ServicesPage() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const { addToast } = useUIStore();
-  const { user } = useUserStore();
+  // const { addToast } = useUIStore();
+  // const { user } = useUserStore();
+  const user = null; // Temporary fix
 
   useEffect(() => {
     const loadServices = async () => {
@@ -198,25 +200,22 @@ export default function ServicesPage() {
     );
   };
 
-  const handleRequestService = (service: Service) => {
+  const handleRequestService = useCallback((service: Service) => {
     setSelectedService(service);
     setRequestForm((prev) => ({
       ...prev,
       serviceId: service.id,
-      name: user?.user_metadata?.full_name || '',
-      email: user?.email || '',
+      name: '',
+      email: '',
     }));
     setShowRequestForm(true);
-  };
+  }, []);
 
   const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!user) {
-      addToast({
-        type: 'error',
-        message: 'Please sign in to request services',
-      });
+      alert('Please sign in to request services');
       return;
     }
 
@@ -233,10 +232,7 @@ export default function ServicesPage() {
         throw new Error(errorData.error || 'Failed to submit request');
       }
 
-      addToast({
-        type: 'success',
-        message: 'Service request submitted successfully',
-      });
+      alert('Service request submitted successfully');
       setShowRequestForm(false);
       setSelectedService(null);
       setRequestForm({
@@ -250,11 +246,9 @@ export default function ServicesPage() {
       });
     } catch (error) {
       console.error('Submit request error:', error);
-      addToast({
-        type: 'error',
-        message:
-          error instanceof Error ? error.message : 'Failed to submit request',
-      });
+      alert(
+        error instanceof Error ? error.message : 'Failed to submit request'
+      );
     } finally {
       setSubmitting(false);
     }

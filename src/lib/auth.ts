@@ -7,6 +7,25 @@ export interface AuthUser {
   role: 'visitor' | 'registered' | 'agent';
 }
 
+// Reset authentication state
+export async function resetAuth() {
+  try {
+    // Clear all auth data
+    await supabase.auth.signOut();
+
+    // Clear local storage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user-storage');
+      sessionStorage.clear();
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Reset auth error:', error);
+    return { success: false, error };
+  }
+}
+
 // Email/Password Authentication
 export async function signUpWithEmail(
   email: string,
@@ -45,18 +64,40 @@ export async function signUpWithEmail(
 }
 
 export async function signInWithEmail(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  if (error) throw error;
-  return data;
+    if (error) {
+      console.error('Sign in error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Sign in error:', error);
+    throw error;
+  }
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Sign out error:', error);
+      throw error;
+    }
+
+    // Clear local storage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user-storage');
+    }
+  } catch (error) {
+    console.error('Sign out error:', error);
+    throw error;
+  }
 }
 
 // Social Authentication
@@ -109,23 +150,41 @@ export async function updatePassword(newPassword: string) {
 
 // User Management
 export async function getCurrentUser() {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (error) throw error;
-  return user;
+    if (error) {
+      console.error('Get current user error:', error);
+      throw error;
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Get current user error:', error);
+    throw error;
+  }
 }
 
 export async function getCurrentSession() {
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
+  try {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
 
-  if (error) throw error;
-  return session;
+    if (error) {
+      console.error('Get current session error:', error);
+      throw error;
+    }
+
+    return session;
+  } catch (error) {
+    console.error('Get current session error:', error);
+    throw error;
+  }
 }
 
 // Role Management

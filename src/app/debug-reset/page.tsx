@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
+import { resetAuth } from '@/lib/auth';
 
 interface DebugInfo {
   url: string;
@@ -113,11 +114,28 @@ function DebugResetContent() {
             {JSON.stringify(debugInfo.allParams, null, 2)}
           </pre>
 
-          <div className="mt-6">
+          <div className="mt-6 space-x-4">
             <Button asChild variant="secondary" size="md">
               <a href="/reset-password">
                 <span>Go to Reset Password Page</span>
               </a>
+            </Button>
+
+            <Button
+              variant="outline"
+              size="md"
+              onClick={async () => {
+                try {
+                  await resetAuth();
+                  alert('Authentication state has been reset successfully!');
+                  window.location.href = '/';
+                } catch (error) {
+                  console.error('Reset error:', error);
+                  alert('Failed to reset authentication state');
+                }
+              }}
+            >
+              Reset Auth State
             </Button>
           </div>
         </div>

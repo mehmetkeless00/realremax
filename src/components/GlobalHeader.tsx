@@ -4,12 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Logo from './Logo';
 import UserMenu from './UserMenu';
-import { useUIStore, useUserStore } from '@/lib/store';
+import { useUserStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 
 export default function GlobalHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { addToast } = useUIStore();
   const { user } = useUserStore();
 
   const navigationLinks = [
@@ -20,10 +19,8 @@ export default function GlobalHeader() {
   ];
 
   const handleFreeValuation = () => {
-    addToast({
-      type: 'info',
-      message: 'Free valuation feature coming soon!',
-    });
+    // Navigate to services page with property valuation filter
+    window.location.href = '/services?service=valuation';
   };
 
   return (
