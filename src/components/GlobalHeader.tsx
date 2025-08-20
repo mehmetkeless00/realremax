@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Logo from './Logo';
 import UserMenu from './UserMenu';
 import { useUIStore, useUserStore } from '@/lib/store';
@@ -11,10 +12,41 @@ export default function GlobalHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { addToast } = useUIStore();
   const { user } = useUserStore();
+  const pathname = usePathname();
+
+  function NavLink({
+    href,
+    label,
+    description,
+    onClick,
+  }: {
+    href: string;
+    label: string;
+    description?: string;
+    onClick?: () => void;
+  }) {
+    const active = pathname?.startsWith(href);
+    return (
+      <Link
+        href={href}
+        onClick={onClick}
+        aria-current={active ? 'page' : undefined}
+        className={`block py-2 px-4 text-dark-charcoal hover:text-primary hover:bg-gray-50 rounded-md transition-colors ${
+          active ? 'text-primary font-semibold' : ''
+        }`}
+      >
+        <div className="font-medium">{label}</div>
+        {description && <div className="text-sm text-muted">{description}</div>}
+      </Link>
+    );
+  }
 
   const navigationLinks = [
-    { href: '/properties', label: 'Buy', description: 'Find your dream home' },
-    { href: '/rent', label: 'Rent', description: 'Rental properties' },
+    {
+      href: '/properties',
+      label: 'Buy/Rent',
+      description: 'Find your dream home or rental',
+    },
     { href: '/agents', label: 'Agents', description: 'Find agents' },
     { href: '/services', label: 'Services', description: 'Our services' },
   ];
@@ -41,16 +73,22 @@ export default function GlobalHeader() {
 
           {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex space-x-8">
-            {navigationLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-dark-charcoal hover:text-primary transition-colors font-medium relative group"
-              >
-                {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-              </Link>
-            ))}
+            {navigationLinks.map((link) => {
+              const active = pathname?.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={`text-dark-charcoal hover:text-primary transition-colors font-medium relative group ${
+                    active ? 'text-primary font-semibold' : ''
+                  }`}
+                >
+                  {link.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right side - User menu and CTA */}
@@ -145,15 +183,13 @@ export default function GlobalHeader() {
           <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
             <nav className="pt-4 space-y-2">
               {navigationLinks.map((link) => (
-                <Link
+                <NavLink
                   key={link.href}
                   href={link.href}
-                  className="block py-2 px-4 text-dark-charcoal hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  label={link.label}
+                  description={link.description}
                   onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <div className="font-medium">{link.label}</div>
-                  <div className="text-sm text-muted">{link.description}</div>
-                </Link>
+                />
               ))}
 
               <div className="pt-2">

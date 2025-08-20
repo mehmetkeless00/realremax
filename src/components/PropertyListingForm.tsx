@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useUIStore } from '@/lib/store';
 import PhotoUpload from './PhotoUpload';
+import { Button } from '@/components/ui/button';
 
 interface PropertyFormData {
   title: string;
@@ -729,45 +730,52 @@ export default function PropertyListingForm({
         {renderStepContent()}
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
-          <button
+        <div className="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
+          {/* Previous Button */}
+          <Button
             type="button"
+            variant="outline"
             onClick={handlePrevious}
             disabled={currentStep === 1}
-            className="px-6 py-2 border border-border rounded-md text-fg hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-w-[110px]"
           >
             Previous
-          </button>
-          <div className="flex space-x-3">
-            {currentStep < 5 ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="px-6 py-2 bg-primary-blue text-white rounded-md hover:bg-blue-700"
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-6 py-2 bg-primary-blue text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-              >
-                {loading
-                  ? 'Saving...'
-                  : property
-                    ? 'Update Property'
-                    : 'Create Property'}
-              </button>
-            )}
-            <button
+          </Button>
+
+          {/* Cancel Button */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="min-w-[110px]"
+          >
+            Cancel
+          </Button>
+
+          {/* Next/Submit Button */}
+          {currentStep < 5 ? (
+            <Button
               type="button"
-              onClick={onCancel}
-              className="px-6 py-2 border border-border rounded-md text-fg hover:bg-black/5"
+              onClick={handleNext}
+              size="lg"
+              className="min-w-[120px] bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600/60 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Cancel
-            </button>
-          </div>
+              Next
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              disabled={loading}
+              size="lg"
+              className="min-w-[120px] bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600/60 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading
+                ? 'Saving...'
+                : property
+                  ? 'Update Property'
+                  : 'Create Property'}
+            </Button>
+          )}
         </div>
       </form>
     </div>

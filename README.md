@@ -114,6 +114,3 @@ The easiest way to deploy is using [Vercel](https://vercel.com):
 This project is licensed under the MIT License.
 
 go
-
-
-deneme

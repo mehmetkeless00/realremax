@@ -61,6 +61,7 @@ export const listingsCardProps = {
       img: '/logo.png',
     },
   ],
+  // currently unused - kept for potential future use
   developments: [
     {
       id: '3001',
@@ -92,6 +93,11 @@ export const listingsCardProps = {
     },
   ],
 } as const;
+
+// add this export below listingsCardProps
+export const moreRecent: ListingItem[] = [
+  ...listingsCardProps.recent,
+].reverse();
 
 export const regions = [
   'Lisbon',

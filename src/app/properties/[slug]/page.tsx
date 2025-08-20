@@ -79,21 +79,44 @@ export default async function PropertyPage({ params }: Props) {
         </div>
       </div>
 
-      <Gallery images={property.images} />
-      <PriceBar
-        price={property.price}
-        currency={property.currency}
-        operation={property.operation}
-      />
-      <Facts
-        type={property.type}
-        bedrooms={property.bedrooms}
-        bathrooms={property.bathrooms}
-        netArea={property.netArea}
-        grossArea={property.grossArea}
-        yearBuilt={property.yearBuilt}
-        energyRating={property.energyRating}
-      />
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+        <div className="lg:col-span-7">
+          <Gallery images={property.images} />
+        </div>
+
+        <aside className="mt-6 lg:mt-0 lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+          <PriceBar
+            price={property.price}
+            currency={property.currency}
+            operation={property.operation}
+          />
+          {/* Facts visible on desktop */}
+          <div className="hidden lg:block">
+            <Facts
+              type={property.type}
+              bedrooms={property.bedrooms}
+              bathrooms={property.bathrooms}
+              netArea={property.netArea}
+              grossArea={property.grossArea}
+              yearBuilt={property.yearBuilt}
+              energyRating={property.energyRating}
+            />
+          </div>
+        </aside>
+      </div>
+
+      {/* Facts visible under gallery on mobile */}
+      <div className="lg:hidden mt-6">
+        <Facts
+          type={property.type}
+          bedrooms={property.bedrooms}
+          bathrooms={property.bathrooms}
+          netArea={property.netArea}
+          grossArea={property.grossArea}
+          yearBuilt={property.yearBuilt}
+          energyRating={property.energyRating}
+        />
+      </div>
 
       {/* Two columns layout */}
       <div className="grid md:grid-cols-3 gap-8 mb-8">

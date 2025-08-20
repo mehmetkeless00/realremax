@@ -1,133 +1,107 @@
-'use client';
+import FiltersBar from '@/components/search/FiltersBar';
+import { searchProperties } from '@/repositories/propertyRepo';
+import Link from 'next/link';
+import Image from 'next/image';
 
-import { Suspense } from 'react';
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import AdvancedSearchBar from '@/components/AdvancedSearchBar';
-import PropertyCard from '@/components/PropertyCard';
-import type { PropertyWithListing } from '@/types/property';
+export default async function PropertiesIndex({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const params = await searchParams;
+  const filters = {
+    mode: params.mode === 'rent' ? 'rent' : 'buy',
+    type: params.type,
+    city: params.city,
+    district: params.district,
+    price_min: params.price_min ? Number(params.price_min) : undefined,
+    price_max: params.price_max ? Number(params.price_max) : undefined,
+    beds_min: params.beds_min ? Number(params.beds_min) : undefined,
+    sort: (['recent', 'price_asc', 'price_desc'] as const).includes(
+      (params.sort ?? '') as 'recent' | 'price_asc' | 'price_desc'
+    )
+      ? (params.sort as 'recent' | 'price_asc' | 'price_desc')
+      : 'recent',
+    page: params.page ? Math.max(1, Number(params.page)) : 1,
+    per: params.per ? Math.min(48, Math.max(6, Number(params.per))) : 12,
+    recent_days: params.recent_days ? Number(params.recent_days) : undefined,
+  } as const;
 
-function PropertiesPageContent() {
-  const searchParams = useSearchParams();
-  const [properties, setProperties] = useState<PropertyWithListing[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 12,
-    total: 0,
-    totalPages: 1,
-  });
-  const [filters, setFilters] = useState({});
-
-  const fetchProperties = async (
-    params: Record<string, string | string[] | number | undefined> = {}
-  ) => {
-    setLoading(true);
-    const url = new URL('/api/search', window.location.origin);
-    Object.entries({
-      ...params,
-      page: pagination.page,
-      limit: pagination.limit,
-    }).forEach(([k, v]) => {
-      if (typeof v === 'string' ? v !== '' : v !== undefined)
-        url.searchParams.append(k, String(v));
-    });
-    const res = await fetch(url.toString());
-    const json = await res.json();
-    setProperties(json.data || []);
-    setPagination(
-      json.pagination || { page: 1, limit: 12, total: 0, totalPages: 1 }
-    );
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    const urlFilters: Record<string, string | string[]> = {};
-    searchParams.forEach((value, key) => {
-      if (key === 'amenities') {
-        if (!urlFilters[key]) urlFilters[key] = [];
-        if (Array.isArray(urlFilters[key])) {
-          (urlFilters[key] as string[]).push(value);
-        } else {
-          urlFilters[key] = [value];
-        }
-      } else {
-        urlFilters[key] = value;
-      }
-    });
-
-    if (Object.keys(urlFilters).length > 0) {
-      setFilters(urlFilters);
-      fetchProperties(urlFilters);
-    } else {
-      fetchProperties(filters);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page, searchParams]);
-
-  const handleSearch = (
-    params: Record<string, string | string[] | number | undefined>
-  ) => {
-    setFilters(params);
-    setPagination((p) => ({ ...p, page: 1 }));
-    fetchProperties(params);
-  };
+  const { items, count } = await searchProperties(filters);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-lg font-bold text-dark-charcoal mb-6">
-          {searchParams.get('agent')
-            ? 'Agent Properties'
-            : 'Advanced Property Search'}
-        </h1>
-        <AdvancedSearchBar onSearch={handleSearch} loading={loading} />
-        <div className="mt-8">
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
-              <p className="mt-2 text-muted">Loading properties...</p>
+    <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
+      <FiltersBar initialFilters={filters} />
+      <div className="mt-4 text-sm text-muted-foreground">
+        {count?.toLocaleString() ?? items.length} listings
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {items.map((it) => (
+          <Link
+            key={it.id}
+            href={`/properties/${it.slug}`}
+            className="rounded-2xl bg-white border shadow-sm overflow-hidden hover:shadow-md transition"
+          >
+            <div className="relative aspect-[4/3]">
+              <Image
+                src={it.images?.[0]?.src ?? '/logo.png'}
+                alt={it.title}
+                fill
+                className="object-cover"
+              />
             </div>
-          ) : properties.length === 0 ? (
-            <div className="text-center py-12 text-muted">
-              No properties found.
+            <div className="p-4">
+              <div className="text-lg font-semibold">
+                {Intl.NumberFormat(undefined, {
+                  style: 'currency',
+                  currency: it.currency ?? 'EUR',
+                  maximumFractionDigits: 0,
+                }).format(it.price)}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {it.location?.city}
+                {it.location?.district ? `, ${it.location.district}` : ''}
+              </div>
+              <div className="mt-2 text-xs inline-flex items-center gap-3">
+                {typeof it.netArea === 'number' && <span>{it.netArea} m²</span>}
+                {typeof it.bedrooms === 'number' && (
+                  <span>{it.bedrooms} bd</span>
+                )}
+                {typeof it.bathrooms === 'number' && (
+                  <span>{it.bathrooms} ba</span>
+                )}
+              </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {properties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex justify-center mt-8 gap-2">
-          <button
-            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-            disabled={pagination.page <= 1}
-            onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}
+          </Link>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-8 flex justify-center gap-3">
+        {filters.page > 1 && (
+          <Link
+            href={{
+              pathname: '/properties',
+              query: { ...params, page: String(filters.page - 1) },
+            }}
+            className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
           >
             Previous
-          </button>
-          <span className="px-4 py-2">
-            {pagination.page} / {pagination.totalPages}
-          </span>
-          <button
-            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-            disabled={pagination.page >= pagination.totalPages}
-            onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
+          </Link>
+        )}
+        {count && filters.page * (filters.per ?? 12) < count && (
+          <Link
+            href={{
+              pathname: '/properties',
+              query: { ...params, page: String(filters.page + 1) },
+            }}
+            className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
           >
             Next
-          </button>
-        </div>
+          </Link>
+        )}
       </div>
     </div>
-  );
-}
-
-export default function PropertiesPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PropertiesPageContent />
-    </Suspense>
   );
 }
