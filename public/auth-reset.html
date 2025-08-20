@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth Reset</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 400px;
+      }
+
+      button {
+        background: #dc2626;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px;
+      }
+
+      button:hover {
+        background: #b91c1c;
+      }
+
+      .success {
+        color: #059669;
+        font-weight: bold;
+      }
+
+      .error {
+        color: #dc2626;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Authentication Reset</h1>
+      <p>This will clear all authentication data from your browser.</p>
+
+      <button onclick="resetAuth()">Reset Auth State</button>
+      <button onclick="window.location.href='/'">Go Home</button>
+
+      <div id="result"></div>
+    </div>
+
+    <script>
+      function resetAuth() {
+        const resultDiv = document.getElementById('result');
+
+        try {
+          // Clear localStorage
+          localStorage.removeItem('user-storage');
+          localStorage.removeItem('supabase.auth.token');
+
+          // Clear sessionStorage
+          sessionStorage.clear();
+
+          // Clear cookies
+          document.cookie.split(';').forEach(function (c) {
+            document.cookie = c
+              .replace(/^ +/, '')
+              .replace(
+                /=.*/,
+                '=;expires=' + new Date().toUTCString() + ';path=/'
+              );
+          });
+
+          resultDiv.innerHTML =
+            '<p class="success">✅ Authentication state cleared successfully!</p>';
+
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        } catch (error) {
+          console.error('Reset error:', error);
+          resultDiv.innerHTML =
+            '<p class="error">❌ Failed to clear authentication state</p>';
+        }
+      }
+    </script>
+  </body>
+</html>
