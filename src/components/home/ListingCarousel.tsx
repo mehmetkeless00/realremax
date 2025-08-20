@@ -1,15 +1,24 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { listingsCardProps } from '@/data/home';
+import { listingsCardProps, type ListingItem } from '@/data/home';
 
 type Props = {
   title: string;
   seeAllHref: string;
-  dataKey: keyof typeof listingsCardProps; // "recent" | "collection" | "developments"
+  dataKey?: keyof typeof listingsCardProps; // optional now
+  items?: ListingItem[];
+  limit?: number;
 };
 
-export default function ListingCarousel({ title, seeAllHref, dataKey }: Props) {
-  const items = listingsCardProps[dataKey];
+export default function ListingCarousel({
+  title,
+  seeAllHref,
+  dataKey = 'recent',
+  items,
+  limit,
+}: Props) {
+  const all = items ?? listingsCardProps[dataKey];
+  const list = typeof limit === 'number' ? all.slice(0, limit) : all;
 
   return (
     <div>
@@ -26,7 +35,7 @@ export default function ListingCarousel({ title, seeAllHref, dataKey }: Props) {
                       lg:[&>*]:snap-none
                       overflow-x-auto snap-x lg:overflow-visible"
       >
-        {items.map((it) => (
+        {list.map((it) => (
           <Link
             key={it.id}
             href={`/properties/${it.id}`}
