@@ -1,177 +1,46 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import HeroSearch from '@/components/home/HeroSearch';
+import ListingCarousel from '@/components/home/ListingCarousel';
+import RegionChips from '@/components/home/RegionChips';
+import CorporateCTA from '@/components/home/CorporateCTA';
+import QuickSearchTags from '@/components/home/QuickSearchTags';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-lg md:text-xl font-bold text-fg mb-6">
-            Find Your Dream Home
-          </h1>
-          <p className="text-xs text-muted mb-8 max-w-2xl mx-auto">
-            Discover the perfect property with Remax Unified Platform. Browse
-            thousands of listings, connect with trusted agents, and make
-            informed decisions.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild variant="secondary" size="lg">
-              <Link href="/properties">
-                <span className="inline-flex items-center gap-2">
-                  Browse Properties
-                </span>
-              </Link>
-            </Button>
-            <Button asChild variant="primary" size="lg">
-              <Link href="/agents">
-                <span className="inline-flex items-center gap-2">
-                  Find Agents
-                </span>
-              </Link>
-            </Button>
-          </div>
-
-          {/* Advanced Search Section */}
-          <div className="mt-12 max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-xl p-6">
-              <h3 className="text-xs font-semibold text-fg mb-4 text-center">
-                Find Your Perfect Property
-              </h3>
-              <p className="text-muted text-center mb-6">
-                Use our advanced search to find properties that match your
-                criteria
-              </p>
-              <div className="text-center">
-                <Button asChild variant="secondary" size="lg">
-                  <Link href="/properties">
-                    <span className="inline-flex items-center gap-2">
-                      <svg
-                        className="w-5 h-5 shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                      </svg>
-                      Start Advanced Search
-                    </span>
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="container mx-auto px-4 md:px-6">
+      <section className="py-10 md:py-16">
+        <HeroSearch />
       </section>
 
-      {/* Features Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-base font-bold text-center text-fg mb-12">
-            Why Choose Remax Unified Platform?
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="w-12 h-12 md:w-10 md:h-10 bg-primary-blue rounded-full flex items-center justify-center mx-auto mb-4 max-w-[60px] max-h-[40vh]">
-                <svg
-                  className="w-5 h-5 md:w-4 md:h-4 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xs font-semibold text-fg mb-2">
-                Advanced Search
-              </h3>
-              <p className="text-muted">
-                Find properties with detailed filters and advanced search
-                options.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="w-12 h-12 md:w-10 md:h-10 bg-primary-red rounded-full flex items-center justify-center mx-auto mb-4 max-w-[60px] max-h-[40vh]">
-                <svg
-                  className="w-5 h-5 md:w-4 md:h-4 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xs font-semibold text-fg mb-2">
-                Trusted Agents
-              </h3>
-              <p className="text-muted">
-                Connect with verified and experienced real estate professionals.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="w-12 h-12 md:w-10 md:h-10 bg-success rounded-full flex items-center justify-center mx-auto mb-4 max-w-[60px] max-h-[40vh]">
-                <svg
-                  className="w-5 h-5 md:w-4 md:h-4 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xs font-semibold text-fg mb-2">
-                Secure Platform
-              </h3>
-              <p className="text-muted">
-                Your data is protected with enterprise-grade security measures.
-              </p>
-            </div>
-          </div>
-        </div>
+      <section className="py-8 md:py-12">
+        <ListingCarousel
+          title="Most Recent"
+          seeAllHref="/properties?sort=new"
+          dataKey="recent"
+        />
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-primary-blue py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-base font-bold text-white mb-4">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="text-xs text-blue-100 mb-8">
-            Join thousands of satisfied customers who found their perfect home
-            with us.
-          </p>
-          <Button asChild variant="outlineOnPrimary" size="lg">
-            <Link href="/auth/signup">
-              <span className="inline-flex items-center gap-2">
-                Get Started Today
-              </span>
-            </Link>
-          </Button>
-        </div>
+      <section className="py-8 md:py-12">
+        <ListingCarousel
+          title="RE/MAX Collection"
+          seeAllHref="/collection"
+          dataKey="collection"
+        />
+      </section>
+
+      <section className="py-8 md:py-12">
+        <ListingCarousel
+          title="Developments"
+          seeAllHref="/developments"
+          dataKey="developments"
+        />
+      </section>
+
+      <section className="py-8 md:py-12">
+        <RegionChips />
+      </section>
+
+      <section className="py-10 md:py-16">
+        <CorporateCTA />
       </section>
     </div>
   );

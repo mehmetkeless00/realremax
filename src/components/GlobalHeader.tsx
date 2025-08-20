@@ -28,23 +28,27 @@ export default function GlobalHeader() {
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-40">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 md:px-6 py-4">
         <div className="flex justify-between items-center">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <Logo size="md" />
+          {/* Logo - Far Left */}
+          <Link
+            href="/"
+            aria-label="Go to homepage"
+            className="flex items-center"
+          >
+            <Logo size="lg" className="shrink-0" />
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex space-x-8">
             {navigationLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-dark-charcoal hover:text-primary-blue font-medium transition-colors relative group"
+                className="text-dark-charcoal hover:text-primary transition-colors font-medium relative group"
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-blue transition-all group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
               </Link>
             ))}
           </nav>
@@ -107,7 +111,7 @@ export default function GlobalHeader() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-dark-charcoal hover:text-primary-blue focus:outline-none"
+              className="md:hidden p-2 text-dark-charcoal hover:text-primary focus:outline-none"
               aria-label="Toggle mobile menu"
             >
               <svg
@@ -144,7 +148,7 @@ export default function GlobalHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block py-2 px-4 text-dark-charcoal hover:text-primary-blue hover:bg-gray-50 rounded-md transition-colors"
+                  className="block py-2 px-4 text-dark-charcoal hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <div className="font-medium">{link.label}</div>
