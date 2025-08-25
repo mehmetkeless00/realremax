@@ -1,194 +1,112 @@
-import { supabase } from '@/lib/supabase';
-import { PROPERTIES, Property } from '@/data/mock-properties';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import type { Property } from '@/types/property';
 
-export type SearchFilters = {
-  mode: 'buy' | 'rent';
+export interface SearchFilters {
   type?: string;
-  city?: string;
-  district?: string;
-  price_min?: number;
-  price_max?: number;
-  beds_min?: number;
-  sort?: 'recent' | 'price_asc' | 'price_desc';
-  page?: number;
-  per?: number;
-  recent_days?: number;
-};
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  location?: string;
+  amenities?: string[];
+}
 
-// Add environment variable support for forcing mock data
-const useMock = process.env.NEXT_PUBLIC_USE_MOCK_LISTINGS === 'true';
-
-export async function searchProperties(f: SearchFilters) {
-  // Force mock if environment variable is set
-  if (useMock) {
-    console.log('Using mock data (NEXT_PUBLIC_USE_MOCK_LISTINGS=true)');
-    return searchPropertiesMock(f);
-  }
-
-  const per = f.per ?? 12;
-  const page = f.page ?? 1;
-  const offset = (page - 1) * per;
-
+export async function searchProperties(
+  filters: SearchFilters
+): Promise<Property[]> {
   try {
-    // Try Supabase first
-    let query = supabase.from('properties').select('*', { count: 'exact' });
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll() } }
+    );
+
+    let query = supabase
+      .from('properties')
+      .select('*')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false });
 
     // Apply filters
-    if (f.mode) {
-      // Tolerate 'sale' vs 'buy' differences
-      if (f.mode === 'buy') {
-        query = query.in('listing_type', ['buy', 'sale']);
-      } else {
-        query = query.eq('listing_type', f.mode);
-      }
-    }
-    if (f.type) {
-      query = query.eq('type', f.type);
-    }
-    if (f.city) {
-      query = query.ilike('city', `%${f.city}%`);
-    }
-    if (f.district) {
-      query = query.ilike('location', `%${f.district}%`);
-    }
-    if (f.price_min !== undefined) {
-      query = query.gte('price', f.price_min);
-    }
-    if (f.price_max !== undefined) {
-      query = query.lte('price', f.price_max);
-    }
-    if (f.beds_min !== undefined) {
-      query = query.gte('bedrooms', f.beds_min);
-    }
-    if (f.recent_days !== undefined) {
-      const recentDate = new Date();
-      recentDate.setDate(recentDate.getDate() - f.recent_days);
-      query = query.gte('created_at', recentDate.toISOString());
+    if (filters.type) {
+      query = query.eq('type', filters.type);
     }
 
-    // Apply sorting
-    switch (f.sort) {
-      case 'price_asc':
-        query = query.order('price', { ascending: true });
-        break;
-      case 'price_desc':
-        query = query.order('price', { ascending: false });
-        break;
-      case 'recent':
-      default:
-        query = query.order('created_at', { ascending: false });
-        break;
+    if (filters.minPrice !== undefined) {
+      query = query.gte('price', filters.minPrice);
     }
 
-    // Apply pagination
-    query = query.range(offset, offset + per - 1);
+    if (filters.maxPrice !== undefined) {
+      query = query.lte('price', filters.maxPrice);
+    }
 
-    const { data, error, count } = await query;
+    if (filters.bedrooms !== undefined) {
+      query = query.eq('bedrooms', filters.bedrooms);
+    }
+
+    if (filters.bathrooms !== undefined) {
+      query = query.eq('bathrooms', filters.bathrooms);
+    }
+
+    if (filters.location) {
+      query = query.ilike('location', `%${filters.location}%`);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
-      throw error;
+      console.error('Supabase query error:', error);
+      throw new Error('Failed to fetch properties');
     }
 
-    // Fallback if no data returned (empty table, RLS blocking, or no matches)
-    if (!data || (Array.isArray(data) && data.length === 0) || !count) {
-      console.warn('Supabase returned 0 rows; falling back to mock data');
-      return searchPropertiesMock(f);
+    if (!data || data.length === 0) {
+      return [];
     }
 
-    // Transform Supabase data to match our Property type
-    const items =
-      data?.map((item) => ({
-        id: item.id,
-        slug: `${item.type}-${item.city?.toLowerCase()}-${item.id}`,
-        title: item.title,
-        type: item.type as Property['type'],
-        operation: item.listing_type as Property['operation'],
-        price: item.price,
-        currency: 'EUR' as const,
-        location: {
-          address: item.address || '',
-          city: item.city || '',
-          district: item.location || '',
-          lat: item.latitude || undefined,
-          lng: item.longitude || undefined,
-        },
-        bedrooms: item.bedrooms || undefined,
-        bathrooms: item.bathrooms || undefined,
-        netArea: item.size || undefined,
-        yearBuilt: item.year_built || undefined,
-        description: item.description || '',
-        amenities: item.amenities || [],
-        images: (item.photos || []).map((src: string) => ({ src, alt: '' })),
-        agent: { name: 'Agent', email: '', phone: '' }, // Placeholder
-        tags: [],
-      })) || [];
+    // Filter by amenities if specified
+    let filteredProperties = data;
+    if (filters.amenities && filters.amenities.length > 0) {
+      filteredProperties = data.filter((property) => {
+        if (!property.amenities) return false;
+        return filters.amenities!.some((amenity) =>
+          property.amenities!.includes(amenity)
+        );
+      });
+    }
 
-    return { items, count: count || 0 };
+    return filteredProperties;
   } catch (error) {
-    console.warn('Supabase query failed, falling back to mock data:', error);
-
-    // Fallback to mock data
-    return searchPropertiesMock(f);
+    console.error('Search properties error:', error);
+    throw new Error('Failed to search properties');
   }
 }
 
-function searchPropertiesMock(f: SearchFilters) {
-  const per = f.per ?? 12;
-  const page = f.page ?? 1;
-  const offset = (page - 1) * per;
+export async function getPropertyById(id: string): Promise<Property | null> {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll() } }
+    );
 
-  // Filter mock properties
-  const filtered = PROPERTIES.filter((property) => {
-    // Mode filter
-    if (property.operation !== f.mode) return false;
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('id', id)
+      .eq('status', 'published')
+      .single();
 
-    // Type filter
-    if (f.type && property.type !== f.type) return false;
+    if (error) {
+      console.error('Get property by ID error:', error);
+      return null;
+    }
 
-    // City filter
-    if (
-      f.city &&
-      !property.location.city.toLowerCase().includes(f.city.toLowerCase())
-    )
-      return false;
-
-    // District filter
-    if (
-      f.district &&
-      !property.location.district
-        ?.toLowerCase()
-        .includes(f.district.toLowerCase())
-    )
-      return false;
-
-    // Price filters
-    if (f.price_min !== undefined && property.price < f.price_min) return false;
-    if (f.price_max !== undefined && property.price > f.price_max) return false;
-
-    // Bedrooms filter
-    if (f.beds_min !== undefined && (property.bedrooms || 0) < f.beds_min)
-      return false;
-
-    return true;
-  });
-
-  // Sort
-  switch (f.sort) {
-    case 'price_asc':
-      filtered.sort((a, b) => a.price - b.price);
-      break;
-    case 'price_desc':
-      filtered.sort((a, b) => b.price - a.price);
-      break;
-    case 'recent':
-    default:
-      // Mock data doesn't have timestamps, so keep original order
-      break;
+    return data;
+  } catch (error) {
+    console.error('Get property by ID error:', error);
+    return null;
   }
-
-  // Paginate
-  const items = filtered.slice(offset, offset + per);
-  const count = filtered.length;
-
-  return { items, count };
 }

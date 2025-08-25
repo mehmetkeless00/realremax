@@ -1,34 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Fallback values for development when environment variables are not set
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseAnonKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'your-anon-key';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Create Supabase client with auth disabled for development if no valid credentials
-const createSupabaseClient = () => {
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  ) {
-    console.warn(
-      'Supabase environment variables not found. Using mock mode for development.'
-    );
-    // Return a mock client for development
-    return createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false,
-      },
-    });
-  }
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
 
-  return createClient(supabaseUrl, supabaseAnonKey);
-};
-
-export const supabase = createSupabaseClient();
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Database types
 export interface Database {
@@ -38,21 +17,21 @@ export interface Database {
         Row: {
           id: string;
           email: string;
-          role: 'visitor' | 'registered' | 'agent';
+          role: 'visitor' | 'registered' | 'agent' | 'admin';
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
           email: string;
-          role?: 'visitor' | 'registered' | 'agent';
+          role?: 'visitor' | 'registered' | 'agent' | 'admin';
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
           email?: string;
-          role?: 'visitor' | 'registered' | 'agent';
+          role?: 'visitor' | 'registered' | 'agent' | 'admin';
           created_at?: string;
           updated_at?: string;
         };
@@ -96,13 +75,19 @@ export interface Database {
           description: string | null;
           price: number;
           location: string;
-          type: string;
+          type:
+            | 'apartment'
+            | 'house'
+            | 'land'
+            | 'commercial'
+            | 'other'
+            | string;
           bedrooms: number | null;
           bathrooms: number | null;
           size: number | null;
           year_built: number | null;
           agent_id: string | null;
-          status: string;
+          status: 'draft' | 'published' | 'archived';
           listing_type: string;
           amenities: string[] | null;
           photos: string[] | null;
@@ -112,6 +97,11 @@ export interface Database {
           country: string | null;
           latitude: number | null;
           longitude: number | null;
+          slug: string | null;
+          meta_title: string | null;
+          meta_description: string | null;
+          og_image_url: string | null;
+          published_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -121,13 +111,19 @@ export interface Database {
           description?: string | null;
           price: number;
           location: string;
-          type: string;
+          type?:
+            | 'apartment'
+            | 'house'
+            | 'land'
+            | 'commercial'
+            | 'other'
+            | string;
           bedrooms?: number | null;
           bathrooms?: number | null;
           size?: number | null;
           year_built?: number | null;
           agent_id?: string | null;
-          status?: string;
+          status?: 'draft' | 'published' | 'archived';
           listing_type?: string;
           amenities?: string[] | null;
           photos?: string[] | null;
@@ -137,6 +133,11 @@ export interface Database {
           country?: string | null;
           latitude?: number | null;
           longitude?: number | null;
+          slug?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          og_image_url?: string | null;
+          published_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -146,13 +147,19 @@ export interface Database {
           description?: string | null;
           price?: number;
           location?: string;
-          type?: string;
+          type?:
+            | 'apartment'
+            | 'house'
+            | 'land'
+            | 'commercial'
+            | 'other'
+            | string;
           bedrooms?: number | null;
           bathrooms?: number | null;
           size?: number | null;
           year_built?: number | null;
           agent_id?: string | null;
-          status?: string;
+          status?: 'draft' | 'published' | 'archived';
           listing_type?: string;
           amenities?: string[] | null;
           photos?: string[] | null;
@@ -162,6 +169,11 @@ export interface Database {
           country?: string | null;
           latitude?: number | null;
           longitude?: number | null;
+          slug?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          og_image_url?: string | null;
+          published_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -1,5 +1,15 @@
 import Link from 'next/link';
-import { regions } from '@/data/home';
+
+const regions = [
+  'Lisbon',
+  'Oporto',
+  'Coimbra',
+  'Braga',
+  'Faro',
+  'Leiria',
+  'Setúbal',
+  'Aveiro',
+] as const;
 
 export default function RegionChips() {
   return (

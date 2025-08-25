@@ -39,7 +39,7 @@ interface Property {
   bathrooms?: number;
   size?: number;
   year_built?: number;
-  status: string;
+  status: 'draft' | 'published' | 'archived';
   listing_type?: string;
   amenities?: string[];
   address?: string;
@@ -49,6 +49,7 @@ interface Property {
   latitude?: number;
   longitude?: number;
   created_at: string;
+  published_at?: string;
 }
 
 export default function ListingsPage() {
@@ -59,6 +60,8 @@ export default function ListingsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const loadProperties = useCallback(async () => {
     try {
@@ -75,13 +78,19 @@ export default function ListingsPage() {
   }, [addToast]);
 
   useEffect(() => {
-    if (user?.user_metadata?.role !== 'agent') {
+    if (
+      user?.user_metadata?.role !== 'agent' &&
+      user?.user_metadata?.role !== 'admin'
+    ) {
       addToast({
         type: 'error',
-        message: 'Access denied. Agent role required.',
+        message: 'Access denied. Agent or Admin role required.',
       });
       return;
     }
+
+    // Check if user is admin
+    setIsAdmin(user?.user_metadata?.role === 'admin');
     loadProperties();
   }, [user, addToast, loadProperties]);
 
@@ -90,7 +99,7 @@ export default function ListingsPage() {
 
     try {
       const url = '/api/listings';
-      const method = editingProperty ? 'PATCH' : 'POST';
+      const method = editingProperty ? 'PUT' : 'POST';
       const body = editingProperty
         ? { id: editingProperty.id, ...formData }
         : formData;
@@ -141,19 +150,51 @@ export default function ListingsPage() {
     }
   };
 
+  const handlePublishToggle = async (property: Property) => {
+    const newStatus = property.status === 'published' ? 'draft' : 'published';
+    const action = newStatus === 'published' ? 'publish' : 'unpublish';
+
+    try {
+      const response = await fetch('/api/listings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: property.id, status: newStatus }),
+      });
+
+      if (!response.ok) throw new Error(`Failed to ${action} property`);
+
+      addToast({
+        type: 'success',
+        message: `Property ${action}ed successfully`,
+      });
+      loadProperties();
+    } catch (error) {
+      console.error(`${action} property error:`, error);
+      addToast({ type: 'error', message: `Failed to ${action} property` });
+    }
+  };
+
   const handleCancel = () => {
     setShowForm(false);
     setEditingProperty(null);
   };
 
-  if (user?.user_metadata?.role !== 'agent') {
+  const filteredProperties = properties.filter((property) => {
+    if (statusFilter === 'all') return true;
+    return property.status === statusFilter;
+  });
+
+  if (
+    user?.user_metadata?.role !== 'agent' &&
+    user?.user_metadata?.role !== 'admin'
+  ) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold text-fg mb-4">Access Denied</h1>
             <p className="text-muted mb-6">
-              You need agent privileges to access this page.
+              You need agent or admin privileges to access this page.
             </p>
             <Button asChild variant="secondary" size="md">
               <Link href="/dashboard">
@@ -171,7 +212,7 @@ export default function ListingsPage() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-fg mb-4">
-            My Property Listings
+            {isAdmin ? 'All Property Listings' : 'My Property Listings'}
           </h1>
           <Button
             onClick={() => setShowForm(true)}
@@ -181,6 +222,36 @@ export default function ListingsPage() {
             Add Property
           </Button>
         </div>
+
+        {/* Admin Filters */}
+        {isAdmin && (
+          <div className="mb-6 bg-white p-4 rounded-lg shadow">
+            <h3 className="text-lg font-semibold text-fg mb-3">
+              Admin Filters
+            </h3>
+            <div className="flex gap-4 items-center">
+              <div>
+                <label className="block text-sm font-medium text-fg mb-1">
+                  Status Filter
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
+              <div className="text-sm text-muted">
+                Showing {filteredProperties.length} of {properties.length}{' '}
+                properties
+              </div>
+            </div>
+          </div>
+        )}
 
         {showForm && (
           <div className="mb-8">
@@ -198,7 +269,7 @@ export default function ListingsPage() {
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
             <p className="mt-2 text-muted">Loading properties...</p>
           </div>
-        ) : properties.length === 0 ? (
+        ) : filteredProperties.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <div className="mb-4">
               <svg
@@ -219,7 +290,9 @@ export default function ListingsPage() {
               No Listings Found
             </h3>
             <p className="text-muted mb-6">
-              You haven&apos;t created any property listings yet.
+              {statusFilter !== 'all'
+                ? `No properties with status "${statusFilter}" found.`
+                : "You haven't created any property listings yet."}
             </p>
             <Button
               onClick={() => setShowForm(true)}
@@ -231,7 +304,7 @@ export default function ListingsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => (
+            {filteredProperties.map((property) => (
               <div
                 key={property.id}
                 className="bg-white rounded-lg shadow overflow-hidden"
@@ -243,11 +316,13 @@ export default function ListingsPage() {
                     </h3>
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${
-                        property.status === 'active'
+                        property.status === 'published'
                           ? 'bg-green-100 text-green-800'
-                          : property.status === 'pending'
+                          : property.status === 'draft'
                             ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-muted/20 text-fg'
+                            : property.status === 'archived'
+                              ? 'bg-gray-100 text-gray-800'
+                              : 'bg-muted/20 text-fg'
                       }`}
                     >
                       {property.status}
@@ -285,6 +360,26 @@ export default function ListingsPage() {
                           </span>
                         )}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Admin Publish/Unpublish Button */}
+                  {isAdmin && (
+                    <div className="mb-4">
+                      <Button
+                        onClick={() => handlePublishToggle(property)}
+                        variant={
+                          property.status === 'published'
+                            ? 'outline'
+                            : 'primary'
+                        }
+                        size="sm"
+                        className="w-full"
+                      >
+                        {property.status === 'published'
+                          ? 'Unpublish'
+                          : 'Publish'}
+                      </Button>
                     </div>
                   )}
 

@@ -21,7 +21,9 @@ const generateLargeDataset = (count: number) => {
     bathrooms: Math.floor(Math.random() * 3) + 1,
     size: Math.floor(Math.random() * 200) + 50,
     year_built: Math.floor(Math.random() * 30) + 1990,
-    status: ['active', 'pending', 'sold'][Math.floor(Math.random() * 3)],
+    status: (['draft', 'published', 'archived'] as const)[
+      Math.floor(Math.random() * 3)
+    ],
     agent_id: `agent-${index + 1}`,
     listing_type: 'sale',
     amenities: ['wifi', 'parking', 'gym'],
@@ -32,6 +34,11 @@ const generateLargeDataset = (count: number) => {
     country: 'Country',
     latitude: 40.7128,
     longitude: -74.006,
+    slug: `property-${index + 1}`,
+    meta_title: `Property ${index + 1} - Real Estate`,
+    meta_description: `Description for Property ${index + 1}`,
+    og_image_url: '/images/placeholder-property.svg',
+    published_at: new Date().toISOString(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     images: ['/images/placeholder-property.svg'],

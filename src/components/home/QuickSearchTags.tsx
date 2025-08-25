@@ -1,5 +1,13 @@
 import Link from 'next/link';
-import { quickTags } from '@/data/home';
+
+const quickTags = [
+  'Condo/Apartment',
+  'House',
+  'Land',
+  'Store',
+  'Office',
+  'Warehouse',
+] as const;
 
 export default function QuickSearchTags() {
   return (

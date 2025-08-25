@@ -49,10 +49,9 @@ const PROPERTY_TYPES = [
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'active', label: 'Active' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'sold', label: 'Sold' },
-  { value: 'rented', label: 'Rented' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'published', label: 'Published' },
+  { value: 'archived', label: 'Archived' },
 ];
 
 const LISTING_TYPES = [
@@ -96,7 +95,7 @@ export default function PropertyListingForm({
     bathrooms: '',
     size: '',
     year_built: '',
-    status: 'active',
+    status: 'draft',
     listing_type: 'sale',
     amenities: [],
     address: '',
@@ -121,7 +120,7 @@ export default function PropertyListingForm({
         bathrooms: property.bathrooms?.toString() || '',
         size: property.size?.toString() || '',
         year_built: property.year_built?.toString() || '',
-        status: property.status || 'active',
+        status: property.status || 'draft',
         listing_type: property.listing_type || 'sale',
         amenities: property.amenities || [],
         address: property.address || '',
@@ -298,22 +297,26 @@ export default function PropertyListingForm({
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-fg mb-1">
-            Status *
-          </label>
-          <select
-            value={formData.status}
-            onChange={(e) => handleInputChange('status', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
-          >
-            {STATUS_OPTIONS.map((status) => (
-              <option key={status.value} value={status.value}>
-                {status.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Status field - only show for admin users or when editing published properties */}
+        {(property?.status === 'published' ||
+          property?.status === 'archived') && (
+          <div>
+            <label className="block text-sm font-medium text-fg mb-1">
+              Status *
+            </label>
+            <select
+              value={formData.status}
+              onChange={(e) => handleInputChange('status', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+            >
+              {STATUS_OPTIONS.map((status) => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div>
