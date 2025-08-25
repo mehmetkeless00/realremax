@@ -4,10 +4,17 @@ import { cookies } from 'next/headers';
 export interface Agent {
   id: string;
   name: string;
+  email: string;
   phone: string;
   company: string;
   license_number: string;
+  photo_url?: string;
+  bio?: string;
+  specialties?: string[];
+  languages?: string[];
+  experience_years?: number;
   created_at: string;
+  updated_at: string;
 }
 
 export async function getAgents(): Promise<Agent[]> {
@@ -19,48 +26,46 @@ export async function getAgents(): Promise<Agent[]> {
       { cookies: { getAll: () => cookieStore.getAll() } }
     );
 
-    const { data: agents, error } = await supabase
+    const { data, error } = await supabase
       .from('agents')
       .select('*')
-      .order('name', { ascending: true });
+      .order('created_at', { ascending: false });
 
     if (error) {
-      console.warn('Supabase query failed, falling back to mock data:', error);
-      return getAgentsMock();
+      console.error('Agents query error:', error);
+      throw new Error('Failed to fetch agents');
     }
 
-    return agents || [];
+    return data || [];
   } catch (error) {
-    console.warn('Agents query failed, falling back to mock data:', error);
-    return getAgentsMock();
+    console.error('Get agents error:', error);
+    throw new Error('Failed to fetch agents');
   }
 }
 
-function getAgentsMock(): Agent[] {
-  return [
-    {
-      id: '1',
-      name: 'John Doe',
-      phone: '+1 555-0123',
-      company: 'Remax Elite',
-      license_number: 'RE123456',
-      created_at: '2024-01-15T10:00:00Z',
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      phone: '+1 555-0124',
-      company: 'Remax Premier',
-      license_number: 'RE123457',
-      created_at: '2024-01-10T14:30:00Z',
-    },
-    {
-      id: '3',
-      name: 'Mike Johnson',
-      phone: '+1 555-0125',
-      company: 'Remax Elite',
-      license_number: 'RE123458',
-      created_at: '2024-01-05T09:15:00Z',
-    },
-  ];
+export async function getAgentById(id: string): Promise<Agent | null> {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll() } }
+    );
+
+    const { data, error } = await supabase
+      .from('agents')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Get agent by ID error:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Get agent by ID error:', error);
+    return null;
+  }
 }

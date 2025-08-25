@@ -91,8 +91,6 @@ export default function PropertyListingFormRefactored({
     }
   };
 
-  const CurrentStepComponent = STEPS[currentStep - 1].component;
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Progress Bar */}

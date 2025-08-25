@@ -2,6 +2,9 @@ import { Metadata } from 'next';
 import { getAgents } from '@/server/data/agents';
 import AgentsList from '@/components/agents/AgentsList';
 
+// Force dynamic rendering since this page uses cookies
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Real Estate Agents',
   description:

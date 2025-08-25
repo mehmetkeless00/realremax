@@ -3,8 +3,7 @@ import { Metadata } from 'next';
 import {
   getPropertyBySlug,
   getSimilarProperties,
-} from '@/data/mock-properties';
-import { formatAddress } from '@/lib/format';
+} from '@/server/db/properties';
 import Breadcrumbs from '@/components/property/Breadcrumbs';
 import Gallery from '@/components/property/Gallery';
 import PriceBar from '@/components/property/PriceBar';
@@ -21,7 +20,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const property = getPropertyBySlug(slug);
+  const property = await getPropertyBySlug(slug);
 
   if (!property) {
     return {
@@ -30,28 +29,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const ogImage = property.images[0]?.src;
+  // Use property.photos[0] if available, otherwise fallback
+  const ogImage = property.photos?.[0] || '/images/placeholder-property.svg';
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: property.currency,
+    currency: 'USD', // Default to USD since we don't have currency in our schema
     maximumFractionDigits: 0,
   }).format(property.price);
 
   return {
-    title: `${property.title} - ${property.location.city}`,
-    description: `${property.description} Located in ${property.location.city}. ${property.bedrooms ? `${property.bedrooms} bedroom` : ''} ${property.type} for ${property.operation} at ${formattedPrice}.`,
+    title: `${property.title} - ${property.city || property.location}`,
+    description: `${property.description} Located in ${property.city || property.location}. ${property.bedrooms ? `${property.bedrooms} bedroom` : ''} ${property.type} for sale at ${formattedPrice}.`,
     keywords: [
       property.type,
-      property.operation,
-      property.location.city,
-      property.location.district,
+      'sale',
+      property.city || property.location,
       'real estate',
       'property',
       formattedPrice,
     ].filter((keyword): keyword is string => Boolean(keyword)),
     openGraph: {
-      title: `${property.title} - ${property.location.city}`,
-      description: `${property.description} Located in ${property.location.city}.`,
+      title: `${property.title} - ${property.city || property.location}`,
+      description: `${property.description} Located in ${property.city || property.location}.`,
       url: `/properties/${slug}`,
       type: 'website',
       images: ogImage
@@ -68,8 +67,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${property.title} - ${property.location.city}`,
-      description: `${property.description} Located in ${property.location.city}.`,
+      title: `${property.title} - ${property.city || property.location}`,
+      description: `${property.description} Located in ${property.city || property.location}.`,
       images: ogImage ? [ogImage] : undefined,
     },
     alternates: {
@@ -77,23 +76,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     other: {
       'property:price:amount': property.price.toString(),
-      'property:price:currency': property.currency,
+      'property:price:currency': 'USD',
       'property:type': property.type,
-      'property:operation': property.operation,
-      'property:location': property.location.city,
+      'property:operation': 'sale',
+      'property:location': property.city || property.location,
     },
   };
 }
 
 export default async function PropertyPage({ params }: Props) {
   const { slug } = await params;
-  const property = getPropertyBySlug(slug);
+  const property = await getPropertyBySlug(slug);
 
   if (!property) {
     notFound();
   }
 
-  const similarProperties = getSimilarProperties(property);
+  const similarProperties = await getSimilarProperties(property);
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
@@ -113,7 +112,7 @@ export default async function PropertyPage({ params }: Props) {
               {property.title}
             </h1>
             <p className="text-lg text-muted-foreground">
-              {formatAddress(property.location)}
+              {property.city || property.location}
             </p>
           </div>
 
@@ -130,25 +129,26 @@ export default async function PropertyPage({ params }: Props) {
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-7">
-          <Gallery images={property.images} />
+          <Gallery
+            images={(property.photos || []).map((photo) => ({
+              src: photo,
+              alt: property.title,
+            }))}
+          />
         </div>
 
         <aside className="mt-6 lg:mt-0 lg:col-span-5 lg:sticky lg:top-24 space-y-6">
-          <PriceBar
-            price={property.price}
-            currency={property.currency}
-            operation={property.operation}
-          />
+          <PriceBar price={property.price} currency="USD" operation="buy" />
           {/* Facts visible on desktop */}
           <div className="hidden lg:block">
             <Facts
               type={property.type}
-              bedrooms={property.bedrooms}
-              bathrooms={property.bathrooms}
-              netArea={property.netArea}
-              grossArea={property.grossArea}
-              yearBuilt={property.yearBuilt}
-              energyRating={property.energyRating}
+              bedrooms={property.bedrooms || undefined}
+              bathrooms={property.bathrooms || undefined}
+              netArea={property.size || undefined}
+              grossArea={property.size || undefined}
+              yearBuilt={property.year_built || undefined}
+              energyRating="A"
             />
           </div>
         </aside>
@@ -158,12 +158,12 @@ export default async function PropertyPage({ params }: Props) {
       <div className="lg:hidden mt-6">
         <Facts
           type={property.type}
-          bedrooms={property.bedrooms}
-          bathrooms={property.bathrooms}
-          netArea={property.netArea}
-          grossArea={property.grossArea}
-          yearBuilt={property.yearBuilt}
-          energyRating={property.energyRating}
+          bedrooms={property.bedrooms || undefined}
+          bathrooms={property.bathrooms || undefined}
+          netArea={property.size || undefined}
+          grossArea={property.size || undefined}
+          yearBuilt={property.year_built || undefined}
+          energyRating="A"
         />
       </div>
 
@@ -174,11 +174,11 @@ export default async function PropertyPage({ params }: Props) {
             <h3 className="text-xl font-semibold text-fg mb-4">Description</h3>
             <p className="text-fg leading-relaxed">{property.description}</p>
           </div>
-          <FeaturesList amenities={property.amenities} />
+          <FeaturesList amenities={property.amenities || []} />
         </div>
 
         <div className="md:col-span-1">
-          <AgentCard agent={property.agent} />
+          <AgentCard agent={{ name: 'Agent', email: '', phone: '' }} />
         </div>
       </div>
 
@@ -199,7 +199,7 @@ export default async function PropertyPage({ params }: Props) {
               >
                 <div className="relative aspect-video">
                   <Image
-                    src={prop.images[0]?.src || '/logo.png'}
+                    src={prop.photos?.[0] || '/logo.png'}
                     alt={prop.title}
                     fill
                     className="object-cover"
@@ -208,7 +208,7 @@ export default async function PropertyPage({ params }: Props) {
                 <div className="p-4">
                   <div className="font-semibold text-fg mb-1">{prop.title}</div>
                   <div className="text-sm text-muted-foreground mb-2">
-                    {formatAddress(prop.location)}
+                    {prop.city || prop.location}
                   </div>
                   <div className="font-medium text-primary">
                     {prop.price.toLocaleString('pt-PT')} €

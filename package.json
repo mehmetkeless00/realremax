@@ -14,6 +14,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "node scripts/check-no-mocks.cjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
