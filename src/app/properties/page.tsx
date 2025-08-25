@@ -37,20 +37,22 @@ export const metadata: Metadata = {
 export default async function PropertiesIndex({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const params = await searchParams;
+  
   const filters = {
-    mode: (searchParams.mode as string) || 'buy',
-    type: searchParams.type as string | undefined,
-    city: searchParams.city as string | undefined,
-    district: searchParams.district as string | undefined,
-    price_min: searchParams.price_min ? Number(searchParams.price_min) : undefined,
-    price_max: searchParams.price_max ? Number(searchParams.price_max) : undefined,
-    beds_min: searchParams.beds_min ? Number(searchParams.beds_min) : undefined,
-    sort: (searchParams.sort as string) || 'recent',
-    page: searchParams.page ? Number(searchParams.page) : 1,
-    per: searchParams.per ? Number(searchParams.per) : 12,
-    recent_days: searchParams.recent_days ? Number(searchParams.recent_days) : undefined,
+    mode: (params.mode as string) || 'buy',
+    type: params.type as string | undefined,
+    city: params.city as string | undefined,
+    district: params.district as string | undefined,
+    price_min: params.price_min ? Number(params.price_min) : undefined,
+    price_max: params.price_max ? Number(params.price_max) : undefined,
+    beds_min: params.beds_min ? Number(params.beds_min) : undefined,
+    sort: (params.sort as string) || 'recent',
+    page: params.page ? Number(params.page) : 1,
+    per: params.per ? Number(params.per) : 12,
+    recent_days: params.recent_days ? Number(params.recent_days) : undefined,
   } as const;
 
   const { items, count } = await getProperties(filters);
