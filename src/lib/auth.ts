@@ -152,8 +152,13 @@ export async function updatePassword(newPassword: string) {
 export async function getCurrentUser() {
   try {
     // Check if Supabase environment variables are available
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      console.warn('Supabase environment variables not found. Returning null for development.');
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      console.warn(
+        'Supabase environment variables not found. Returning null for development.'
+      );
       return null;
     }
 
@@ -181,8 +186,13 @@ export async function getCurrentUser() {
 export async function getCurrentSession() {
   try {
     // Check if Supabase environment variables are available
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      console.warn('Supabase environment variables not found. Returning null for development.');
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      console.warn(
+        'Supabase environment variables not found. Returning null for development.'
+      );
       return null;
     }
 
