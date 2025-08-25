@@ -1,37 +1,61 @@
 import FiltersBar from '@/components/search/FiltersBar';
-import { searchProperties } from '@/repositories/propertyRepo';
+import { getProperties } from '@/server/data/properties';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Suspense } from 'react';
+import { Metadata } from 'next';
 
-export default async function PropertiesIndex({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | undefined>>;
-}) {
-  const params = await searchParams;
+export const metadata: Metadata = {
+  title: 'Properties',
+  description:
+    'Browse our extensive collection of properties for sale and rent. Find your perfect home with detailed listings, photos, and agent information.',
+  keywords: [
+    'properties',
+    'real estate',
+    'buy property',
+    'rent property',
+    'homes for sale',
+    'apartments for rent',
+  ],
+  openGraph: {
+    title: 'Properties - Remax Unified Platform',
+    description:
+      'Browse our extensive collection of properties for sale and rent.',
+    url: '/properties',
+    type: 'website',
+  },
+  twitter: {
+    title: 'Properties - Remax Unified Platform',
+    description:
+      'Browse our extensive collection of properties for sale and rent.',
+  },
+  alternates: {
+    canonical: '/properties',
+  },
+};
+
+export default async function PropertiesIndex() {
   const filters = {
-    mode: params.mode === 'rent' ? 'rent' : 'buy',
-    type: params.type,
-    city: params.city,
-    district: params.district,
-    price_min: params.price_min ? Number(params.price_min) : undefined,
-    price_max: params.price_max ? Number(params.price_max) : undefined,
-    beds_min: params.beds_min ? Number(params.beds_min) : undefined,
-    sort: (['recent', 'price_asc', 'price_desc'] as const).includes(
-      (params.sort ?? '') as 'recent' | 'price_asc' | 'price_desc'
-    )
-      ? (params.sort as 'recent' | 'price_asc' | 'price_desc')
-      : 'recent',
-    page: params.page ? Math.max(1, Number(params.page)) : 1,
-    per: params.per ? Math.min(48, Math.max(6, Number(params.per))) : 12,
-    recent_days: params.recent_days ? Number(params.recent_days) : undefined,
+    mode: 'buy',
+    type: undefined,
+    city: undefined,
+    district: undefined,
+    price_min: undefined,
+    price_max: undefined,
+    beds_min: undefined,
+    sort: 'recent',
+    page: 1,
+    per: 12,
+    recent_days: undefined,
   } as const;
 
-  const { items, count } = await searchProperties(filters);
+  const { items, count } = await getProperties(filters);
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
-      <FiltersBar initialFilters={filters} />
+      <Suspense fallback={<div>Loading filters...</div>}>
+        <FiltersBar initialFilters={filters} />
+      </Suspense>
       <div className="mt-4 text-sm text-muted-foreground">
         {count?.toLocaleString() ?? items.length} listings
       </div>
@@ -83,7 +107,7 @@ export default async function PropertiesIndex({
           <Link
             href={{
               pathname: '/properties',
-              query: { ...params, page: String(filters.page - 1) },
+              query: { ...filters, page: String(filters.page - 1) },
             }}
             className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
           >
@@ -94,7 +118,7 @@ export default async function PropertiesIndex({
           <Link
             href={{
               pathname: '/properties',
-              query: { ...params, page: String(filters.page + 1) },
+              query: { ...filters, page: String(filters.page + 1) },
             }}
             className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
           >

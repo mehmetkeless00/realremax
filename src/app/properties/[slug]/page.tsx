@@ -24,15 +24,64 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const property = getPropertyBySlug(slug);
 
   if (!property) {
-    return { title: 'Property Not Found' };
+    return {
+      title: 'Property Not Found',
+      description: 'The requested property could not be found.',
+    };
   }
 
   const ogImage = property.images[0]?.src;
+  const formattedPrice = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: property.currency,
+    maximumFractionDigits: 0,
+  }).format(property.price);
 
   return {
-    title: property.title,
-    description: property.description,
-    openGraph: ogImage ? { images: [{ url: ogImage }] } : undefined,
+    title: `${property.title} - ${property.location.city}`,
+    description: `${property.description} Located in ${property.location.city}. ${property.bedrooms ? `${property.bedrooms} bedroom` : ''} ${property.type} for ${property.operation} at ${formattedPrice}.`,
+    keywords: [
+      property.type,
+      property.operation,
+      property.location.city,
+      property.location.district,
+      'real estate',
+      'property',
+      formattedPrice,
+    ].filter((keyword): keyword is string => Boolean(keyword)),
+    openGraph: {
+      title: `${property.title} - ${property.location.city}`,
+      description: `${property.description} Located in ${property.location.city}.`,
+      url: `/properties/${slug}`,
+      type: 'website',
+      images: ogImage
+        ? [
+            {
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              alt: property.title,
+            },
+          ]
+        : undefined,
+      siteName: 'Remax Unified Platform',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${property.title} - ${property.location.city}`,
+      description: `${property.description} Located in ${property.location.city}.`,
+      images: ogImage ? [ogImage] : undefined,
+    },
+    alternates: {
+      canonical: `/properties/${slug}`,
+    },
+    other: {
+      'property:price:amount': property.price.toString(),
+      'property:price:currency': property.currency,
+      'property:type': property.type,
+      'property:operation': property.operation,
+      'property:location': property.location.city,
+    },
   };
 }
 

@@ -9,10 +9,14 @@ import { useUIStore } from '@/lib/store';
 
 interface PhotoUploadProps {
   propertyId?: string;
-  onUploadComplete: (urls: string[]) => void;
+  onUploadComplete?: (urls: string[]) => void;
   existingPhotos?: string[];
   maxFiles?: number;
   className?: string;
+  // For form integration
+  value?: string[];
+  onChange?: (urls: string[]) => void;
+  onRemove?: (url: string) => void;
 }
 
 export default function PhotoUpload({
@@ -21,6 +25,9 @@ export default function PhotoUpload({
   existingPhotos = [],
   maxFiles = 10,
   className = '',
+  value,
+  onChange,
+  onRemove,
 }: PhotoUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -92,7 +99,16 @@ export default function PhotoUpload({
         }
 
         if (uploadedUrls.length > 0) {
-          onUploadComplete([...existingPhotos, ...uploadedUrls]);
+          const currentPhotos = value || existingPhotos;
+          const newPhotos = [...currentPhotos, ...uploadedUrls];
+
+          if (onChange) {
+            onChange(newPhotos);
+          }
+          if (onUploadComplete) {
+            onUploadComplete(newPhotos);
+          }
+
           addToast({
             type: 'success',
             message: `Successfully uploaded ${uploadedUrls.length} photo(s)`,
@@ -145,8 +161,18 @@ export default function PhotoUpload({
       }
 
       // Local state'den kaldır
-      const newPhotos = existingPhotos.filter((_, i) => i !== index);
-      onUploadComplete(newPhotos);
+      const currentPhotos = value || existingPhotos;
+      const newPhotos = currentPhotos.filter((_, i) => i !== index);
+
+      if (onChange) {
+        onChange(newPhotos);
+      }
+      if (onRemove) {
+        onRemove(photoUrl);
+      }
+      if (onUploadComplete) {
+        onUploadComplete(newPhotos);
+      }
 
       addToast({
         type: 'success',
@@ -202,7 +228,7 @@ export default function PhotoUpload({
               PNG, JPG, GIF up to 5MB each
             </p>
             <p className="text-xs text-muted">
-              {existingPhotos.length}/{maxFiles} photos uploaded
+              {(value || existingPhotos).length}/{maxFiles} photos uploaded
             </p>
           </div>
         </div>
@@ -225,11 +251,11 @@ export default function PhotoUpload({
       )}
 
       {/* Existing Photos */}
-      {existingPhotos.length > 0 && (
+      {(value || existingPhotos).length > 0 && (
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-fg">Uploaded Photos</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {existingPhotos.map((photo, index) => (
+            {(value || existingPhotos).map((photo, index) => (
               <div key={index} className="relative group">
                 <OptimizedImage
                   src={photo}
