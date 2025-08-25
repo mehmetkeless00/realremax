@@ -15,7 +15,16 @@ export type SearchFilters = {
   recent_days?: number;
 };
 
+// Add environment variable support for forcing mock data
+const useMock = process.env.NEXT_PUBLIC_USE_MOCK_LISTINGS === 'true';
+
 export async function searchProperties(f: SearchFilters) {
+  // Force mock if environment variable is set
+  if (useMock) {
+    console.log('Using mock data (NEXT_PUBLIC_USE_MOCK_LISTINGS=true)');
+    return searchPropertiesMock(f);
+  }
+
   const per = f.per ?? 12;
   const page = f.page ?? 1;
   const offset = (page - 1) * per;
@@ -26,7 +35,12 @@ export async function searchProperties(f: SearchFilters) {
 
     // Apply filters
     if (f.mode) {
-      query = query.eq('listing_type', f.mode);
+      // Tolerate 'sale' vs 'buy' differences
+      if (f.mode === 'buy') {
+        query = query.in('listing_type', ['buy', 'sale']);
+      } else {
+        query = query.eq('listing_type', f.mode);
+      }
     }
     if (f.type) {
       query = query.eq('type', f.type);
@@ -73,6 +87,12 @@ export async function searchProperties(f: SearchFilters) {
 
     if (error) {
       throw error;
+    }
+
+    // Fallback if no data returned (empty table, RLS blocking, or no matches)
+    if (!data || (Array.isArray(data) && data.length === 0) || !count) {
+      console.warn('Supabase returned 0 rows; falling back to mock data');
+      return searchPropertiesMock(f);
     }
 
     // Transform Supabase data to match our Property type

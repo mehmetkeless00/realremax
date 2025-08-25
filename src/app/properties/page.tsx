@@ -51,6 +51,21 @@ export default async function PropertiesIndex() {
 
   const { items, count } = await getProperties(filters);
 
+  // Add empty state
+  if (!items || items.length === 0) {
+    return (
+      <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
+        <Suspense fallback={<div>Loading filters...</div>}>
+          <FiltersBar initialFilters={filters} />
+        </Suspense>
+        <div className="mt-12 text-center text-muted-foreground">
+          <div className="text-2xl font-semibold mb-2">No listings found</div>
+          <p>Try adjusting your filters or come back later.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
       <Suspense fallback={<div>Loading filters...</div>}>
