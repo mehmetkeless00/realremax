@@ -40,16 +40,19 @@ export default async function PropertiesIndex({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  
+
   const filters = {
-    mode: (params.mode as string) || 'buy',
+    mode: ((params.mode as string) || 'buy') as 'rent' | 'buy',
     type: params.type as string | undefined,
     city: params.city as string | undefined,
     district: params.district as string | undefined,
     price_min: params.price_min ? Number(params.price_min) : undefined,
     price_max: params.price_max ? Number(params.price_max) : undefined,
     beds_min: params.beds_min ? Number(params.beds_min) : undefined,
-    sort: (params.sort as string) || 'recent',
+    sort: ((params.sort as string) || 'recent') as
+      | 'recent'
+      | 'price_asc'
+      | 'price_desc',
     page: params.page ? Number(params.page) : 1,
     per: params.per ? Number(params.per) : 12,
     recent_days: params.recent_days ? Number(params.recent_days) : undefined,

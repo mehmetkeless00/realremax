@@ -98,22 +98,21 @@ export default function PhotoUpload({
           setUploadProgress(((i + 1) / totalFiles) * 100);
         }
 
-        if (uploadedUrls.length > 0) {
-          const currentPhotos = value || existingPhotos;
-          const newPhotos = [...currentPhotos, ...uploadedUrls];
+        // Mevcut fotoğraflarla birleştir
+        const currentPhotos = value || existingPhotos;
+        const allPhotos = [...currentPhotos, ...uploadedUrls];
 
-          if (onChange) {
-            onChange(newPhotos);
-          }
-          if (onUploadComplete) {
-            onUploadComplete(newPhotos);
-          }
-
-          addToast({
-            type: 'success',
-            message: `Successfully uploaded ${uploadedUrls.length} photo(s)`,
-          });
+        if (onChange) {
+          onChange(allPhotos);
         }
+        if (onUploadComplete) {
+          onUploadComplete(allPhotos);
+        }
+
+        addToast({
+          type: 'success',
+          message: 'Photos uploaded successfully',
+        });
       } catch (error) {
         console.error('Upload error:', error);
         addToast({
@@ -125,7 +124,7 @@ export default function PhotoUpload({
         setUploadProgress(0);
       }
     },
-    [propertyId, existingPhotos, onUploadComplete, addToast]
+    [propertyId, existingPhotos, onUploadComplete, addToast, onChange, value]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

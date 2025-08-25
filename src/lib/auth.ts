@@ -151,6 +151,12 @@ export async function updatePassword(newPassword: string) {
 // User Management
 export async function getCurrentUser() {
   try {
+    // Check if Supabase environment variables are available
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.warn('Supabase environment variables not found. Returning null for development.');
+      return null;
+    }
+
     const {
       data: { user },
       error,
@@ -164,12 +170,22 @@ export async function getCurrentUser() {
     return user;
   } catch (error) {
     console.error('Get current user error:', error);
+    // In development, return null instead of throwing error
+    if (process.env.NODE_ENV === 'development') {
+      return null;
+    }
     throw error;
   }
 }
 
 export async function getCurrentSession() {
   try {
+    // Check if Supabase environment variables are available
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.warn('Supabase environment variables not found. Returning null for development.');
+      return null;
+    }
+
     const {
       data: { session },
       error,
@@ -183,6 +199,10 @@ export async function getCurrentSession() {
     return session;
   } catch (error) {
     console.error('Get current session error:', error);
+    // In development, return null instead of throwing error
+    if (process.env.NODE_ENV === 'development') {
+      return null;
+    }
     throw error;
   }
 }
