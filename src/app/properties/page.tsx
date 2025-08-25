@@ -34,19 +34,23 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function PropertiesIndex() {
+export default async function PropertiesIndex({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const filters = {
-    mode: 'buy',
-    type: undefined,
-    city: undefined,
-    district: undefined,
-    price_min: undefined,
-    price_max: undefined,
-    beds_min: undefined,
-    sort: 'recent',
-    page: 1,
-    per: 12,
-    recent_days: undefined,
+    mode: (searchParams.mode as string) || 'buy',
+    type: searchParams.type as string | undefined,
+    city: searchParams.city as string | undefined,
+    district: searchParams.district as string | undefined,
+    price_min: searchParams.price_min ? Number(searchParams.price_min) : undefined,
+    price_max: searchParams.price_max ? Number(searchParams.price_max) : undefined,
+    beds_min: searchParams.beds_min ? Number(searchParams.beds_min) : undefined,
+    sort: (searchParams.sort as string) || 'recent',
+    page: searchParams.page ? Number(searchParams.page) : 1,
+    per: searchParams.per ? Number(searchParams.per) : 12,
+    recent_days: searchParams.recent_days ? Number(searchParams.recent_days) : undefined,
   } as const;
 
   const { items, count } = await getProperties(filters);
