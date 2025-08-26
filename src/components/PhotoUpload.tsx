@@ -6,6 +6,7 @@ import { useDropzone } from 'react-dropzone';
 import OptimizedImage from './OptimizedImage';
 import { supabase } from '@/lib/supabase';
 import { useUIStore } from '@/lib/store';
+import { filterValidUrls } from '@/lib/utils';
 
 interface PhotoUploadProps {
   propertyId?: string;
@@ -227,7 +228,8 @@ export default function PhotoUpload({
               PNG, JPG, GIF up to 5MB each
             </p>
             <p className="text-xs text-muted">
-              {(value || existingPhotos).length}/{maxFiles} photos uploaded
+              {filterValidUrls(value || existingPhotos).length}/{maxFiles}{' '}
+              photos uploaded
             </p>
           </div>
         </div>
@@ -254,7 +256,7 @@ export default function PhotoUpload({
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-fg">Uploaded Photos</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {(value || existingPhotos).map((photo, index) => (
+            {filterValidUrls(value || existingPhotos).map((photo, index) => (
               <div key={index} className="relative group">
                 <OptimizedImage
                   src={photo}

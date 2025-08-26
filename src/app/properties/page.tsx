@@ -4,6 +4,7 @@ import { searchProperties } from '@/repositories/propertyRepo';
 import FiltersBar from '@/components/search/FiltersBar';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getFirstValidUrl } from '@/lib/utils';
 
 interface SearchParams {
   mode?: string;
@@ -81,7 +82,7 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
           >
             <div className="relative aspect-[4/3]">
               <Image
-                src={property.photos?.[0] ?? '/logo.png'}
+                src={getFirstValidUrl(property.photos, '/logo.png')}
                 alt={property.title}
                 fill
                 className="object-cover"

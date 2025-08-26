@@ -1,20 +1,18 @@
 'use client';
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { SearchFilters } from '@/repositories/propertyRepo';
 
 type Props = { initialFilters: SearchFilters };
 
 export default function FiltersBar({ initialFilters }: Props) {
+  const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const params = useSearchParams();
 
   const [type, setType] = useState<string | undefined>(initialFilters.type);
-  const [location, setLocation] = useState<string>(
-    initialFilters.location ?? ''
-  );
+  const [location, setLocation] = useState<string>('');
   const [priceMin, setPriceMin] = useState<string>(
     initialFilters.minPrice?.toString() ?? ''
   );
@@ -28,8 +26,10 @@ export default function FiltersBar({ initialFilters }: Props) {
     initialFilters.bathrooms?.toString() ?? ''
   );
 
+  const hydratedOnceRef = useRef(false); // avoid double-apply in StrictMode
+
   function apply(next: Record<string, string | number | undefined>) {
-    const q = new URLSearchParams(params?.toString());
+    const q = new URLSearchParams(searchParams?.toString());
     Object.entries(next).forEach(([k, v]) => {
       if (v === undefined || v === '' || v === null) q.delete(k);
       else q.set(k, String(v));
@@ -38,6 +38,36 @@ export default function FiltersBar({ initialFilters }: Props) {
     q.delete('page');
     router.push(`${pathname}?${q.toString()}`);
   }
+
+  const applyLocationFilter = (loc: string) => {
+    // REUSE existing logic here:
+    apply({ location: loc });
+  };
+
+  const updateUrlParam = (loc: string) => {
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    if (loc) params.set('region', loc);
+    else params.delete('region');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const commitLocation = (loc: string) => {
+    applyLocationFilter(loc);
+    updateUrlParam(loc);
+  };
+
+  // Hydrate Location from URL on mount / when query changes
+  useEffect(() => {
+    if (hydratedOnceRef.current) return;
+    const fromUrl =
+      searchParams.get('region') ?? searchParams.get('location') ?? '';
+    if (fromUrl && fromUrl !== location) {
+      setLocation(fromUrl);
+      commitLocation(fromUrl);
+      hydratedOnceRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   return (
     <div className="sticky top-16 z-10 bg-white/70 backdrop-blur border-b border-b-gray-200 py-3">
@@ -63,11 +93,14 @@ export default function FiltersBar({ initialFilters }: Props) {
 
           {/* Location */}
           <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            onBlur={() => apply({ location })}
             placeholder="Location"
             className="rounded-full border px-3 py-2 text-sm"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            onBlur={() => commitLocation(location)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') commitLocation(location);
+            }}
           />
 
           {/* Price */}
@@ -137,6 +170,7 @@ export default function FiltersBar({ initialFilters }: Props) {
               setPriceMax('');
               setBedrooms('');
               setBathrooms('');
+              commitLocation('');
               router.push(pathname);
             }}
             className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"

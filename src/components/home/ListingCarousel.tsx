@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { getFirstValidUrl } from '@/lib/utils';
 
 // Real property data structure from Supabase
 type Property = {
@@ -81,14 +82,10 @@ export default function ListingCarousel({
       >
         {list.map((property) => {
           // Image fallback: photos(array) -> og_image_url -> placeholder
-          const firstPhoto =
-            Array.isArray(property.photos) && property.photos.length > 0
-              ? property.photos[0]
-              : null;
-          const imageUrl =
-            firstPhoto ??
-            property.og_image_url ??
-            '/images/placeholder-property.svg';
+          const imageUrl = getFirstValidUrl(
+            property.photos,
+            property.og_image_url || '/images/placeholder-property.svg'
+          );
 
           const href = `/properties/${property.slug ?? property.id}`;
           const price = formatPrice(property.price);

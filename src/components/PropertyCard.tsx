@@ -7,6 +7,7 @@ import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import { useFavoritesStore } from '@/lib/store/favoritesStore';
 import type { PropertyCardProps } from '@/types/property';
+import { getFirstValidUrl } from '@/lib/utils';
 
 export default function PropertyCard({
   property,
@@ -24,7 +25,7 @@ export default function PropertyCard({
 
   // Default image if property image fails to load
   const defaultImage = '/images/placeholder-property.svg';
-  const propertyImage = property.images?.[0] || defaultImage;
+  const propertyImage = getFirstValidUrl(property.photos, defaultImage);
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.preventDefault();

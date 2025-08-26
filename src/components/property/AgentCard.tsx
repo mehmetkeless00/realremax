@@ -61,7 +61,7 @@ export default function AgentCard({ agent }: AgentCardProps) {
 
       {/* Agent Info */}
       <div className="flex items-center gap-3 mb-6">
-        {agent.photo && (
+        {agent.photo && agent.photo.trim() !== '' && (
           <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
             <Image
               src={agent.photo}

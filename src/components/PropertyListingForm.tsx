@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useUIStore } from '@/lib/store';
 import PhotoUpload from './PhotoUpload';
 import { Button } from '@/components/ui/button';
+import { filterValidUrls } from '@/lib/utils';
 
 interface PropertyFormData {
   title: string;
@@ -665,19 +666,21 @@ export default function PropertyListingForm({
               Photos ({formData.photos.length})
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {formData.photos.slice(0, 4).map((photo, index) => (
-                <Image
-                  key={index}
-                  src={photo}
-                  alt={`Property photo ${index + 1}`}
-                  width={150}
-                  height={80}
-                  className="w-full h-16 object-cover rounded"
-                />
-              ))}
-              {formData.photos.length > 4 && (
+              {filterValidUrls(formData.photos)
+                .slice(0, 4)
+                .map((photo, index) => (
+                  <Image
+                    key={index}
+                    src={photo}
+                    alt={`Property photo ${index + 1}`}
+                    width={150}
+                    height={80}
+                    className="w-full h-16 object-cover rounded"
+                  />
+                ))}
+              {filterValidUrls(formData.photos).length > 4 && (
                 <div className="w-full h-16 bg-muted/20 rounded flex items-center justify-center text-sm text-muted">
-                  +{formData.photos.length - 4} more
+                  +{filterValidUrls(formData.photos).length - 4} more
                 </div>
               )}
             </div>

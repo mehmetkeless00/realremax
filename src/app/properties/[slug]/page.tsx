@@ -13,6 +13,7 @@ import AgentCard from '@/components/property/AgentCard';
 import MapPlaceholder from '@/components/property/MapPlaceholder';
 import Link from 'next/link';
 import Image from 'next/image';
+import { filterValidUrls, getFirstValidUrl } from '@/lib/utils';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -30,7 +31,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   // Use property.photos[0] if available, otherwise fallback
-  const ogImage = property.photos?.[0] || '/images/placeholder-property.svg';
+  const ogImage = getFirstValidUrl(
+    property.photos,
+    '/images/placeholder-property.svg'
+  );
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD', // Default to USD since we don't have currency in our schema
@@ -130,7 +134,7 @@ export default async function PropertyPage({ params }: Props) {
       <div className="lg:grid lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-7">
           <Gallery
-            images={(property.photos || []).map((photo) => ({
+            images={filterValidUrls(property.photos || []).map((photo) => ({
               src: photo,
               alt: property.title,
             }))}
@@ -199,7 +203,7 @@ export default async function PropertyPage({ params }: Props) {
               >
                 <div className="relative aspect-video">
                   <Image
-                    src={prop.photos?.[0] || '/logo.png'}
+                    src={getFirstValidUrl(prop.photos, '/logo.png')}
                     alt={prop.title}
                     fill
                     className="object-cover"
