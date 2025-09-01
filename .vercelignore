@@ -101,4 +101,11 @@ DEPLOYMENT.md
 *.md
 
 # Development files
-Tasks/ 
+Tasks/
+
+# Demo and test pages (exclude from build)
+src/app/*-demo/
+src/app/responsive-testing-demo/
+src/app/image-optimization-demo/
+src/app/cls-optimization-demo/
+__tests__/ 

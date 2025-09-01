@@ -1,4 +1,7 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   images: {
@@ -25,12 +28,10 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  // Performance optimizations
+  // Enable experimental features
   experimental: {
     optimizeCss: true,
   },
-  // Compression
-  compress: true,
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

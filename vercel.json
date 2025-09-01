@@ -5,5 +5,11 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
+  ],
+  "routes": [
+    {
+      "src": "/(.*-demo|responsive-testing-demo|image-optimization-demo|cls-optimization-demo)/.*",
+      "dest": "/404"
+    }
   ]
 }

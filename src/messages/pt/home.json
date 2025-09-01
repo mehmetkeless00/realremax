@@ -1,0 +1,15 @@
+{
+  "headline": "Encontre a casa dos seus sonhos",
+  "subheadline": "Pesquise milhares de imóveis e conecte-se com agentes de confiança.",
+  "buy": "Comprar",
+  "rent": "Arrendar",
+  "searchPlaceholder": "Cidade, bairro, palavra-chave…",
+  "search": "Pesquisar",
+  "browseProperties": "Ver imóveis",
+  "findAgents": "Encontrar agentes",
+  "sections": {
+    "mostRecent": "Mais recentes",
+    "newThisWeek": "Novos esta semana"
+  },
+  "noProperties": "Não há imóveis disponíveis no momento."
+}

@@ -1,0 +1,15 @@
+{
+  "headline": "Find Your Dream Home",
+  "subheadline": "Search thousands of listings and connect with trusted agents.",
+  "buy": "Buy",
+  "rent": "Rent",
+  "searchPlaceholder": "City, neighborhood, keyword…",
+  "search": "Search",
+  "browseProperties": "Browse Properties",
+  "findAgents": "Find Agents",
+  "sections": {
+    "mostRecent": "Most Recent",
+    "newThisWeek": "New this week"
+  },
+  "noProperties": "No properties available at the moment."
+}

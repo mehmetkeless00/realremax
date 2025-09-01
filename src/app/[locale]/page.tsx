@@ -3,34 +3,30 @@ import ListingCarousel from '@/components/home/ListingCarousel';
 import RegionChips from '@/components/home/RegionChips';
 import CorporateCTA from '@/components/home/CorporateCTA';
 import { listPublishedListings } from '@/server/db/listings';
+import { getTranslations } from 'next-intl/server';
 
-export const revalidate = 60; // ISR: refresh every 60 seconds
+export const revalidate = 60;
 
 export default async function HomePage() {
-  // Fetch real published listings
-  let recentListings: Awaited<ReturnType<typeof listPublishedListings>> = [];
-  let weeklyListings: Awaited<ReturnType<typeof listPublishedListings>> = [];
+  const t = await getTranslations('home');
+  let recentListings = [] as Awaited<ReturnType<typeof listPublishedListings>>;
+  let weeklyListings = [] as Awaited<ReturnType<typeof listPublishedListings>>;
 
   try {
-    // Get most recent published listings
     recentListings = await listPublishedListings(8);
-
-    // Get listings from the last 7 days (if any)
-    const allListings = await listPublishedListings(20);
+    const all = await listPublishedListings(20);
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    weeklyListings = allListings
-      .filter((listing) => {
-        const publishedDate = listing.published_at
-          ? new Date(listing.published_at)
-          : new Date(listing.created_at);
-        return publishedDate >= oneWeekAgo;
+    weeklyListings = all
+      .filter((l) => {
+        const d = l.published_at
+          ? new Date(l.published_at)
+          : new Date(l.created_at);
+        return d >= oneWeekAgo;
       })
       .slice(0, 8);
-  } catch (error) {
-    // Fail quietly; show empty state
-    console.error('Failed to fetch listings:', error);
+  } catch (e) {
+    console.error('Failed to fetch listings:', e);
   }
 
   return (
@@ -41,8 +37,8 @@ export default async function HomePage() {
 
       <section className="py-8 md:py-12">
         <ListingCarousel
-          title="Most Recent"
-          seeAllHref="/properties?sort=recent"
+          title={t('sections.mostRecent')}
+          seeAllHref={{ pathname: '/properties', query: { sort: 'recent' } }}
           items={recentListings}
           limit={8}
         />
@@ -50,8 +46,8 @@ export default async function HomePage() {
 
       <section className="py-8 md:py-12">
         <ListingCarousel
-          title="New this week"
-          seeAllHref="/properties?sort=recent&recent_days=7"
+          title={t('sections.newThisWeek')}
+          seeAllHref={{ pathname: '/properties', query: { sort: 'recent' } }}
           items={weeklyListings}
           limit={8}
         />

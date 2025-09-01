@@ -1,14 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import Logo from './Logo';
 import UserMenu from './UserMenu';
 import { useUserStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function GlobalHeader() {
+  const t = useTranslations('nav');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useUserStore();
   const pathname = usePathname();
@@ -27,7 +30,8 @@ export default function GlobalHeader() {
     const active = pathname?.startsWith(href);
     return (
       <Link
-        href={href}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        href={href as any}
         onClick={onClick}
         aria-current={active ? 'page' : undefined}
         className={`block py-2 px-4 text-dark-charcoal hover:text-primary hover:bg-gray-50 rounded-md transition-colors ${
@@ -41,13 +45,9 @@ export default function GlobalHeader() {
   }
 
   const navigationLinks = [
-    {
-      href: '/properties',
-      label: 'Buy/Rent',
-      description: 'Find your dream home or rental',
-    },
-    { href: '/agents', label: 'Agents', description: 'Find agents' },
-    { href: '/services', label: 'Services', description: 'Our services' },
+    { href: '/properties', label: t('buyRent'), description: undefined },
+    { href: '/agents', label: t('agents'), description: undefined },
+    { href: '/services', label: t('services'), description: undefined },
   ];
 
   const handleFreeValuation = () => {
@@ -75,7 +75,8 @@ export default function GlobalHeader() {
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  href={link.href as any}
                   aria-current={active ? 'page' : undefined}
                   className={`text-dark-charcoal hover:text-primary transition-colors font-medium relative group ${
                     active ? 'text-primary font-semibold' : ''
@@ -91,28 +92,20 @@ export default function GlobalHeader() {
           {/* Right side - User menu and CTA */}
           <div className="flex items-center space-x-4">
             <Link
-              href="/favorites"
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              href={'/favorites' as any}
               className="text-dark-charcoal hover:text-primary-red transition-colors p-2 relative"
-              title="My Favorites"
+              title={t('myFavorites')}
+              aria-label={t('myFavorites')}
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
+              <span className="sr-only">{t('myFavorites')}</span>
+              ❤️
             </Link>
 
             {user?.user_metadata?.role === 'agent' && (
               <Link
-                href="/dashboard/listings"
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                href={'/dashboard/listings' as any}
                 className="text-dark-charcoal hover:text-primary-blue transition-colors p-2 relative"
                 title="My Listings"
               >
@@ -132,6 +125,7 @@ export default function GlobalHeader() {
               </Link>
             )}
 
+            <LanguageSwitcher />
             <UserMenu />
 
             <Button
@@ -140,7 +134,7 @@ export default function GlobalHeader() {
               size="md"
               className="hidden sm:block"
             >
-              Free Valuation
+              {t('freeValuation')}
             </Button>
 
             {/* Mobile menu button */}
@@ -199,7 +193,7 @@ export default function GlobalHeader() {
                   size="md"
                   className="w-full"
                 >
-                  Free Valuation
+                  {t('freeValuation')}
                 </Button>
               </div>
             </nav>
