@@ -91,8 +91,10 @@ export interface Database {
           listing_type: string;
           amenities: string[] | null;
           photos: string[] | null;
+          features: string[] | null;
           address: string | null;
           city: string | null;
+          district: string | null;
           postal_code: string | null;
           country: string | null;
           latitude: number | null;
@@ -101,6 +103,8 @@ export interface Database {
           meta_title: string | null;
           meta_description: string | null;
           og_image_url: string | null;
+          currency: string | null;
+          energy_rating: string | null;
           published_at: string | null;
           created_at: string;
           updated_at: string;
@@ -127,8 +131,10 @@ export interface Database {
           listing_type?: string;
           amenities?: string[] | null;
           photos?: string[] | null;
+          features?: string[] | null;
           address?: string | null;
           city?: string | null;
+          district?: string | null;
           postal_code?: string | null;
           country?: string | null;
           latitude?: number | null;
@@ -137,6 +143,8 @@ export interface Database {
           meta_title?: string | null;
           meta_description?: string | null;
           og_image_url?: string | null;
+          currency?: string | null;
+          energy_rating?: string | null;
           published_at?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -163,8 +171,10 @@ export interface Database {
           listing_type?: string;
           amenities?: string[] | null;
           photos?: string[] | null;
+          features?: string[] | null;
           address?: string | null;
           city?: string | null;
+          district?: string | null;
           postal_code?: string | null;
           country?: string | null;
           latitude?: number | null;
@@ -173,6 +183,8 @@ export interface Database {
           meta_title?: string | null;
           meta_description?: string | null;
           og_image_url?: string | null;
+          currency?: string | null;
+          energy_rating?: string | null;
           published_at?: string | null;
           created_at?: string;
           updated_at?: string;

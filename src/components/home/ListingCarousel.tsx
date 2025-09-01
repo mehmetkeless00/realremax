@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import Image from 'next/image';
+import { getCoverUrl } from '@/lib/image-helpers';
+import { SmartImage } from '@/lib/smart-image';
 
 // Real property data structure from Supabase
 type Property = {
@@ -80,16 +81,7 @@ export default function ListingCarousel({
                       overflow-x-auto snap-x lg:overflow-visible"
       >
         {list.map((property) => {
-          // Image fallback: photos(array) -> og_image_url -> placeholder
-          const firstPhoto =
-            Array.isArray(property.photos) && property.photos.length > 0
-              ? property.photos[0]
-              : null;
-          const imageUrl =
-            firstPhoto ??
-            property.og_image_url ??
-            '/images/placeholder-property.svg';
-
+          const imageUrl = getCoverUrl(property);
           const href = `/properties/${property.slug ?? property.id}`;
           const price = formatPrice(property.price);
           const location =
@@ -103,8 +95,8 @@ export default function ListingCarousel({
               href={href}
               className="min-w-[260px] lg:min-w-0 snap-start rounded-2xl bg-white border shadow-sm overflow-hidden hover:shadow-md transition"
             >
-              <div className="relative aspect-video">
-                <Image
+              <div className="relative aspect-video bg-muted overflow-hidden rounded-lg">
+                <SmartImage
                   src={imageUrl}
                   alt={property.title || 'Property'}
                   fill

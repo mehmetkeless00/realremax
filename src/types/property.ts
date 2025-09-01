@@ -11,6 +11,16 @@ export type Listing = Database['public']['Tables']['listings']['Row'];
 export type ListingInsert = Database['public']['Tables']['listings']['Insert'];
 export type ListingUpdate = Database['public']['Tables']['listings']['Update'];
 
+// Property image type for CMS and gallery
+export interface PropertyImage {
+  id: string;
+  property_id: string;
+  public_url: string; // görüntülemek için bunu kullan
+  storage_path?: string | null; // bucket içi path
+  position?: number | null;
+  created_at?: string | null;
+}
+
 // Extended property type for UI with additional fields
 export interface PropertyWithListing extends Property {
   listing?: Listing;
