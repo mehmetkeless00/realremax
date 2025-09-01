@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUserStore } from '@/lib/store';
 import { useFavoritesStore } from '@/lib/store/favoritesStore';
 import { useUIStore } from '@/lib/store';
 import PropertyCard from '@/components/PropertyCard';
-import RealtimeDemo from '@/components/RealtimeDemo';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import type { PropertyWithListing } from '@/types/property';
 
 export default function FavoritesPage() {
@@ -41,7 +40,7 @@ export default function FavoritesPage() {
             id: '1',
             title: 'Modern Downtown Apartment',
             description:
-              'Beautiful 2-bedroom apartment in the heart of downtown with stunning city views.',
+              'Beautiful 2-bedroom apartment with modern amenities and city views.',
             price: 450000,
             location: 'Downtown, City Center',
             type: 'apartment',
@@ -50,15 +49,26 @@ export default function FavoritesPage() {
             size: 1200,
             year_built: 2018,
             agent_id: 'agent-1',
-            status: 'active',
+            status: 'published',
             listing_type: 'sale',
             amenities: ['Balcony', 'Elevator', 'Parking'],
+            features: ['Balcony', 'Elevator', 'Parking'],
             address: '123 Main St',
             city: 'Istanbul',
+            district: 'Downtown',
             postal_code: '34000',
             country: 'Turkey',
             latitude: 41.0082,
             longitude: 28.9784,
+            slug: 'modern-downtown-apartment',
+            meta_title: 'Modern Downtown Apartment for Sale',
+            meta_description:
+              'Beautiful 2-bedroom apartment with modern amenities and city views.',
+            og_image_url:
+              'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500&h=300&fit=crop',
+            currency: 'EUR',
+            energy_rating: 'A',
+            published_at: '2024-01-15T10:00:00Z',
             created_at: '2024-01-15T10:00:00Z',
             updated_at: '2024-01-15T10:00:00Z',
             listing: {
@@ -94,15 +104,26 @@ export default function FavoritesPage() {
             size: 2800,
             year_built: 2012,
             agent_id: 'agent-2',
-            status: 'active',
+            status: 'published',
             listing_type: 'sale',
             amenities: ['Garden', 'Pool', 'Garage'],
+            features: ['Garden', 'Pool', 'Garage'],
             address: '456 Elm St',
             city: 'Ankara',
+            district: 'Suburban Heights',
             postal_code: '06000',
             country: 'Turkey',
             latitude: 39.9334,
             longitude: 32.8597,
+            slug: 'luxury-family-home',
+            meta_title: 'Luxury Family Home for Sale',
+            meta_description:
+              'Spacious 4-bedroom family home with large backyard and modern amenities.',
+            og_image_url:
+              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&h=300&fit=crop',
+            currency: 'EUR',
+            energy_rating: 'B',
+            published_at: '2024-01-14T10:00:00Z',
             created_at: '2024-01-14T10:00:00Z',
             updated_at: '2024-01-14T10:00:00Z',
             listing: {
@@ -196,9 +217,6 @@ export default function FavoritesPage() {
           <h1 className="text-lg font-bold text-dark-charcoal mb-4">
             My Favorites
           </h1>
-
-          {/* Real-time Demo Component */}
-          <RealtimeDemo />
 
           {/* Controls */}
           <div className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-lg shadow-sm">

@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import {
   getPropertyBySlug,
   getSimilarProperties,
-} from '@/data/mock-properties';
-import { formatAddress } from '@/lib/format';
+  type PropertyRow,
+} from '@/server/db/properties';
 import Breadcrumbs from '@/components/property/Breadcrumbs';
 import Gallery from '@/components/property/Gallery';
 import PriceBar from '@/components/property/PriceBar';
@@ -15,161 +15,195 @@ import MapPlaceholder from '@/components/property/MapPlaceholder';
 import Link from 'next/link';
 import Image from 'next/image';
 
-type Props = {
-  params: Promise<{ slug: string }>;
-};
+type PageProps = { params: Promise<{ slug: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const property = getPropertyBySlug(slug);
-
+  const property = await getPropertyBySlug(slug);
   if (!property) {
-    return { title: 'Property Not Found' };
+    return {
+      title: 'Property Not Found',
+      description: 'The requested property could not be found.',
+    };
   }
 
-  const ogImage = property.images[0]?.src;
+  const ogImage = property.photos?.[0] ?? '/images/placeholder-property.svg';
+  const formattedPrice = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: property?.currency ?? 'EUR',
+    maximumFractionDigits: 0,
+  }).format(property.price ?? 0);
 
   return {
-    title: property.title,
-    description: property.description,
-    openGraph: ogImage ? { images: [{ url: ogImage }] } : undefined,
+    title: `${property.title} • ${formattedPrice}`,
+    description: property.meta_description ?? property.description ?? '',
+    openGraph: {
+      images: [{ url: ogImage }],
+    },
   };
 }
 
-export default async function PropertyPage({ params }: Props) {
+export default async function PropertyPage({ params }: PageProps) {
   const { slug } = await params;
-  const property = getPropertyBySlug(slug);
+  const property = await getPropertyBySlug(slug);
+  if (!property) notFound();
 
-  if (!property) {
-    notFound();
-  }
+  const images = (property.photos ?? []).map((src: string) => ({
+    src,
+    alt: property.title,
+  }));
+  const amenities = property.amenities ?? [];
 
-  const similarProperties = getSimilarProperties(property);
+  const operation: 'buy' | 'rent' =
+    (property as PropertyRow & { listing_type?: string }).listing_type ===
+    'rent'
+      ? 'rent'
+      : 'buy';
+  const currency =
+    (property as PropertyRow & { currency?: string }).currency ?? 'EUR';
 
-  const breadcrumbItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Properties', href: '/properties' },
-    { label: property.title },
-  ];
+  const similar = await getSimilarProperties(property, 6);
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-8">
-      <Breadcrumbs items={breadcrumbItems} />
+    <div className="container py-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Properties', href: '/properties' },
+          { label: property.title },
+        ]}
+      />
 
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-fg mb-2">
-              {property.title}
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              {formatAddress(property.location)}
+      {/* Üst kısım: Galeri + Fiyat barı */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          {/* Galeri */}
+          {images.length ? (
+            <Gallery images={images} />
+          ) : (
+            <div className="aspect-[16/9] w-full overflow-hidden rounded-xl bg-muted flex items-center justify-center">
+              <Image
+                src="/images/placeholder-property.svg"
+                alt="No image"
+                width={960}
+                height={540}
+                className="object-contain"
+              />
+            </div>
+          )}
+
+          {/* Başlık / Konum */}
+          <div className="mt-6">
+            <h1 className="text-3xl font-bold">{property.title}</h1>
+            <p className="text-muted-foreground">
+              {property.city ?? property.location ?? ''}
             </p>
           </div>
 
-          <div className="flex gap-3">
-            <button className="text-sm text-muted-foreground hover:text-primary">
-              Share
-            </button>
-            <button className="text-sm text-muted-foreground hover:text-primary">
-              Favorite
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-        <div className="lg:col-span-7">
-          <Gallery images={property.images} />
-        </div>
-
-        <aside className="mt-6 lg:mt-0 lg:col-span-5 lg:sticky lg:top-24 space-y-6">
-          <PriceBar
-            price={property.price}
-            currency={property.currency}
-            operation={property.operation}
-          />
-          {/* Facts visible on desktop */}
-          <div className="hidden lg:block">
+          {/* Özellikler */}
+          <div className="mt-6">
             <Facts
               type={property.type}
-              bedrooms={property.bedrooms}
-              bathrooms={property.bathrooms}
-              netArea={property.netArea}
-              grossArea={property.grossArea}
-              yearBuilt={property.yearBuilt}
-              energyRating={property.energyRating}
+              bedrooms={property.bedrooms ?? undefined}
+              bathrooms={property.bathrooms ?? undefined}
+              netArea={
+                (property as PropertyRow & { size?: number }).size ?? undefined
+              }
+              yearBuilt={
+                (property as PropertyRow & { year_built?: number })
+                  .year_built ?? undefined
+              }
+              energyRating={
+                (property as PropertyRow & { energy_rating?: string })
+                  .energy_rating ?? undefined
+              }
+            />
+            <FeaturesList amenities={amenities} />
+          </div>
+
+          {/* Açıklama */}
+          {property.description && (
+            <div className="prose max-w-none mt-6">
+              <h3 className="text-lg font-semibold mb-2">Description</h3>
+              <p className="text-fg">{property.description}</p>
+            </div>
+          )}
+
+          {/* Harita placeholder */}
+          <div className="mt-8">
+            <MapPlaceholder />
+          </div>
+        </div>
+
+        {/* Sağ panel */}
+        <div className="lg:col-span-1">
+          {/* Fiyat barı */}
+          <PriceBar
+            price={property.price ?? 0}
+            currency={currency}
+            operation={operation}
+          />
+
+          {/* İletişim Kartı */}
+          <div className="mt-6">
+            <AgentCard
+              agent={{
+                name: 'Agent',
+                email: '',
+                phone: '',
+              }}
             />
           </div>
-        </aside>
-      </div>
-
-      {/* Facts visible under gallery on mobile */}
-      <div className="lg:hidden mt-6">
-        <Facts
-          type={property.type}
-          bedrooms={property.bedrooms}
-          bathrooms={property.bathrooms}
-          netArea={property.netArea}
-          grossArea={property.grossArea}
-          yearBuilt={property.yearBuilt}
-          energyRating={property.energyRating}
-        />
-      </div>
-
-      {/* Two columns layout */}
-      <div className="grid md:grid-cols-3 gap-8 mb-8">
-        <div className="md:col-span-2">
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold text-fg mb-4">Description</h3>
-            <p className="text-fg leading-relaxed">{property.description}</p>
-          </div>
-          <FeaturesList amenities={property.amenities} />
-        </div>
-
-        <div className="md:col-span-1">
-          <AgentCard agent={property.agent} />
         </div>
       </div>
 
-      <MapPlaceholder />
-
-      {/* Similar Properties */}
-      {similarProperties.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold text-fg mb-4">
-            Similar Properties
-          </h3>
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {similarProperties.map((prop) => (
+      {/* Benzer ilanlar */}
+      {similar?.length ? (
+        <div className="mt-12">
+          <h3 className="text-xl font-semibold mb-4">Similar Properties</h3>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {similar.map((prop) => (
               <Link
                 key={prop.id}
-                href={`/properties/${prop.slug}`}
-                className="min-w-[280px] rounded-2xl bg-white border shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                href={`/properties/${prop.slug ?? prop.id}`}
+                className="group rounded-xl overflow-hidden border"
               >
-                <div className="relative aspect-video">
+                <div className="aspect-[16/9] bg-muted relative">
                   <Image
-                    src={prop.images[0]?.src || '/logo.png'}
+                    src={
+                      Array.isArray(
+                        (prop as PropertyRow & { photos?: string[] }).photos
+                      ) &&
+                      (prop as PropertyRow & { photos?: string[] }).photos?.[0]
+                        ? (prop as PropertyRow & { photos?: string[] })
+                            .photos![0]
+                        : '/images/placeholder-property.svg'
+                    }
                     alt={prop.title}
                     fill
                     className="object-cover"
                   />
                 </div>
-                <div className="p-4">
-                  <div className="font-semibold text-fg mb-1">{prop.title}</div>
-                  <div className="text-sm text-muted-foreground mb-2">
-                    {formatAddress(prop.location)}
+                <div className="p-3">
+                  <div className="font-medium line-clamp-1">{prop.title}</div>
+                  <div className="text-sm text-muted-foreground line-clamp-1">
+                    {(prop as PropertyRow & { city?: string }).city ||
+                      prop.location}
                   </div>
                   <div className="font-medium text-primary">
-                    {prop.price.toLocaleString('pt-PT')} €
+                    {(
+                      prop as PropertyRow & { price?: number }
+                    ).price?.toLocaleString?.('pt-PT')}{' '}
+                    €
                   </div>
                 </div>
               </Link>
             ))}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

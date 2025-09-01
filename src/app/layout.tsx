@@ -11,9 +11,63 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'Remax Unified Platform',
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  ),
+  title: {
+    default: 'Remax Unified Platform',
+    template: '%s | Remax Unified Platform',
+  },
   description:
-    'Unified real estate platform for property search and management',
+    'Unified real estate platform for property search and management. Find your perfect property with trusted agents.',
+  keywords: ['real estate', 'property', 'buy', 'rent', 'agents', 'remax'],
+  authors: [{ name: 'Remax Team' }],
+  creator: 'Remax Team',
+  publisher: 'Remax Unified Platform',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    title: 'Remax Unified Platform',
+    description:
+      'Unified real estate platform for property search and management',
+    siteName: 'Remax Unified Platform',
+    images: [
+      {
+        url: '/logo.png',
+        width: 120,
+        height: 120,
+        alt: 'Remax Unified Platform Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Remax Unified Platform',
+    description:
+      'Unified real estate platform for property search and management',
+    images: ['/logo.png'],
+    creator: '@remax',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
 };
 
 export default function RootLayout({

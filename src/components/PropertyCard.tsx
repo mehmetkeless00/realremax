@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import OptimizedImage from './OptimizedImage';
+import { getCoverUrl } from '@/lib/image-helpers';
+import { SmartImage } from '@/lib/smart-image';
 import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import { useFavoritesStore } from '@/lib/store/favoritesStore';
@@ -18,13 +19,11 @@ export default function PropertyCard({
   const { user } = useUserStore();
   const { addToast } = useUIStore();
   const { favorites, toggleFavorite, isSyncing } = useFavoritesStore();
-  const [imageError, setImageError] = useState(false);
 
   const isFavorite = favorites.includes(property.id);
 
-  // Default image if property image fails to load
-  const defaultImage = '/images/placeholder-property.svg';
-  const propertyImage = property.images?.[0] || defaultImage;
+  // Use SmartImage's getCoverUrl for consistent image handling
+  const propertyImage = getCoverUrl(property);
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -59,6 +58,18 @@ export default function PropertyCard({
         type: 'error',
         message: 'Failed to update favorites. Please try again.',
       });
+    }
+  };
+
+  const handleFavoriteKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      // Create a synthetic mouse event for the favorite toggle
+      const syntheticEvent = {
+        preventDefault: () => {},
+        stopPropagation: () => {},
+      } as React.MouseEvent;
+      handleFavoriteToggle(syntheticEvent);
     }
   };
 
@@ -105,26 +116,32 @@ export default function PropertyCard({
 
   if (view === 'list') {
     return (
-      <div
+      <article
         className={`card hover:shadow-lg transition-all duration-300 ${className}`}
+        role="article"
+        aria-labelledby={`property-title-${property.id}`}
       >
-        <Link href={`/properties/${property.id}`}>
+        <Link
+          href={`/properties/${property.id}`}
+          className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg block"
+          aria-describedby={`property-details-${property.id}`}
+        >
           <div className="flex flex-col md:flex-row">
-            {/* Image Section */}
+            {/* Image Section with SmartImage */}
             <div className="relative md:w-64 md:h-40 w-full h-40 max-h-[40vh]">
-              <OptimizedImage
-                src={imageError ? defaultImage : propertyImage}
-                alt={property.title}
-                width={400}
-                height={300}
+              <SmartImage
+                src={propertyImage}
+                alt={`${property.title} - ${property.location}`}
+                fill
                 className="w-full h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
-                sizes="(max-width: 768px) 100vw, 256px"
-                onError={() => setImageError(true)}
               />
 
               {/* Status Badge */}
               <div className="absolute top-2 left-2">
-                <span className={getPropertyStatusColor(property.status)}>
+                <span
+                  className={getPropertyStatusColor(property.status)}
+                  aria-label={`Property status: ${property.status}`}
+                >
                   {property.status}
                 </span>
               </div>
@@ -136,6 +153,7 @@ export default function PropertyCard({
                     className={getListingTypeColor(
                       property.listing.listing_type
                     )}
+                    aria-label={`Listing type: ${property.listing.listing_type}`}
                   >
                     {property.listing.listing_type === 'sale'
                       ? 'For Sale'
@@ -148,12 +166,17 @@ export default function PropertyCard({
               {showFavorite && (
                 <button
                   onClick={handleFavoriteToggle}
+                  onKeyDown={handleFavoriteKeyDown}
                   disabled={isSyncing}
-                  className={`absolute bottom-2 right-2 p-2 rounded-full shadow-lg transition-all duration-200 ${
+                  className={`absolute bottom-2 right-2 p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 ${
                     isFavorite
                       ? 'bg-red-600 text-white'
                       : 'bg-white text-gray-500 hover:text-red-600'
                   } ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  aria-label={
+                    isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                  }
+                  aria-pressed={isFavorite}
                 >
                   {isSyncing ? (
                     <svg
@@ -161,6 +184,7 @@ export default function PropertyCard({
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -175,6 +199,7 @@ export default function PropertyCard({
                       fill={isFavorite ? 'currentColor' : 'none'}
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -191,7 +216,10 @@ export default function PropertyCard({
             {/* Content Section */}
             <div className="flex-1 p-6">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-sm font-semibold text-dark-charcoal hover:text-primary-blue transition-colors">
+                <h3
+                  id={`property-title-${property.id}`}
+                  className="text-sm font-semibold text-dark-charcoal hover:text-primary-blue transition-colors"
+                >
                   {property.title}
                 </h3>
                 <div className="text-right">
@@ -212,6 +240,7 @@ export default function PropertyCard({
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -229,7 +258,11 @@ export default function PropertyCard({
                 {property.location}
               </p>
 
-              <div className="flex flex-wrap gap-4 text-sm text-muted mb-4">
+              <div
+                id={`property-details-${property.id}`}
+                className="flex flex-wrap gap-4 text-sm text-muted mb-4"
+                aria-label="Property details"
+              >
                 {property.bedrooms && (
                   <span className="flex items-center">
                     <svg
@@ -237,6 +270,7 @@ export default function PropertyCard({
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -261,6 +295,7 @@ export default function PropertyCard({
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -279,6 +314,7 @@ export default function PropertyCard({
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -301,7 +337,10 @@ export default function PropertyCard({
               {property.agent && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-6 h-6 bg-primary-blue rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    <div
+                      className="w-6 h-6 bg-primary-blue rounded-full flex items-center justify-center text-white text-sm font-medium"
+                      aria-label={`Agent: ${property.agent.name}`}
+                    >
                       {property.agent.name.charAt(0)}
                     </div>
                     <div className="ml-2">
@@ -318,30 +357,36 @@ export default function PropertyCard({
             </div>
           </div>
         </Link>
-      </div>
+      </article>
     );
   }
 
-  // Grid View (default)
+  // Grid View (default) with SmartImage
   return (
-    <div
+    <article
       className={`card hover:shadow-lg transition-all duration-300 overflow-hidden ${className}`}
+      role="article"
+      aria-labelledby={`property-title-${property.id}`}
     >
-      <Link href={`/properties/${property.id}`}>
+      <Link
+        href={`/properties/${property.id}`}
+        className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg block"
+        aria-describedby={`property-details-${property.id}`}
+      >
         <div className="relative">
-          <OptimizedImage
-            src={imageError ? defaultImage : propertyImage}
-            alt={property.title}
-            width={400}
-            height={192}
+          <SmartImage
+            src={propertyImage}
+            alt={`${property.title} - ${property.location}`}
+            fill
             className="w-full h-40 max-h-[40vh] object-cover"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            onError={() => setImageError(true)}
           />
 
           {/* Status Badge */}
           <div className="absolute top-2 left-2">
-            <span className={getPropertyStatusColor(property.status)}>
+            <span
+              className={getPropertyStatusColor(property.status)}
+              aria-label={`Property status: ${property.status}`}
+            >
               {property.status}
             </span>
           </div>
@@ -351,6 +396,7 @@ export default function PropertyCard({
             <div className="absolute top-2 right-2">
               <span
                 className={getListingTypeColor(property.listing.listing_type)}
+                aria-label={`Listing type: ${property.listing.listing_type}`}
               >
                 {property.listing.listing_type === 'sale'
                   ? 'For Sale'
@@ -363,12 +409,17 @@ export default function PropertyCard({
           {showFavorite && (
             <button
               onClick={handleFavoriteToggle}
+              onKeyDown={handleFavoriteKeyDown}
               disabled={isSyncing}
-              className={`absolute bottom-2 right-2 p-2 rounded-full shadow-lg transition-all duration-200 ${
+              className={`absolute bottom-2 right-2 p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 ${
                 isFavorite
                   ? 'bg-red-600 text-white'
                   : 'bg-white text-gray-500 hover:text-red-600'
               } ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+              aria-label={
+                isFavorite ? 'Remove from favorites' : 'Add to favorites'
+              }
+              aria-pressed={isFavorite}
             >
               {isSyncing ? (
                 <svg
@@ -376,6 +427,7 @@ export default function PropertyCard({
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -390,6 +442,7 @@ export default function PropertyCard({
                   fill={isFavorite ? 'currentColor' : 'none'}
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -405,7 +458,10 @@ export default function PropertyCard({
 
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-sm font-semibold text-fg hover:text-primary-blue transition-colors line-clamp-1">
+            <h3
+              id={`property-title-${property.id}`}
+              className="text-sm font-semibold text-fg hover:text-primary-blue transition-colors line-clamp-1"
+            >
               {property.title}
             </h3>
             <div className="text-right">
@@ -426,6 +482,7 @@ export default function PropertyCard({
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -443,7 +500,11 @@ export default function PropertyCard({
             <span className="line-clamp-1">{property.location}</span>
           </p>
 
-          <div className="flex justify-between text-sm text-muted">
+          <div
+            id={`property-details-${property.id}`}
+            className="flex justify-between text-sm text-muted"
+            aria-label="Property details"
+          >
             <div className="flex space-x-3">
               {property.bedrooms && (
                 <span className="flex items-center">
@@ -452,6 +513,7 @@ export default function PropertyCard({
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -476,6 +538,7 @@ export default function PropertyCard({
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -494,6 +557,6 @@ export default function PropertyCard({
           </div>
         </div>
       </Link>
-    </div>
+    </article>
   );
 }
