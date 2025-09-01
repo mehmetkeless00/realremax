@@ -3,7 +3,14 @@ import { routing } from './src/i18n/routing';
 
 export default createMiddleware(routing);
 
-// Explicitly include "/" so default-locale root is always handled
+// Proper matcher for next-intl v4 with root handling
 export const config = {
-  matcher: ['/', '/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: [
+    // Root route
+    '/',
+    // Locale routes
+    '/(pt|en)/:path*',
+    // All other routes except static files
+    '/((?!api|_next|_vercel|.*\\..*).*)',
+  ],
 };
