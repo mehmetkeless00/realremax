@@ -1,9 +1,11 @@
 // src/server/db/properties.ts
 'use server';
+import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase';
 import {
   PROPERTY_BUCKET,
@@ -35,6 +37,18 @@ function getAdminStorage() {
   return createAdminClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { 'X-Client-Info': 'remax-server' } },
+  });
+}
+
+/** Public (anon) storage client: read-only operations (list/getPublicUrl) */
+function getPublicStorage() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  }
+  return createClient(url, anon, {
+    auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 
@@ -83,11 +97,11 @@ function makePathCandidates(propertyId: string, ownerId: string | null, raw?: st
   return Array.from(out);
 }
 
-/** Bir klasörü listele ve bulunan dosyalar için signed URL üret (SERVICE_ROLE ile) */
+/** Bir klasörü listele ve bulunan dosyalar için public URL üret (anon client ile) */
 async function listSignedUnder(prefix: string): Promise<string[]> {
-  const admin = getAdminStorage();
+  const pub = getPublicStorage();
 
-  const { data, error } = await admin.storage
+  const { data, error } = await pub.storage
     .from(PROPERTY_BUCKET)
     .list(prefix, { limit: 1000, sortBy: { column: 'updated_at', order: 'desc' } });
 
@@ -100,17 +114,17 @@ async function listSignedUnder(prefix: string): Promise<string[]> {
   const out: string[] = [];
   for (const f of files) {
     const full = `${prefix ? prefix.replace(/\/+$/, '') + '/' : ''}${f.name}`;
-    const { data: signed } = await admin.storage
+    const { data: pubUrl } = pub.storage
       .from(PROPERTY_BUCKET)
-      .createSignedUrl(full, 60 * 60 * 24 * 7);
-    if (signed?.signedUrl) out.push(signed.signedUrl);
+      .getPublicUrl(full);
+    if (pubUrl?.publicUrl) out.push(pubUrl.publicUrl);
   }
   return out;
 }
 
 /** Bucket içinde BFS ile klasörleri dolaş; basename eşleşmesi bulunca yol döndür. */
 async function findPathByBasename(basename: string, seeds: string[]): Promise<string | null> {
-  const admin = getAdminStorage();
+  const pub = getPublicStorage();
   const seen = new Set<string>();
   const queue: string[] = [];
 
@@ -123,7 +137,7 @@ async function findPathByBasename(basename: string, seeds: string[]): Promise<st
     if (seen.has(prefix)) continue;
     seen.add(prefix);
 
-    const { data, error } = await admin.storage
+    const { data, error } = await pub.storage
       .from(PROPERTY_BUCKET)
       .list(prefix, { limit: 1000, sortBy: { column: 'updated_at', order: 'desc' } });
 
@@ -145,9 +159,9 @@ async function findPathByBasename(basename: string, seeds: string[]): Promise<st
   return null;
 }
 
-/** Path adaylarını sırayla dene → SERVICE_ROLE ile signed; olmazsa BFS ile ara; en son public */
+/** Path adaylarını sırayla dene → anon ile public URL; bulunamazsa BFS ile ara; en son public fallback */
 async function buildRenderableUrls(propertyId: string, ownerId: string | null, rows: any[]): Promise<string[]> {
-  const admin = getAdminStorage();
+  const pub = getPublicStorage();
   const out: string[] = [];
 
   const rawPaths: string[] = rows.map((r: any) =>
@@ -160,15 +174,12 @@ async function buildRenderableUrls(propertyId: string, ownerId: string | null, r
 
     let picked: string | null = null;
 
-    // 1) Bilinen adaylar
+    // 1) Bilinen adaylar → public URL üret
     for (const rel of candidates) {
-      const { data: signed, error } = await admin.storage
+      const { data: pubUrl } = pub.storage
         .from(PROPERTY_BUCKET)
-        .createSignedUrl(rel, 60 * 60 * 24 * 7);
-      if (signed?.signedUrl) { picked = signed.signedUrl; break; }
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[img] signed FAIL (admin)', { rel, raw, reason: error?.message });
-      }
+        .getPublicUrl(rel);
+      if (pubUrl?.publicUrl) { picked = pubUrl.publicUrl; break; }
     }
 
     // 2) Bulunamadıysa BFS ile ara (propertyId / ownerId / ownerId+propertyId / root)
@@ -179,10 +190,10 @@ async function buildRenderableUrls(propertyId: string, ownerId: string | null, r
         ownerId ? `${ownerId}/${propertyId}` : '',
       ]);
       if (maybePath) {
-        const { data: signed } = await admin.storage
+        const { data: pubUrl } = pub.storage
           .from(PROPERTY_BUCKET)
-          .createSignedUrl(maybePath, 60 * 60 * 24 * 7);
-        if (signed?.signedUrl) picked = signed.signedUrl;
+          .getPublicUrl(maybePath);
+        if (pubUrl?.publicUrl) picked = pubUrl.publicUrl;
       }
     }
 
@@ -233,7 +244,7 @@ export async function getSimilarProperties(
   let q = supabase
     .from('properties')
     .select('*')
-    .eq('status', 'published')
+    .eq('status', 'active')
     .neq('id', base.id);
 
   if (base.type) q = q.eq('type', base.type);

@@ -49,9 +49,10 @@ const PROPERTY_TYPES = [
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'published', label: 'Published' },
-  { value: 'archived', label: 'Archived' },
+  { value: 'active', label: 'Active' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'sold', label: 'Sold' },
+  { value: 'rented', label: 'Rented' },
 ];
 
 const LISTING_TYPES = [
@@ -95,7 +96,7 @@ export default function PropertyListingForm({
     bathrooms: '',
     size: '',
     year_built: '',
-    status: 'draft',
+    status: 'pending',
     listing_type: 'sale',
     amenities: [],
     address: '',
@@ -120,7 +121,7 @@ export default function PropertyListingForm({
         bathrooms: property.bathrooms?.toString() || '',
         size: property.size?.toString() || '',
         year_built: property.year_built?.toString() || '',
-        status: property.status || 'draft',
+        status: property.status || 'pending',
         listing_type: property.listing_type || 'sale',
         amenities: property.amenities || [],
         address: property.address || '',
@@ -297,9 +298,8 @@ export default function PropertyListingForm({
           </select>
         </div>
 
-        {/* Status field - only show for admin users or when editing published properties */}
-        {(property?.status === 'published' ||
-          property?.status === 'archived') && (
+        {/* Status field - shown when editing existing property */}
+        {property && (
           <div>
             <label className="block text-sm font-medium text-fg mb-1">
               Status *

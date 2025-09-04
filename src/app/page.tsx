@@ -2,21 +2,21 @@ import HeroSearch from '@/components/home/HeroSearch';
 import ListingCarousel from '@/components/home/ListingCarousel';
 import RegionChips from '@/components/home/RegionChips';
 import CorporateCTA from '@/components/home/CorporateCTA';
-import { listPublishedListings } from '@/server/db/listings';
+import { listActiveListings } from '@/server/db/listings';
 
 export const revalidate = 60; // ISR: refresh every 60 seconds
 
 export default async function HomePage() {
-  // Fetch real published listings
-  let recentListings: Awaited<ReturnType<typeof listPublishedListings>> = [];
-  let weeklyListings: Awaited<ReturnType<typeof listPublishedListings>> = [];
+  // Fetch real active listings
+  let recentListings: Awaited<ReturnType<typeof listActiveListings>> = [];
+  let weeklyListings: Awaited<ReturnType<typeof listActiveListings>> = [];
 
   try {
-    // Get most recent published listings
-    recentListings = await listPublishedListings(8);
+    // Get most recent active listings
+    recentListings = await listActiveListings(8);
 
     // Get listings from the last 7 days (if any)
-    const allListings = await listPublishedListings(20);
+    const allListings = await listActiveListings(20);
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 

@@ -32,7 +32,7 @@ const mockProperty: PropertyWithListing = {
   size: 200,
   year_built: 2020,
   agent_id: 'agent-1',
-  status: 'published',
+  status: 'active',
   listing_type: 'sale',
   amenities: ['garden', 'garage'],
   features: ['garden', 'garage'],

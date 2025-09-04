@@ -2,7 +2,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-export type PropertyStatus = 'draft' | 'published' | 'archived';
+export type ListingStatus = 'active' | 'pending' | 'sold' | 'rented';
 
 export interface CreateListingData {
   title: string;
@@ -14,7 +14,7 @@ export interface CreateListingData {
   meta_title?: string;
   meta_description?: string;
   og_image_url?: string;
-  status?: PropertyStatus;
+  status?: ListingStatus;
 }
 
 export interface UpdateListingData {
@@ -27,7 +27,7 @@ export interface UpdateListingData {
   meta_title?: string;
   meta_description?: string;
   og_image_url?: string;
-  status?: PropertyStatus;
+  status?: ListingStatus;
 }
 
 export async function getSupabase() {
@@ -73,7 +73,7 @@ export async function createListing(body: CreateListingData) {
     meta_title: body.meta_title ?? null,
     meta_description: body.meta_description ?? null,
     og_image_url: body.og_image_url ?? null,
-    status: isAdmin ? (body.status ?? 'draft') : 'draft',
+    status: isAdmin ? (body.status ?? 'pending') : 'pending',
     published_at: null,
     // agent_id: let DB default set auth.uid() via RLS migration
   };
@@ -105,14 +105,14 @@ export async function updateListing(id: string, body: UpdateListingData) {
     og_image_url: body.og_image_url ?? undefined,
   };
 
-  if (isAdmin && body.status === 'published') {
-    patch.status = 'published';
+  if (isAdmin && body.status === 'active') {
+    patch.status = 'active';
     patch.published_at = new Date().toISOString();
-  } else if (isAdmin && body.status === 'draft') {
-    patch.status = 'draft';
-    patch.published_at = null;
+  } else if (isAdmin && body.status && ['pending','sold','rented'].includes(body.status)) {
+    patch.status = body.status;
+    if (body.status === 'pending') patch.published_at = null;
   } else if (!isAdmin && body.status) {
-    patch.status = 'draft';
+    patch.status = 'pending';
     patch.published_at = null;
   }
 
@@ -150,13 +150,13 @@ export async function deleteListing(id: string) {
   return { message: 'Property deleted successfully' };
 }
 
-/** Public/homepage feed: published only, newest first */
-export async function listPublishedListings(limit = 12) {
+/** Public/homepage feed: active only, newest first */
+export async function listActiveListings(limit = 12) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
     .from('properties')
     .select('*')
-    .eq('status', 'published')
+    .eq('status', 'active')
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
     .limit(limit);
