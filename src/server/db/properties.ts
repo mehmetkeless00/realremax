@@ -1,9 +1,10 @@
 // src/server/db/properties.ts
 'use server';
+import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase';
 import {
   PROPERTY_BUCKET,
@@ -25,18 +26,17 @@ async function getDBClient() {
   );
 }
 
-/** Storage için SERVICE_ROLE (yalnız server) */
-function getAdminStorage() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  if (!url || !key) {
+/** Public (anon) storage client: read-only operations (list/getPublicUrl) */
+function getPublicStorage() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) {
     throw new Error(
-      'Missing SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL'
+      'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY'
     );
   }
-  return createAdminClient(url, key, {
+  return createClient(url, anon, {
     auth: { persistSession: false, autoRefreshToken: false },
-    global: { headers: { 'X-Client-Info': 'remax-server' } },
   });
 }
 
@@ -72,7 +72,7 @@ function makePathCandidates(
 
   try {
     p = decodeURIComponent(p);
-  } catch {}
+  } catch { }
 
   const seg = p.split('/').filter(Boolean);
   const basename = seg.at(-1) ?? '';
@@ -100,7 +100,7 @@ async function findPathByBasename(
   basename: string,
   seeds: string[]
 ): Promise<string | null> {
-  const admin = getAdminStorage();
+  const pub = getPublicStorage();
   const seen = new Set<string>();
   const queue: string[] = [];
 
@@ -113,7 +113,7 @@ async function findPathByBasename(
     if (seen.has(prefix)) continue;
     seen.add(prefix);
 
-    const { data, error } = await admin.storage
+    const { data, error } = await pub.storage
       .from(PROPERTY_BUCKET)
       .list(prefix, {
         limit: 1000,
@@ -140,14 +140,14 @@ async function findPathByBasename(
   return null;
 }
 
-/** Path adaylarını sırayla dene → SERVICE_ROLE ile signed; olmazsa BFS ile ara; en son public */
+/** Path adaylarını sırayla dene → anon ile public URL; bulunamazsa BFS ile ara; en son public fallback */
 async function buildRenderableUrls(
   propertyId: string,
   ownerId: string | null,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rows: any[]
 ): Promise<string[]> {
-  const admin = getAdminStorage();
+  const pub = getPublicStorage();
   const out: string[] = [];
 
   const rawPaths: string[] = rows
@@ -174,21 +174,14 @@ async function buildRenderableUrls(
 
     let picked: string | null = null;
 
-    // 1) Bilinen adaylar
+    // 1) Bilinen adaylar → public URL üret
     for (const rel of candidates) {
-      const { data: signed, error } = await admin.storage
+      const { data: pubUrl } = pub.storage
         .from(PROPERTY_BUCKET)
-        .createSignedUrl(rel, 60 * 60 * 24 * 7);
-      if (signed?.signedUrl) {
-        picked = signed.signedUrl;
+        .getPublicUrl(rel);
+      if (pubUrl?.publicUrl) {
+        picked = pubUrl.publicUrl;
         break;
-      }
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[img] signed FAIL (admin)', {
-          rel,
-          raw,
-          reason: error?.message,
-        });
       }
     }
 
@@ -200,17 +193,17 @@ async function buildRenderableUrls(
         ownerId ? `${ownerId}/${propertyId}` : '',
       ]);
       if (maybePath) {
-        const { data: signed } = await admin.storage
+        const { data: pubUrl } = pub.storage
           .from(PROPERTY_BUCKET)
-          .createSignedUrl(maybePath, 60 * 60 * 24 * 7);
-        if (signed?.signedUrl) picked = signed.signedUrl;
+          .getPublicUrl(maybePath);
+        if (pubUrl?.publicUrl) picked = pubUrl.publicUrl;
       }
     }
 
     // 3) Son çare: public fallback (bucket public ise)
     if (!picked) {
-      const pub = toPublicImageUrl(candidates[0] ?? raw);
-      if (pub) picked = pub;
+      const fallback = toPublicImageUrl(candidates[0] ?? raw);
+      if (fallback) picked = fallback;
     }
 
     if (picked) out.push(picked);
@@ -269,7 +262,7 @@ export async function getSimilarProperties(
   let q = supabase
     .from('properties')
     .select('*')
-    .eq('status', 'published')
+    .eq('status', 'active')
     .neq('id', base.id);
 
   if (base.type) q = q.eq('type', base.type);
