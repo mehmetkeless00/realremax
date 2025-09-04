@@ -87,7 +87,7 @@ export interface Database {
           size: number | null;
           year_built: number | null;
           agent_id: string | null;
-          status: 'draft' | 'published' | 'archived';
+          status: 'active' | 'pending' | 'sold' | 'rented';
           listing_type: string;
           amenities: string[] | null;
           photos: string[] | null;
@@ -127,7 +127,7 @@ export interface Database {
           size?: number | null;
           year_built?: number | null;
           agent_id?: string | null;
-          status?: 'draft' | 'published' | 'archived';
+          status?: 'active' | 'pending' | 'sold' | 'rented';
           listing_type?: string;
           amenities?: string[] | null;
           photos?: string[] | null;
@@ -167,7 +167,7 @@ export interface Database {
           size?: number | null;
           year_built?: number | null;
           agent_id?: string | null;
-          status?: 'draft' | 'published' | 'archived';
+          status?: 'active' | 'pending' | 'sold' | 'rented';
           listing_type?: string;
           amenities?: string[] | null;
           photos?: string[] | null;

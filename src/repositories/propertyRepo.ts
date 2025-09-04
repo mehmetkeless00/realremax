@@ -26,7 +26,7 @@ export async function searchProperties(
     let query = supabase
       .from('properties')
       .select('*')
-      .eq('status', 'published')
+      .eq('status', 'active')
       .order('created_at', { ascending: false });
 
     // Apply filters
@@ -96,7 +96,7 @@ export async function getPropertyById(id: string): Promise<Property | null> {
       .from('properties')
       .select('*')
       .eq('id', id)
-      .eq('status', 'published')
+      .eq('status', 'active')
       .single();
 
     if (error) {

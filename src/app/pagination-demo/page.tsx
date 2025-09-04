@@ -21,8 +21,8 @@ const generateLargeDataset = (count: number) => {
     bathrooms: Math.floor(Math.random() * 3) + 1,
     size: Math.floor(Math.random() * 200) + 50,
     year_built: Math.floor(Math.random() * 30) + 1990,
-    status: (['draft', 'published', 'archived'] as const)[
-      Math.floor(Math.random() * 3)
+    status: (['active', 'pending', 'sold', 'rented'] as const)[
+      Math.floor(Math.random() * 4)
     ],
     agent_id: `agent-${index + 1}`,
     listing_type: 'sale',
