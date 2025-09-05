@@ -6,18 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-interface Service {
+type Service = {
   id: string;
-  name: string;
-  description: string;
-  category: string;
-  price: number | null;
-  duration: string;
-  icon: string;
-  features: string[];
-  is_active: boolean;
-  sort_order: number;
-}
+  slug: string;
+  title: string;
+  short_description?: string | null;
+  icon?: string | null;
+  order_index?: number | null;
+  status: 'active' | 'pending' | 'sold' | 'rented' | string;
+};
 
 interface ServiceRequestForm {
   serviceId: string;
@@ -32,6 +29,7 @@ interface ServiceRequestForm {
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -55,17 +53,18 @@ export default function ServicesPage() {
     const loadServices = async () => {
       try {
         setLoading(true);
-        console.log('Loading services...');
-        const response = await fetch('/api/services');
-        console.log('Response status:', response.status);
-        if (!response.ok) throw new Error('Failed to load services');
-        const data = await response.json();
-        console.log('Services data:', data);
-        setServices(data);
-      } catch (error) {
-        console.error('Load services error:', error);
-        // Don't use addToast for now to avoid store issues
-        console.error('Failed to load services');
+        setError(null);
+        const response = await fetch('/api/services', { cache: 'no-store' });
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({} as any));
+          throw new Error(err?.error || `Failed to load services (status ${response.status})`);
+        }
+        const json = await response.json();
+        const list = Array.isArray(json?.services) ? json.services : Array.isArray(json) ? json : [];
+        setServices(list);
+      } catch (e: any) {
+        console.error('Failed to load services', e);
+        setError(e?.message ?? 'Failed to load services');
       } finally {
         setLoading(false);
       }
@@ -74,14 +73,11 @@ export default function ServicesPage() {
     loadServices();
   }, []);
 
-  const filteredServices = services.filter(
-    (service) =>
-      selectedCategory === 'all' || service.category === selectedCategory
-  );
+  const filteredServices = services; // no category filtering with new schema
 
-  const categories = ['all', ...new Set(services.map((s) => s.category))];
+  const categories: string[] = ['all'];
 
-  const getIconComponent = (iconName: string) => {
+  const getIconComponent = (iconName: string | null | undefined) => {
     const iconMap: Record<string, React.ReactElement> = {
       calculator: (
         <svg
@@ -181,8 +177,9 @@ export default function ServicesPage() {
       ),
     };
 
+    const name = iconName || '';
     return (
-      iconMap[iconName] || (
+      iconMap[name] || (
         <svg
           className="w-6 h-6"
           fill="none"
@@ -267,6 +264,30 @@ export default function ServicesPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="text-center py-12">
+            <p className="text-red-600">Failed to load services: {error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!services.length) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="text-center py-12">
+            <p className="text-muted">No services found.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
@@ -297,7 +318,7 @@ export default function ServicesPage() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" role="main">
           {filteredServices.map((service) => (
             <Card
               key={service.id}
@@ -306,58 +327,23 @@ export default function ServicesPage() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-fg mb-1">
-                    {service.name}
+                    {service.title}
                   </h3>
                   <Badge variant="outline" className="text-xs mb-2">
-                    {service.category}
+                    {service.slug}
                   </Badge>
-                  <p className="text-sm text-muted mb-3">
-                    {service.description}
-                  </p>
+                  {service.short_description && (
+                    <p className="text-sm text-muted mb-3">
+                      {service.short_description}
+                    </p>
+                  )}
                 </div>
                 <div className="w-12 h-12 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0">
                   {getIconComponent(service.icon)}
                 </div>
               </div>
 
-              <div className="space-y-3 mb-4">
-                {service.price !== null && (
-                  <div className="flex items-center text-sm">
-                    <span className="font-semibold text-primary-blue">
-                      ${service.price}
-                    </span>
-                    {service.duration && (
-                      <span className="text-muted ml-2">
-                        • {service.duration}
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {service.features && service.features.length > 0 && (
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-fg">Features:</p>
-                    <ul className="text-xs text-muted space-y-1">
-                      {service.features.slice(0, 3).map((feature, index) => (
-                        <li key={index} className="flex items-center">
-                          <svg
-                            className="w-3 h-3 text-green-500 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+              <div className="space-y-3 mb-4"></div>
 
               <Button
                 onClick={() => handleRequestService(service)}
