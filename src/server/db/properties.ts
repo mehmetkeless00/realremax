@@ -4,7 +4,7 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase';
 import {
@@ -23,21 +23,20 @@ async function getDBClient() {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } }
+    { cookies: { getAll: () => cookieStore.getAll() } },
   );
 }
 
-/** Public (anon) storage client: read-only operations (list/getPublicUrl) */
-function getPublicStorage() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) {
-    throw new Error(
-      'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY'
-    );
+/** Storage için SERVICE_ROLE (yalnız server) */
+function getAdminStorage() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  if (!url || !key) {
+    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL');
   }
-  return createClient(url, anon, {
+  return createAdminClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { headers: { 'X-Client-Info': 'remax-server' } },
   });
 }
 
@@ -60,7 +59,6 @@ async function fetchPropertyImagesRaw(propertyId: string) {
     .select('*')
     .eq('property_id', propertyId);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (error && (error as any)?.code !== '42P01') {
     console.warn('property_images error:', error);
   }
@@ -68,11 +66,7 @@ async function fetchPropertyImagesRaw(propertyId: string) {
 }
 
 /** raw (url/path) → bucket içi relatif path adayları */
-function makePathCandidates(
-  propertyId: string,
-  ownerId: string | null,
-  raw?: string | null
-): string[] {
+function makePathCandidates(propertyId: string, ownerId: string | null, raw?: string | null): string[] {
   if (!raw) return [];
   let p = String(raw);
 
@@ -83,9 +77,7 @@ function makePathCandidates(
     .replace(/^public\//, '')
     .replace(/^\/+/, '');
 
-  try {
-    p = decodeURIComponent(p);
-  } catch { }
+  try { p = decodeURIComponent(p); } catch {}
 
   const seg = p.split('/').filter(Boolean);
   const basename = seg.at(-1) ?? '';
@@ -97,23 +89,14 @@ function makePathCandidates(
   if (seg.length > 2) out.add(seg.slice(2).join('/'));
   if (basename) out.add(basename);
   if (propertyId && basename) out.add(`${propertyId}/${basename}`);
-  if (propertyId && penultimate && basename)
-    out.add(`${propertyId}/${penultimate}/${basename}`);
+  if (propertyId && penultimate && basename) out.add(`${propertyId}/${penultimate}/${basename}`);
   if (ownerId && basename) out.add(`${ownerId}/${basename}`);
-  if (ownerId && propertyId && basename)
-    out.add(`${ownerId}/${propertyId}/${basename}`);
-  if (ownerId && penultimate && basename)
-    out.add(`${ownerId}/${penultimate}/${basename}`);
+  if (ownerId && propertyId && basename) out.add(`${ownerId}/${propertyId}/${basename}`);
+  if (ownerId && penultimate && basename) out.add(`${ownerId}/${penultimate}/${basename}`);
 
   return Array.from(out);
 }
 
-
-/** Bucket içinde BFS ile klasörleri dolaş; basename eşleşmesi bulunca yol döndür. */
-async function findPathByBasename(
-  basename: string,
-  seeds: string[]
-): Promise<string | null> {
 /** Bir klasörü listele ve bulunan dosyalar için public URL üret (anon client ile) */
 async function listSignedUnder(prefix: string): Promise<string[]> {
   const pub = getPublicStorage();
@@ -139,25 +122,55 @@ async function listSignedUnder(prefix: string): Promise<string[]> {
   return out;
 }
 
+/** Bucket içinde BFS ile klasörleri dolaş; basename eşleşmesi bulunca yol döndür. */
+async function findPathByBasename(basename: string, seeds: string[]): Promise<string | null> {
+  const pub = getPublicStorage();
+  const seen = new Set<string>();
+  const queue: string[] = [];
 
+  // aynıları at, boş kökü en sona koy
+  for (const s of Array.from(new Set(seeds.filter(Boolean)))) queue.push(s);
+  queue.push(''); // root da tara
+
+  while (queue.length) {
+    const prefix = queue.shift()!;
+    if (seen.has(prefix)) continue;
+    seen.add(prefix);
+
+    const { data, error } = await pub.storage
+      .from(PROPERTY_BUCKET)
+      .list(prefix, { limit: 1000, sortBy: { column: 'updated_at', order: 'desc' } });
+
+    if (error) {
+      if (process.env.NODE_ENV === 'development') console.warn('[img] bfs list FAIL', prefix, error.message);
+      continue;
+    }
+
+    for (const e of data ?? []) {
+      if ((e as any).type === 'folder') {
+        const next = `${prefix ? prefix.replace(/\/+$/, '') + '/' : ''}${e.name}`;
+        queue.push(next);
+      } else if (e.name === basename) {
+        const full = `${prefix ? prefix.replace(/\/+$/, '') + '/' : ''}${e.name}`;
+        return full;
+      }
+    }
+  }
+  return null;
+}
 
 /** Path adaylarını sırayla dene → anon ile public URL; bulunamazsa BFS ile ara; en son public fallback */
+async function buildRenderableUrls(propertyId: string, ownerId: string | null, rows: any[]): Promise<string[]> {
+  const pub = getPublicStorage();
+  const out: string[] = [];
 
-async function buildRenderableUrls(
-  propertyId: string,
-  ownerId: string | null,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rows: any[]
-): Promise<string[]> {
-
+  const rawPaths: string[] = rows.map((r: any) =>
+    r?.storage_path ?? r?.path ?? r?.file_path ?? r?.url ?? r?.image_url ?? r?.name ?? ''
+  ).filter(Boolean);
 
   for (const raw of rawPaths) {
     const candidates = makePathCandidates(propertyId, ownerId, raw);
-    const basename =
-      candidates
-        .find((c) => !c.endsWith('/'))
-        ?.split('/')
-        .pop() || '';
+    const basename = candidates.find(c => !c.endsWith('/'))?.split('/').pop() || '';
 
     let picked: string | null = null;
 
@@ -166,12 +179,7 @@ async function buildRenderableUrls(
       const { data: pubUrl } = pub.storage
         .from(PROPERTY_BUCKET)
         .getPublicUrl(rel);
-
-      if (pubUrl?.publicUrl) {
-        picked = pubUrl.publicUrl;
-        break;
-      }
-
+      if (pubUrl?.publicUrl) { picked = pubUrl.publicUrl; break; }
     }
 
     // 2) Bulunamadıysa BFS ile ara (propertyId / ownerId / ownerId+propertyId / root)
@@ -191,8 +199,8 @@ async function buildRenderableUrls(
 
     // 3) Son çare: public fallback (bucket public ise)
     if (!picked) {
-      const fallback = toPublicImageUrl(candidates[0] ?? raw);
-      if (fallback) picked = fallback;
+      const pub = toPublicImageUrl(candidates[0] ?? raw);
+      if (pub) picked = pub;
     }
 
     if (picked) out.push(picked);
@@ -216,27 +224,12 @@ export async function getPropertyBySlug(slug: string) {
   if (!p) return null;
 
   const rows = await fetchPropertyImagesRaw(p.id);
-  const photosFromImages = await buildRenderableUrls(
-    p.id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (p as any).owner_id ?? null,
-    rows
-  );
+  const photosFromImages = await buildRenderableUrls(p.id, (p as any).owner_id ?? null, rows);
 
-  const photosFromArray = normalizePhotoArray(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (p as any).photos,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (p as any).og_image_url
-  );
+  const photosFromArray = normalizePhotoArray((p as any).photos, (p as any).og_image_url);
   const photos = dedupe([...photosFromImages, ...photosFromArray]).slice(0, 24);
 
-  const amenities = normalizeAmenities(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (p as any).amenities,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (p as any).features
-  );
+  const amenities = normalizeAmenities((p as any).amenities, (p as any).features);
 
   return { ...p, photos, amenities };
 }
@@ -259,7 +252,6 @@ export async function getSimilarProperties(
     const city = String(base.location).split(',')[0].trim();
     if (city) q = q.ilike('location', `%${city}%`);
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const propType = (base as any)?.extras?.propertyType;
   if (propType) q = q.contains('extras', { propertyType: propType });
 

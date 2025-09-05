@@ -36,11 +36,7 @@ export function SmartImage(props: {
         const img = document.createElement('img');
         img.src = src;
         img.alt = alt || 'image';
-        Object.assign(img.style, {
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-        });
+        Object.assign(img.style, { width: '100%', height: '100%', objectFit: 'cover' });
         parent.innerHTML = '';
         parent.appendChild(img);
       }}
