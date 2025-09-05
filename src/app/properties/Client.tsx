@@ -99,7 +99,7 @@ export default function Client({ initial }: { initial: Initial }) {
         setItems(json.items || []);
         setTotal(json.total || 0);
       })
-      .catch((err) => console.error(' listings fetch error:', err))
+      .catch(() => {})
       .finally(() => setLoading(false));
     return () => ctrl.abort();
   }, [filters, sort, page]);

@@ -14,9 +14,8 @@ export default async function Page({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Object.entries(params).filter(([, v]) => v != null) as any
   ).toString();
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/listings${
-    qs ? `?${qs}` : ''
-  }`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const url = `${baseUrl}/api/listings${qs ? `?${qs}` : ''}`;
   const res = await fetch(url, { cache: 'no-store' });
   const initial = await res.json();
 

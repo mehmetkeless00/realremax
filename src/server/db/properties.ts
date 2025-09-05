@@ -72,7 +72,7 @@ function makePathCandidates(
 
   try {
     p = decodeURIComponent(p);
-  } catch { }
+  } catch {}
 
   const seg = p.split('/').filter(Boolean);
   const basename = seg.at(-1) ?? '';
