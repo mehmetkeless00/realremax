@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { resetAuth } from '@/lib/auth';
 
@@ -116,9 +117,9 @@ function DebugResetContent() {
 
           <div className="mt-6 space-x-4">
             <Button asChild variant="secondary" size="md">
-              <a href="/reset-password">
+              <Link href="/reset-password">
                 <span>Go to Reset Password Page</span>
-              </a>
+              </Link>
             </Button>
 
             <Button
