@@ -10,7 +10,6 @@ export function isSupabaseOrSigned(u: string) {
 }
 
 /** Kapak görseli seçim sırası: photos[0] → cover_url → og/meta → image/image_url */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getCoverUrl(p: any): string | null {
   const candidates = [
     p?.photos?.[0],

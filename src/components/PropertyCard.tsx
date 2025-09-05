@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { getCoverUrl } from '@/lib/image-helpers';
 import { SmartImage } from '@/lib/smart-image';
