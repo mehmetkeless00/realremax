@@ -4,6 +4,7 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase';
 import {
@@ -34,6 +35,18 @@ function getPublicStorage() {
     throw new Error(
       'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY'
     );
+  }
+  return createClient(url, anon, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+/** Public (anon) storage client: read-only operations (list/getPublicUrl) */
+function getPublicStorage() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
   }
   return createClient(url, anon, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -95,74 +108,48 @@ function makePathCandidates(
   return Array.from(out);
 }
 
+
 /** Bucket içinde BFS ile klasörleri dolaş; basename eşleşmesi bulunca yol döndür. */
 async function findPathByBasename(
   basename: string,
   seeds: string[]
 ): Promise<string | null> {
+/** Bir klasörü listele ve bulunan dosyalar için public URL üret (anon client ile) */
+async function listSignedUnder(prefix: string): Promise<string[]> {
   const pub = getPublicStorage();
-  const seen = new Set<string>();
-  const queue: string[] = [];
 
-  // aynıları at, boş kökü en sona koy
-  for (const s of Array.from(new Set(seeds.filter(Boolean)))) queue.push(s);
-  queue.push(''); // root da tara
+  const { data, error } = await pub.storage
+    .from(PROPERTY_BUCKET)
+    .list(prefix, { limit: 1000, sortBy: { column: 'updated_at', order: 'desc' } });
 
-  while (queue.length) {
-    const prefix = queue.shift()!;
-    if (seen.has(prefix)) continue;
-    seen.add(prefix);
-
-    const { data, error } = await pub.storage
-      .from(PROPERTY_BUCKET)
-      .list(prefix, {
-        limit: 1000,
-        sortBy: { column: 'updated_at', order: 'desc' },
-      });
-
-    if (error) {
-      if (process.env.NODE_ENV === 'development')
-        console.warn('[img] bfs list FAIL', prefix, error.message);
-      continue;
-    }
-
-    for (const e of data ?? []) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((e as any).type === 'folder') {
-        const next = `${prefix ? prefix.replace(/\/+$/, '') + '/' : ''}${e.name}`;
-        queue.push(next);
-      } else if (e.name === basename) {
-        const full = `${prefix ? prefix.replace(/\/+$/, '') + '/' : ''}${e.name}`;
-        return full;
-      }
-    }
+  if (error) {
+    if (process.env.NODE_ENV === 'development') console.warn('[img] list FAIL', prefix, error.message);
+    return [];
   }
-  return null;
+
+  const files = (data ?? []).filter((e: any) => e?.name && e?.type !== 'folder');
+  const out: string[] = [];
+  for (const f of files) {
+    const full = `${prefix ? prefix.replace(/\/+$/, '') + '/' : ''}${f.name}`;
+    const { data: pubUrl } = pub.storage
+      .from(PROPERTY_BUCKET)
+      .getPublicUrl(full);
+    if (pubUrl?.publicUrl) out.push(pubUrl.publicUrl);
+  }
+  return out;
 }
 
+
+
 /** Path adaylarını sırayla dene → anon ile public URL; bulunamazsa BFS ile ara; en son public fallback */
+
 async function buildRenderableUrls(
   propertyId: string,
   ownerId: string | null,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rows: any[]
 ): Promise<string[]> {
-  const pub = getPublicStorage();
-  const out: string[] = [];
 
-  const rawPaths: string[] = rows
-    .map(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (r: any) =>
-        r?.storage_path ??
-        r?.path ??
-        r?.file_path ??
-        r?.url ??
-        r?.image_url ??
-        r?.name ??
-        ''
-    )
-    .filter(Boolean);
 
   for (const raw of rawPaths) {
     const candidates = makePathCandidates(propertyId, ownerId, raw);
@@ -179,10 +166,12 @@ async function buildRenderableUrls(
       const { data: pubUrl } = pub.storage
         .from(PROPERTY_BUCKET)
         .getPublicUrl(rel);
+
       if (pubUrl?.publicUrl) {
         picked = pubUrl.publicUrl;
         break;
       }
+
     }
 
     // 2) Bulunamadıysa BFS ile ara (propertyId / ownerId / ownerId+propertyId / root)

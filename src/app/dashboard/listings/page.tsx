@@ -39,7 +39,7 @@ interface Property {
   bathrooms?: number;
   size?: number;
   year_built?: number;
-  status: 'draft' | 'published' | 'archived';
+  status: 'active' | 'pending' | 'sold' | 'rented';
   listing_type?: string;
   amenities?: string[];
   address?: string;
@@ -151,8 +151,8 @@ export default function ListingsPage() {
   };
 
   const handlePublishToggle = async (property: Property) => {
-    const newStatus = property.status === 'published' ? 'draft' : 'published';
-    const action = newStatus === 'published' ? 'publish' : 'unpublish';
+    const newStatus = property.status === 'active' ? 'pending' : 'active';
+    const action = newStatus === 'active' ? 'activate' : 'deactivate';
 
     try {
       const response = await fetch('/api/listings', {
@@ -240,9 +240,10 @@ export default function ListingsPage() {
                   className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                 >
                   <option value="all">All Statuses</option>
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                  <option value="archived">Archived</option>
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="sold">Sold</option>
+                  <option value="rented">Rented</option>
                 </select>
               </div>
               <div className="text-sm text-muted">
@@ -316,13 +317,15 @@ export default function ListingsPage() {
                     </h3>
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${
-                        property.status === 'published'
+                        property.status === 'active'
                           ? 'bg-green-100 text-green-800'
-                          : property.status === 'draft'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : property.status === 'archived'
-                              ? 'bg-gray-100 text-gray-800'
-                              : 'bg-muted/20 text-fg'
+                          : property.status === 'pending'
+                            ? 'bg-amber-100 text-amber-800'
+                            : property.status === 'sold'
+                              ? 'bg-slate-100 text-slate-800'
+                              : property.status === 'rented'
+                                ? 'bg-indigo-100 text-indigo-800'
+                                : 'bg-muted/20 text-fg'
                       }`}
                     >
                       {property.status}
@@ -368,17 +371,11 @@ export default function ListingsPage() {
                     <div className="mb-4">
                       <Button
                         onClick={() => handlePublishToggle(property)}
-                        variant={
-                          property.status === 'published'
-                            ? 'outline'
-                            : 'primary'
-                        }
+                        variant={property.status === 'active' ? 'outline' : 'primary'}
                         size="sm"
                         className="w-full"
                       >
-                        {property.status === 'published'
-                          ? 'Unpublish'
-                          : 'Publish'}
+                        {property.status === 'active' ? 'Deactivate' : 'Activate'}
                       </Button>
                     </div>
                   )}

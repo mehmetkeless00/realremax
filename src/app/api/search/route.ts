@@ -40,7 +40,12 @@ export async function GET(request: NextRequest) {
     if (bathrooms) query = query.gte('bathrooms', bathrooms);
     if (sizeMin) query = query.gte('size', sizeMin);
     if (sizeMax) query = query.lte('size', sizeMax);
-    if (status) query = query.eq('status', status);
+    // Public default: only active records unless explicit status provided
+    if (status) {
+      query = query.eq('status', status);
+    } else {
+      query = query.eq('status', 'active');
+    }
     if (yearBuilt) query = query.gte('year_built', yearBuilt);
     if (agent) query = query.eq('agent_id', agent);
 
