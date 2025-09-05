@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import CLSOptimizedImage from './CLSOptimizedImage';
 import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
@@ -124,7 +124,10 @@ export default function PropertyCard({
         aria-labelledby={`property-title-${property.id}`}
       >
         <Link
-          href={`/properties/${property.id}`}
+          href={{
+            pathname: '/properties/[slug]',
+            params: { slug: property.id.toString() },
+          }}
           className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg block"
           aria-describedby={`property-details-${property.id}`}
         >
@@ -375,7 +378,10 @@ export default function PropertyCard({
       aria-labelledby={`property-title-${property.id}`}
     >
       <Link
-        href={`/properties/${property.id}`}
+        href={{
+          pathname: '/properties/[slug]',
+          params: { slug: property.id.toString() },
+        }}
         className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg block"
         aria-describedby={`property-details-${property.id}`}
       >

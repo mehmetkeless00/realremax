@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 
 const quickTags = [
   'Condo/Apartment',
@@ -19,7 +19,10 @@ export default function QuickSearchTags() {
         {quickTags.map((t) => (
           <Link
             key={t}
-            href={`/properties?type=${encodeURIComponent(t)}`}
+            href={{
+              pathname: '/properties',
+              query: { type: t },
+            }}
             className="rounded-full border px-4 py-2 text-sm hover:border-primary hover:text-primary"
           >
             {t}

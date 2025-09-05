@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export default function CorporateCTA() {
@@ -21,7 +21,7 @@ export default function CorporateCTA() {
           <p className="mt-2 text-sm text-muted-foreground">{c.desc}</p>
           <div className="mt-4">
             <Button asChild>
-              <Link href={c.href}>Learn more</Link>
+              <NextLink href={c.href}>Learn more</NextLink>
             </Button>
           </div>
         </div>

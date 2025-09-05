@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { usePathname } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
 import Logo from './Logo';
 import UserMenu from './UserMenu';
 import { useUserStore } from '@/lib/store';
@@ -60,13 +61,13 @@ export default function GlobalHeader() {
       <div className="container mx-auto px-4 md:px-6 py-4">
         <div className="flex justify-between items-center">
           {/* Logo - Far Left */}
-          <Link
+          <NextLink
             href="/"
             aria-label="Go to homepage"
             className="flex items-center"
           >
             <Logo size="lg" className="shrink-0" />
-          </Link>
+          </NextLink>
 
           {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex space-x-8">

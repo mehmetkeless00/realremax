@@ -80,8 +80,8 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
           <Link
             key={property.id}
             href={{
-              pathname: '/properties/[id]',
-              params: { id: property.slug || property.id.toString() },
+              pathname: '/properties/[slug]',
+              params: { slug: property.slug || property.id.toString() },
             }}
             className="rounded-2xl bg-white border shadow-sm overflow-hidden hover:shadow-md transition"
           >

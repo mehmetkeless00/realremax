@@ -86,6 +86,10 @@ export default function FavoritesPage() {
             photos: [
               'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500&h=300&fit=crop',
             ],
+            features: ['Balcony', 'Elevator', 'Parking'],
+            district: 'Downtown',
+            currency: 'EUR',
+            energy_rating: 'B',
           },
           {
             id: '2',
@@ -137,6 +141,10 @@ export default function FavoritesPage() {
             photos: [
               'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&h=300&fit=crop',
             ],
+            features: ['Garden', 'Garage', 'Pool'],
+            district: 'Suburban Heights',
+            currency: 'EUR',
+            energy_rating: 'A',
           },
         ];
 

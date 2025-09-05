@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 
@@ -79,7 +80,7 @@ export default function HeroSearch() {
           <Link href="/properties">{t('browseProperties')}</Link>
         </Button>
         <Button asChild size="lg" variant="outline">
-          <Link href="/agents">{t('findAgents')}</Link>
+          <NextLink href="/agents">{t('findAgents')}</NextLink>
         </Button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
 import Logo from '@/components/Logo';
 import { useTranslations } from 'next-intl';
 
@@ -27,7 +28,8 @@ function Section({ title, items }: { title: string; items: LinkItem[] }) {
         {items.map((it, index) => (
           <li key={index}>
             <Link
-              href={it.href}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              href={it.href as any}
               className="text-sm text-muted-foreground hover:text-primary"
             >
               {it.label}
@@ -74,13 +76,13 @@ export default function GlobalFooter() {
       <div className="container mx-auto px-4 md:px-6 py-10 space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
-            <Link
+            <NextLink
               href="/"
               aria-label="Go to homepage"
               className="inline-flex items-center"
             >
               <Logo size="md" className="shrink-0" />
-            </Link>
+            </NextLink>
             <p className="text-sm text-muted-foreground">{t('tagline')}</p>
           </div>
 
@@ -92,15 +94,15 @@ export default function GlobalFooter() {
         <div className="border-top py-6 text-xs text-muted-foreground flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <p>{t('copyright', { year })}</p>
           <div className="flex gap-4">
-            <Link href="/privacy" className="hover:text-primary">
+            <NextLink href="/privacy" className="hover:text-primary">
               {t('privacy')}
-            </Link>
-            <Link href="/terms" className="hover:text-primary">
+            </NextLink>
+            <NextLink href="/terms" className="hover:text-primary">
               {t('terms')}
-            </Link>
-            <Link href="/contact" className="hover:text-primary">
+            </NextLink>
+            <NextLink href="/contact" className="hover:text-primary">
               {t('contact')}
-            </Link>
+            </NextLink>
           </div>
         </div>
       </div>

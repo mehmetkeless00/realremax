@@ -13,7 +13,8 @@ export default function LanguageSwitcher() {
   return (
     <div className="flex items-center gap-2">
       <Link
-        href={pathname}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        href={pathname as any}
         locale="en"
         aria-label="Switch to English"
         className={`${base} ${locale === 'en' ? active : inactive}`}
@@ -21,7 +22,8 @@ export default function LanguageSwitcher() {
         EN
       </Link>
       <Link
-        href={pathname}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        href={pathname as any}
         locale="pt"
         aria-label="Mudar para Português"
         className={`${base} ${locale === 'pt' ? active : inactive}`}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import OptimizedImage from './OptimizedImage';
 import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
@@ -111,7 +111,12 @@ export default function PropertyCardRefactored({
       <Card
         className={`hover:shadow-lg transition-all duration-300 ${className}`}
       >
-        <Link href={`/properties/${property.id}`}>
+        <Link
+          href={{
+            pathname: '/properties/[slug]',
+            params: { slug: property.id.toString() },
+          }}
+        >
           <div className="flex flex-col md:flex-row">
             {/* Image Section */}
             <div className="relative md:w-64 md:h-40 w-full h-40 max-h-[40vh]">
@@ -314,7 +319,12 @@ export default function PropertyCardRefactored({
     <Card
       className={`hover:shadow-lg transition-all duration-300 ${className}`}
     >
-      <Link href={`/properties/${property.id}`}>
+      <Link
+        href={{
+          pathname: '/properties/[slug]',
+          params: { slug: property.id.toString() },
+        }}
+      >
         <div className="relative">
           <OptimizedImage
             src={imageError ? defaultImage : propertyImage}

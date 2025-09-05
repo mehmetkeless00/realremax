@@ -35,11 +35,9 @@ const IGNORED_FILES = ['check-no-mocks.cjs', 'jest.setup.js', 'jest.config.js'];
 
 // Files that are intentionally demo pages (UI examples)
 const DEMO_PAGES = [
-  'agents-demo/page.tsx',
   'cls-optimization-demo/page.tsx',
   'design-system-demo/page.tsx',
   'image-optimization-demo/page.tsx',
-  'pagination-demo/page.tsx',
   'property-card-demo/page.tsx',
   'responsive-testing-demo/page.tsx',
   'RealtimeDemo.tsx',

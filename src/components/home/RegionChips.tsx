@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 
 const regions = [
   'Lisbon',
@@ -21,7 +21,10 @@ export default function RegionChips() {
         {regions.map((r) => (
           <Link
             key={r}
-            href={`/properties?region=${encodeURIComponent(r)}`}
+            href={{
+              pathname: '/properties',
+              query: { region: r },
+            }}
             className="rounded-full border px-4 py-2 text-sm hover:border-primary hover:text-primary"
           >
             {r}

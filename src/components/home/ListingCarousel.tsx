@@ -1,4 +1,5 @@
 import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
 import Image from 'next/image';
 import { getFirstValidUrl } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -69,9 +70,19 @@ export default function ListingCarousel({
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl md:text-3xl font-bold text-fg">{title}</h2>
-          <Link href={seeAllHref} className="text-sm hover:text-primary">
-            {tCommon('seeAll')}
-          </Link>
+          {typeof seeAllHref === 'string' && seeAllHref === '/properties' ? (
+            <Link href={seeAllHref} className="text-sm hover:text-primary">
+              {tCommon('seeAll')}
+            </Link>
+          ) : (
+            <NextLink
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              href={seeAllHref as any}
+              className="text-sm hover:text-primary"
+            >
+              {tCommon('seeAll')}
+            </NextLink>
+          )}
         </div>
         <div className="text-center py-8 text-muted-foreground">
           <p>{tHome('noProperties')}</p>
@@ -84,9 +95,19 @@ export default function ListingCarousel({
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl md:text-3xl font-bold text-fg">{title}</h2>
-        <Link href={seeAllHref} className="text-sm hover:text-primary">
-          {tCommon('seeAll')}
-        </Link>
+        {typeof seeAllHref === 'string' && seeAllHref === '/properties' ? (
+          <Link href={seeAllHref} className="text-sm hover:text-primary">
+            {tCommon('seeAll')}
+          </Link>
+        ) : (
+          <NextLink
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            href={seeAllHref as any}
+            className="text-sm hover:text-primary"
+          >
+            {tCommon('seeAll')}
+          </NextLink>
+        )}
       </div>
 
       {/* Mobile: horizontal scroll; Desktop: grid */}
@@ -104,8 +125,8 @@ export default function ListingCarousel({
 
           const id = (property.slug ?? property.id).toString();
           const detailHref = {
-            pathname: '/properties/[id]' as const,
-            params: { id },
+            pathname: '/properties/[slug]' as const,
+            params: { slug: id },
           };
           const price = formatPrice(property.price);
           const location =

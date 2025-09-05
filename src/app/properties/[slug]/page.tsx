@@ -10,9 +10,8 @@ import Gallery from '@/components/property/Gallery';
 import PriceBar from '@/components/property/PriceBar';
 import Facts from '@/components/property/Facts';
 import FeaturesList from '@/components/property/FeaturesList';
-import AgentCard from '@/components/property/AgentCard';
 import MapPlaceholder from '@/components/property/MapPlaceholder';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { filterValidUrls, getFirstValidUrl } from '@/lib/utils';
 
@@ -30,15 +29,11 @@ export async function generateMetadata({
     };
   }
 
-<<<<<<< HEAD
-  const ogImage = property.photos?.[0] ?? '/images/placeholder-property.svg';
-=======
   // Use property.photos[0] if available, otherwise fallback
   const ogImage = getFirstValidUrl(
     property.photos,
     '/images/placeholder-property.svg'
   );
->>>>>>> origin/main
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: property?.currency ?? 'EUR',
@@ -59,19 +54,7 @@ export default async function PropertyPage({ params }: PageProps) {
   const property = await getPropertyBySlug(slug);
   if (!property) notFound();
 
-  const images = (property.photos ?? []).map((src: string) => ({
-    src,
-    alt: property.title,
-  }));
   const amenities = property.amenities ?? [];
-
-  const operation: 'buy' | 'rent' =
-    (property as PropertyRow & { listing_type?: string }).listing_type ===
-    'rent'
-      ? 'rent'
-      : 'buy';
-  const currency =
-    (property as PropertyRow & { currency?: string }).currency ?? 'EUR';
 
   const similar = await getSimilarProperties(property, 6);
 
@@ -84,47 +67,6 @@ export default async function PropertyPage({ params }: PageProps) {
           { label: property.title },
         ]}
       />
-
-      {/* Üst kısım: Galeri + Fiyat barı */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          {/* Galeri */}
-          {images.length ? (
-            <Gallery images={images} />
-          ) : (
-            <div className="aspect-[16/9] w-full overflow-hidden rounded-xl bg-muted flex items-center justify-center">
-              <Image
-                src="/images/placeholder-property.svg"
-                alt="No image"
-                width={960}
-                height={540}
-                className="object-contain"
-              />
-            </div>
-          )}
-
-          {/* Başlık / Konum */}
-          <div className="mt-6">
-            <h1 className="text-3xl font-bold">{property.title}</h1>
-            <p className="text-muted-foreground">
-              {property.city ?? property.location ?? ''}
-            </p>
-          </div>
-
-<<<<<<< HEAD
-          {/* Özellikler */}
-          <div className="mt-6">
-=======
-          <div className="flex gap-3">
-            <button className="text-sm text-muted-foreground hover:text-primary">
-              Share
-            </button>
-            <button className="text-sm text-muted-foreground hover:text-primary">
-              Favorite
-            </button>
-          </div>
-        </div>
-      </div>
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-7">
@@ -140,7 +82,6 @@ export default async function PropertyPage({ params }: PageProps) {
           <PriceBar price={property.price} currency="USD" operation="buy" />
           {/* Facts visible on desktop */}
           <div className="hidden lg:block">
->>>>>>> origin/main
             <Facts
               type={property.type}
               bedrooms={property.bedrooms ?? undefined}
@@ -172,28 +113,7 @@ export default async function PropertyPage({ params }: PageProps) {
           <div className="mt-8">
             <MapPlaceholder />
           </div>
-        </div>
-
-        {/* Sağ panel */}
-        <div className="lg:col-span-1">
-          {/* Fiyat barı */}
-          <PriceBar
-            price={property.price ?? 0}
-            currency={currency}
-            operation={operation}
-          />
-
-          {/* İletişim Kartı */}
-          <div className="mt-6">
-            <AgentCard
-              agent={{
-                name: 'Agent',
-                email: '',
-                phone: '',
-              }}
-            />
-          </div>
-        </div>
+        </aside>
       </div>
 
       {/* Benzer ilanlar */}
@@ -204,24 +124,15 @@ export default async function PropertyPage({ params }: PageProps) {
             {similar.map((prop) => (
               <Link
                 key={prop.id}
-                href={`/properties/${prop.slug ?? prop.id}`}
+                href={{
+                  pathname: '/properties/[slug]',
+                  params: { slug: prop.slug ?? prop.id },
+                }}
                 className="group rounded-xl overflow-hidden border"
               >
                 <div className="aspect-[16/9] bg-muted relative">
                   <Image
-<<<<<<< HEAD
-                    src={
-                      Array.isArray(
-                        (prop as PropertyRow & { photos?: string[] }).photos
-                      ) &&
-                      (prop as PropertyRow & { photos?: string[] }).photos?.[0]
-                        ? (prop as PropertyRow & { photos?: string[] })
-                            .photos![0]
-                        : '/images/placeholder-property.svg'
-                    }
-=======
                     src={getFirstValidUrl(prop.photos, '/logo.png')}
->>>>>>> origin/main
                     alt={prop.title}
                     fill
                     className="object-cover"

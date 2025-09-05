@@ -4,6 +4,12 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      { source: '/pt/imoveis', destination: '/pt/properties' },
+      { source: '/pt/imoveis/:slug*', destination: '/pt/properties/:slug*' },
+    ];
+  },
   images: {
     // Supabase Storage domains
     remotePatterns: [
