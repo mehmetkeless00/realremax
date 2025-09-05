@@ -1,190 +1,374 @@
+import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseServer } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
 
-export async function GET(req: NextRequest) {
-  const supabase = await createSupabaseServer();
-  const { searchParams } = new URL(req.url);
-
-  const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
-  const limit = 24;
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
-
-  let q = supabase
-    .from('properties')
-    .select('*', { count: 'exact' })
-    .eq('status', 'published')
-    .is('deleted_at', null);
-
-  // op -> transaction_type
-  const op = searchParams.get('op');
-  if (op === 'buy') q = q.in('transaction_type', ['sale']);
-  else if (op === 'rent')
-    q = q.in('transaction_type', ['rent', 'lease', 'short-term-rent']);
-
-  // type (property_type or fallback type)
-  const typeCsv = searchParams.get('type');
-  if (typeCsv) {
-    const parts = typeCsv
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (parts.length)
-      q = q.or(
-        parts.map((p) => `property_type.eq.${p},type.eq.${p}`).join(',')
-      );
-  }
-
-  // price
-  const priceMin = searchParams.get('price_min');
-  if (priceMin) q = q.gte('price', Number(priceMin));
-  const priceMax = searchParams.get('price_max');
-  if (priceMax) q = q.lte('price', Number(priceMax));
-
-  // beds / baths
-  const bedsMin = searchParams.get('beds_min');
-  if (bedsMin) q = q.gte('bedrooms', Number(bedsMin));
-  const bathsMin = searchParams.get('baths_min');
-  if (bathsMin) q = q.gte('bathrooms', Number(bathsMin));
-
-  // area (usable_area_m2 or internal_area_sqm)
-  const areaMin = searchParams.get('area_min');
-  if (areaMin)
-    q = q.or(`usable_area_m2.gte.${areaMin},internal_area_sqm.gte.${areaMin}`);
-  const areaMax = searchParams.get('area_max');
-  if (areaMax)
-    q = q.or(`usable_area_m2.lte.${areaMax},internal_area_sqm.lte.${areaMax}`);
-
-  // features[]
-  const featuresCsv = searchParams.get('features');
-  if (featuresCsv)
-    q = q.contains(
-      'features',
-      featuresCsv
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean)
+export async function GET() {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll() } }
     );
 
-  // energy_class
-  const energyCsv = searchParams.get('energy');
-  if (energyCsv)
-    q = q.in(
-      'energy_class',
-      energyCsv.split(',').map((s) => s.trim())
-    );
+    // Get user for potential future use
+    await supabase.auth.getUser();
 
-  // loc: "city|district" or "district"
-  const loc = searchParams.get('loc');
-  if (loc) {
-    if (loc.includes('|')) {
-      const [city, district] = loc.split('|');
-      q = q.ilike('city', city).ilike('district', district);
-    } else {
-      q = q.ilike('district', loc);
-    }
-  }
-
-  // bbox: west,south,east,north
-  const bbox = searchParams.get('loc_bbox');
-  if (bbox) {
-    const [w, s, e, n] = bbox.split(',').map(Number);
-    if ([w, s, e, n].every(Number.isFinite)) {
-      q = q.gte('lng', w).lte('lng', e).gte('lat', s).lte('lat', n);
-    }
-  }
-
-  // published=X days
-  const published = searchParams.get('published');
-  if (published) {
-    const days = Number(published);
-    const iso = new Date(Date.now() - days * 86400000).toISOString();
-    q = q.gte('published_at', iso);
-  }
-
-  // tag flags: price_reduced, virtual_tour, exclusive, open_house, new_to_market
-  (
-    [
-      'price_reduced',
-      'virtual_tour',
-      'exclusive',
-      'open_house',
-      'new_to_market',
-    ] as const
-  ).forEach((flag) => {
-    if (searchParams.get(flag) === 'true') q = q.contains('tags', [flag]);
-  });
-
-  // q: multi-column ILIKE
-  const s = searchParams.get('q');
-  if (s) {
-    const like = `%${s}%`;
-    q = q.or(
-      [
-        `title.ilike.${like}`,
-        `location.ilike.${like}`,
-        `full_address.ilike.${like}`,
-        `city.ilike.${like}`,
-        `district.ilike.${like}`,
-        `reference_code.ilike.${like}`,
-      ].join(',')
-    );
-  }
-
-  // sorting
-  const sort = searchParams.get('sort') || 'relevance';
-  if (sort === 'date_desc') {
-    q = q
-      .order('published_at', { ascending: false })
-      .order('created_at', { ascending: false });
-  } else if (sort === 'price_asc') {
-    q = q.order('price', { ascending: true, nullsFirst: true });
-  } else if (sort === 'price_desc') {
-    q = q.order('price', { ascending: false });
-  } else if (sort === 'area_desc') {
-    q = q
-      .order('usable_area_m2', { ascending: false, nullsFirst: true })
-      .order('internal_area_sqm', { ascending: false, nullsFirst: true });
-  } else {
-    q = q.order('created_at', { ascending: false });
-  }
-
-  const { data, count, error } = await q.range(from, to);
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 400 });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const items = (data ?? []).map((row: any) => {
-    const tags: string[] = row.tags ?? [];
-    return {
-      id: row.id,
-      title: row.title,
-      operation: row.transaction_type === 'sale' ? 'buy' : 'rent',
-      type: row.property_type ?? row.type ?? 'other',
-      price_eur: Number(row.price ?? 0),
-      beds: row.bedrooms ?? 0,
-      baths: row.bathrooms ?? 0,
-      area_m2: row.usable_area_m2 ?? row.internal_area_sqm ?? null,
-      energy: row.energy_class ?? null,
-      features: row.features ?? [],
-      location: {
-        country: row.country ?? 'PT',
-        district: row.district ?? '',
-        city: row.city ?? '',
-        parish: row.area ?? '',
+    // Return demo data for now
+    const demoProperties = [
+      {
+        id: '1',
+        title: 'Modern Apartment in City Center',
+        description: 'Beautiful 2-bedroom apartment with modern amenities',
+        price: 250000,
+        location: 'Istanbul, Turkey',
+        type: 'apartment',
+        bedrooms: 2,
+        bathrooms: 2,
+        size: 120,
+        year_built: 2020,
+        status: 'active',
+        listing_type: 'sale',
+        amenities: ['Parking', 'Gym', 'Pool'],
+        address: '123 Main Street',
+        city: 'Istanbul',
+        postal_code: '34000',
+        country: 'Turkey',
+        latitude: 41.0082,
+        longitude: 28.9784,
+        created_at: '2024-01-15T10:00:00Z',
+        agent_id: 'demo-agent-1',
       },
-      published_at: row.published_at ?? row.created_at ?? null,
-      price_reduced: tags.includes('price_reduced'),
-      virtual_tour: tags.includes('virtual_tour'),
-      exclusive: tags.includes('exclusive'),
-      open_house: tags.includes('open_house'),
-      new_to_market: tags.includes('new_to_market'),
-      images: [row.cover_image_url].filter(Boolean),
-      lat: row.lat ?? row.latitude ?? null,
-      lng: row.lng ?? row.longitude ?? null,
-      slug: row.slug ?? null,
-    };
-  });
+      {
+        id: '2',
+        title: 'Luxury Villa with Garden',
+        description: 'Spacious 4-bedroom villa with private garden',
+        price: 850000,
+        location: 'Antalya, Turkey',
+        type: 'villa',
+        bedrooms: 4,
+        bathrooms: 3,
+        size: 280,
+        year_built: 2018,
+        status: 'active',
+        listing_type: 'sale',
+        amenities: ['Garden', 'Pool', 'Security'],
+        address: '456 Villa Road',
+        city: 'Antalya',
+        postal_code: '07000',
+        country: 'Turkey',
+        latitude: 36.8969,
+        longitude: 30.7133,
+        created_at: '2024-01-10T14:30:00Z',
+        agent_id: 'demo-agent-1',
+      },
+      {
+        id: '3',
+        title: 'Cozy Studio for Rent',
+        description: 'Perfect studio apartment for young professionals',
+        price: 2500,
+        location: 'Ankara, Turkey',
+        type: 'studio',
+        bedrooms: 1,
+        bathrooms: 1,
+        size: 45,
+        year_built: 2022,
+        status: 'active',
+        listing_type: 'rent',
+        amenities: ['Furnished', 'Internet', 'Utilities included'],
+        address: '789 Studio Lane',
+        city: 'Ankara',
+        postal_code: '06000',
+        country: 'Turkey',
+        latitude: 39.9334,
+        longitude: 32.8597,
+        created_at: '2024-01-05T09:15:00Z',
+        agent_id: 'demo-agent-1',
+      },
+    ];
 
-  return NextResponse.json({ items, total: count ?? 0, page, pageSize: limit });
+    return NextResponse.json(demoProperties);
+  } catch (error) {
+    console.error('Listings API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // İstekten property verilerini al
+    const {
+      title,
+      description,
+      price,
+      location,
+      type,
+      bedrooms,
+      bathrooms,
+      size,
+      year_built,
+      status,
+      listing_type,
+      amenities,
+      address,
+      city,
+      postal_code,
+      country,
+      latitude,
+      longitude,
+      photos,
+    } = await request.json();
+
+    // Basit validasyon
+    if (!title || !price || !location || !type) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Demo mode: Return mock created property
+    const mockNewProperty = {
+      id: `demo-${Date.now()}`, // Generate a unique demo ID
+      title,
+      description,
+      price: parseFloat(price),
+      location,
+      type,
+      bedrooms: bedrooms ? parseInt(bedrooms) : null,
+      bathrooms: bathrooms ? parseFloat(bathrooms) : null,
+      size: size ? parseInt(size) : null,
+      year_built: year_built ? parseInt(year_built) : null,
+      status: status || 'active',
+      listing_type: listing_type || 'sale',
+      amenities: amenities || [],
+      address: address || '',
+      city: city || '',
+      postal_code: postal_code || '',
+      country: country || 'Turkey',
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
+      photos: photos || [],
+      agent_id: 'demo-agent-1',
+      created_at: new Date().toISOString(),
+    };
+
+    return NextResponse.json([mockNewProperty]);
+
+    /* Real implementation - commented for demo mode
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll() } }
+    );
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user || user.user_metadata?.role !== 'agent') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    const { data, error } = await supabase
+      .from('properties')
+      .insert([
+        {
+          title,
+          description,
+          price,
+          location,
+          type,
+          bedrooms: bedrooms ? parseInt(bedrooms) : null,
+          bathrooms: bathrooms ? parseFloat(bathrooms) : null,
+          size: size ? parseInt(size) : null,
+          year_built: year_built ? parseInt(year_built) : null,
+          status: status || 'active',
+          listing_type: listing_type || 'sale',
+          amenities: amenities || [],
+          address: address || '',
+          city: city || '',
+          postal_code: postal_code || '',
+          country: country || 'Turkey',
+          latitude: latitude ? parseFloat(latitude) : null,
+          longitude: longitude ? parseFloat(longitude) : null,
+          photos: photos || [],
+          agent_id: user.id,
+        },
+      ])
+      .select();
+
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(data);
+    */
+  } catch (error) {
+    console.error('Create property error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { id, ...updateData } = await request.json();
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Property ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Demo mode: Check if ID exists in demo data
+    const demoPropertyIds = ['1', '2', '3'];
+    if (demoPropertyIds.includes(id)) {
+      // Return mock updated property data
+      const mockUpdatedProperty = {
+        id,
+        ...updateData,
+        bedrooms: updateData.bedrooms ? parseInt(updateData.bedrooms) : null,
+        bathrooms: updateData.bathrooms
+          ? parseFloat(updateData.bathrooms)
+          : null,
+        size: updateData.size ? parseInt(updateData.size) : null,
+        year_built: updateData.year_built
+          ? parseInt(updateData.year_built)
+          : null,
+        latitude: updateData.latitude ? parseFloat(updateData.latitude) : null,
+        longitude: updateData.longitude
+          ? parseFloat(updateData.longitude)
+          : null,
+        updated_at: new Date().toISOString(),
+        agent_id: 'demo-agent-1',
+      };
+      return NextResponse.json([mockUpdatedProperty]);
+    }
+
+    // If not demo data, proceed with real update
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll() } }
+    );
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user || user.user_metadata?.role !== 'agent') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    // Property'nin agent'a ait olduğunu kontrol et
+    const { data: existingProperty } = await supabase
+      .from('properties')
+      .select('agent_id')
+      .eq('id', id)
+      .single();
+
+    if (!existingProperty || existingProperty.agent_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Property not found or unauthorized' },
+        { status: 404 }
+      );
+    }
+
+    // Data type conversions
+    const processedData = {
+      ...updateData,
+      bedrooms: updateData.bedrooms ? parseInt(updateData.bedrooms) : null,
+      bathrooms: updateData.bathrooms ? parseFloat(updateData.bathrooms) : null,
+      size: updateData.size ? parseInt(updateData.size) : null,
+      year_built: updateData.year_built
+        ? parseInt(updateData.year_built)
+        : null,
+      latitude: updateData.latitude ? parseFloat(updateData.latitude) : null,
+      longitude: updateData.longitude ? parseFloat(updateData.longitude) : null,
+      photos: updateData.photos || [],
+    };
+
+    // Property'yi güncelle
+    const { data, error } = await supabase
+      .from('properties')
+      .update(processedData)
+      .eq('id', id)
+      .select();
+
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Update property error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Property ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Demo mode: Check if ID exists in demo data
+    const demoPropertyIds = ['1', '2', '3'];
+    if (demoPropertyIds.includes(id)) {
+      return NextResponse.json({ message: 'Property deleted successfully' });
+    }
+
+    // If not demo data, proceed with real deletion
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll() } }
+    );
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user || user.user_metadata?.role !== 'agent') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    // Property'nin agent'a ait olduğunu kontrol et
+    const { data: existingProperty } = await supabase
+      .from('properties')
+      .select('agent_id')
+      .eq('id', id)
+      .single();
+
+    if (!existingProperty || existingProperty.agent_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Property not found or unauthorized' },
+        { status: 404 }
+      );
+    }
+
+    // Property'yi sil
+    const { error } = await supabase.from('properties').delete().eq('id', id);
+
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ message: 'Property deleted successfully' });
+  } catch (error) {
+    console.error('Delete property error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

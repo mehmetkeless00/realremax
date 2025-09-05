@@ -1,0 +1,56 @@
+{
+  "common": {
+    "seeAll": "See all →"
+  },
+  "nav": {
+    "buyRent": "Buy/Rent",
+    "agents": "Agents",
+    "services": "Services",
+    "favorites": "Favorites",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "freeValuation": "Free Valuation",
+    "myFavorites": "My Favorites"
+  },
+  "home": {
+    "headline": "Find Your Dream Home",
+    "subheadline": "Search thousands of listings and connect with trusted agents.",
+    "buy": "Buy",
+    "rent": "Rent",
+    "searchPlaceholder": "City, neighborhood, keyword…",
+    "search": "Search",
+    "browseProperties": "Browse Properties",
+    "findAgents": "Find Agents",
+    "sections": {
+      "mostRecent": "Most Recent",
+      "newThisWeek": "New this week"
+    },
+    "noProperties": "No properties available at the moment."
+  },
+  "properties": {
+    "emptyTitle": "No listings found",
+    "emptySubtitle": "Try adjusting your filters or come back later.",
+    "loadingFilters": "Loading filters..."
+  },
+  "footer": {
+    "buy": "Buy",
+    "rent": "Rent",
+    "agents": "Agents",
+    "services": "Services",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "favorites": "Favorites",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "explore": "Explore",
+    "myAccount": "My Account",
+    "tools": "Tools",
+    "tagline": "Your trusted partner in real estate",
+    "copyright": "© {year} RealRemax. All rights reserved.",
+    "advancedSearch": "Advanced Search",
+    "addListing": "Add Listing"
+  }
+}

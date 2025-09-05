@@ -1,10 +1,11 @@
-import Link from 'next/link';
-import { getCoverUrl } from '@/lib/image-helpers';
-import { SmartImage } from '@/lib/smart-image';
+import { Link } from '@/i18n/navigation';
+import Image from 'next/image';
+import { getFirstValidUrl } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 // Real property data structure from Supabase
 type Property = {
-  id: string;
+  id: string | number;
   title: string;
   price: number;
   location: string;
@@ -23,8 +24,20 @@ type Property = {
 
 type Props = {
   title: string;
-  seeAllHref: string;
-  items?: Property[];
+  seeAllHref:
+    | '/'
+    | '/properties'
+    | '/agents'
+    | '/services'
+    | '/favorites'
+    | '/dashboard'
+    | '/profile'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/advanced-search-bar'
+    | '/property-listing-form'
+    | { pathname: '/properties'; query: { sort: string } };
+  items: Property[];
   limit?: number;
 };
 
@@ -48,6 +61,8 @@ export default function ListingCarousel({
   limit,
 }: Props) {
   const list = typeof limit === 'number' ? items.slice(0, limit) : items;
+  const tCommon = useTranslations('common');
+  const tHome = useTranslations('home');
 
   if (!list.length) {
     return (
@@ -55,11 +70,11 @@ export default function ListingCarousel({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl md:text-3xl font-bold text-fg">{title}</h2>
           <Link href={seeAllHref} className="text-sm hover:text-primary">
-            See all →
+            {tCommon('seeAll')}
           </Link>
         </div>
         <div className="text-center py-8 text-muted-foreground">
-          <p>No properties available at the moment.</p>
+          <p>{tHome('noProperties')}</p>
         </div>
       </div>
     );
@@ -70,7 +85,7 @@ export default function ListingCarousel({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl md:text-3xl font-bold text-fg">{title}</h2>
         <Link href={seeAllHref} className="text-sm hover:text-primary">
-          See all →
+          {tCommon('seeAll')}
         </Link>
       </div>
 
@@ -81,8 +96,17 @@ export default function ListingCarousel({
                       overflow-x-auto snap-x lg:overflow-visible"
       >
         {list.map((property) => {
-          const imageUrl = getCoverUrl(property);
-          const href = `/properties/${property.slug ?? property.id}`;
+          // Image fallback: photos(array) -> og_image_url -> placeholder
+          const imageUrl = getFirstValidUrl(
+            property.photos,
+            property.og_image_url || '/images/placeholder-property.svg'
+          );
+
+          const id = (property.slug ?? property.id).toString();
+          const detailHref = {
+            pathname: '/properties/[id]' as const,
+            params: { id },
+          };
           const price = formatPrice(property.price);
           const location =
             property.location ||
@@ -91,12 +115,12 @@ export default function ListingCarousel({
 
           return (
             <Link
-              key={property.id}
-              href={href}
+              key={String(property.id)}
+              href={detailHref}
               className="min-w-[260px] lg:min-w-0 snap-start rounded-2xl bg-white border shadow-sm overflow-hidden hover:shadow-md transition"
             >
-              <div className="relative aspect-video bg-muted overflow-hidden rounded-lg">
-                <SmartImage
+              <div className="relative aspect-video">
+                <Image
                   src={imageUrl}
                   alt={property.title || 'Property'}
                   fill

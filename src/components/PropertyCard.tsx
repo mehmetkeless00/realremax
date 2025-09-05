@@ -1,12 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { getCoverUrl } from '@/lib/image-helpers';
-import { SmartImage } from '@/lib/smart-image';
+import CLSOptimizedImage from './CLSOptimizedImage';
 import { useUserStore } from '@/lib/store';
 import { useUIStore } from '@/lib/store';
 import { useFavoritesStore } from '@/lib/store/favoritesStore';
 import type { PropertyCardProps } from '@/types/property';
+import { getFirstValidUrl } from '@/lib/utils';
 
 export default function PropertyCard({
   property,
@@ -18,11 +19,13 @@ export default function PropertyCard({
   const { user } = useUserStore();
   const { addToast } = useUIStore();
   const { favorites, toggleFavorite, isSyncing } = useFavoritesStore();
+  const [imageError, setImageError] = useState(false);
 
   const isFavorite = favorites.includes(property.id);
 
-  // Use SmartImage's getCoverUrl for consistent image handling
-  const propertyImage = getCoverUrl(property);
+  // Default image if property image fails to load
+  const defaultImage = '/images/placeholder-property.svg';
+  const propertyImage = getFirstValidUrl(property.photos, defaultImage);
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -126,13 +129,17 @@ export default function PropertyCard({
           aria-describedby={`property-details-${property.id}`}
         >
           <div className="flex flex-col md:flex-row">
-            {/* Image Section with SmartImage */}
+            {/* Image Section with CLS optimization */}
             <div className="relative md:w-64 md:h-40 w-full h-40 max-h-[40vh]">
-              <SmartImage
-                src={propertyImage}
+              <CLSOptimizedImage
+                src={imageError ? defaultImage : propertyImage}
                 alt={`${property.title} - ${property.location}`}
-                fill
+                width={400}
+                height={300}
+                aspectRatio={4 / 3}
                 className="w-full h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                sizes="(max-width: 768px) 100vw, 256px"
+                onError={() => setImageError(true)}
               />
 
               {/* Status Badge */}
@@ -360,7 +367,7 @@ export default function PropertyCard({
     );
   }
 
-  // Grid View (default) with SmartImage
+  // Grid View (default) with CLS optimization
   return (
     <article
       className={`card hover:shadow-lg transition-all duration-300 overflow-hidden ${className}`}
@@ -373,11 +380,15 @@ export default function PropertyCard({
         aria-describedby={`property-details-${property.id}`}
       >
         <div className="relative">
-          <SmartImage
-            src={propertyImage}
+          <CLSOptimizedImage
+            src={imageError ? defaultImage : propertyImage}
             alt={`${property.title} - ${property.location}`}
-            fill
+            width={400}
+            height={300}
+            aspectRatio={4 / 3}
             className="w-full h-40 max-h-[40vh] object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            onError={() => setImageError(true)}
           />
 
           {/* Status Badge */}

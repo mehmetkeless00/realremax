@@ -14,6 +14,7 @@ import AgentCard from '@/components/property/AgentCard';
 import MapPlaceholder from '@/components/property/MapPlaceholder';
 import Link from 'next/link';
 import Image from 'next/image';
+import { filterValidUrls, getFirstValidUrl } from '@/lib/utils';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -29,7 +30,15 @@ export async function generateMetadata({
     };
   }
 
+<<<<<<< HEAD
   const ogImage = property.photos?.[0] ?? '/images/placeholder-property.svg';
+=======
+  // Use property.photos[0] if available, otherwise fallback
+  const ogImage = getFirstValidUrl(
+    property.photos,
+    '/images/placeholder-property.svg'
+  );
+>>>>>>> origin/main
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: property?.currency ?? 'EUR',
@@ -102,8 +111,36 @@ export default async function PropertyPage({ params }: PageProps) {
             </p>
           </div>
 
+<<<<<<< HEAD
           {/* Özellikler */}
           <div className="mt-6">
+=======
+          <div className="flex gap-3">
+            <button className="text-sm text-muted-foreground hover:text-primary">
+              Share
+            </button>
+            <button className="text-sm text-muted-foreground hover:text-primary">
+              Favorite
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+        <div className="lg:col-span-7">
+          <Gallery
+            images={filterValidUrls(property.photos || []).map((photo) => ({
+              src: photo,
+              alt: property.title,
+            }))}
+          />
+        </div>
+
+        <aside className="mt-6 lg:mt-0 lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+          <PriceBar price={property.price} currency="USD" operation="buy" />
+          {/* Facts visible on desktop */}
+          <div className="hidden lg:block">
+>>>>>>> origin/main
             <Facts
               type={property.type}
               bedrooms={property.bedrooms ?? undefined}
@@ -172,6 +209,7 @@ export default async function PropertyPage({ params }: PageProps) {
               >
                 <div className="aspect-[16/9] bg-muted relative">
                   <Image
+<<<<<<< HEAD
                     src={
                       Array.isArray(
                         (prop as PropertyRow & { photos?: string[] }).photos
@@ -181,6 +219,9 @@ export default async function PropertyPage({ params }: PageProps) {
                             .photos![0]
                         : '/images/placeholder-property.svg'
                     }
+=======
+                    src={getFirstValidUrl(prop.photos, '/logo.png')}
+>>>>>>> origin/main
                     alt={prop.title}
                     fill
                     className="object-cover"

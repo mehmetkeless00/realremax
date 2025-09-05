@@ -1,0 +1,56 @@
+{
+  "common": {
+    "seeAll": "Ver todos →"
+  },
+  "nav": {
+    "buyRent": "Comprar/Alugar",
+    "agents": "Agentes",
+    "services": "Serviços",
+    "favorites": "Favoritos",
+    "dashboard": "Painel",
+    "profile": "Perfil",
+    "freeValuation": "Avaliação Gratuita",
+    "myFavorites": "Meus Favoritos"
+  },
+  "home": {
+    "headline": "Encontre Sua Casa dos Sonhos",
+    "subheadline": "Pesquise milhares de listagens e conecte-se com agentes confiáveis.",
+    "buy": "Comprar",
+    "rent": "Alugar",
+    "searchPlaceholder": "Cidade, bairro, palavra-chave…",
+    "search": "Pesquisar",
+    "browseProperties": "Navegar Propriedades",
+    "findAgents": "Encontrar Agentes",
+    "sections": {
+      "mostRecent": "Mais Recentes",
+      "newThisWeek": "Novos esta semana"
+    },
+    "noProperties": "Nenhuma propriedade disponível no momento."
+  },
+  "properties": {
+    "emptyTitle": "Nenhuma listagem encontrada",
+    "emptySubtitle": "Tente ajustar seus filtros ou volte mais tarde.",
+    "loadingFilters": "Carregando filtros..."
+  },
+  "footer": {
+    "buy": "Comprar",
+    "rent": "Alugar",
+    "agents": "Agentes",
+    "services": "Serviços",
+    "signIn": "Entrar",
+    "signUp": "Cadastrar",
+    "favorites": "Favoritos",
+    "dashboard": "Painel",
+    "profile": "Perfil",
+    "contact": "Contato",
+    "privacy": "Política de Privacidade",
+    "terms": "Termos de Serviço",
+    "explore": "Explorar",
+    "myAccount": "Minha Conta",
+    "tools": "Ferramentas",
+    "tagline": "Seu parceiro confiável em imóveis",
+    "copyright": "© {year} RealRemax. Todos os direitos reservados.",
+    "advancedSearch": "Busca Avançada",
+    "addListing": "Adicionar Listagem"
+  }
+}

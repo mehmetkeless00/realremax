@@ -30,7 +30,6 @@ export interface PropertyWithListing extends Property {
     company: string;
     phone: string;
   };
-  images?: string[];
   isFavorite?: boolean;
 }
 

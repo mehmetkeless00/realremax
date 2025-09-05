@@ -1,35 +1,31 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Logo from '@/components/Logo';
+import { useTranslations } from 'next-intl';
 
-type LinkItem = { label: string; href: string };
-
-const explore: LinkItem[] = [
-  { label: 'Buy', href: '/properties?mode=buy' },
-  { label: 'Rent', href: '/properties?mode=rent' },
-  { label: 'Agents', href: '/agents' },
-  { label: 'Services', href: '/services' },
-];
-
-const account: LinkItem[] = [
-  { label: 'Sign in', href: '/auth/signin' },
-  { label: 'Sign up', href: '/auth/signup' },
-  { label: 'Favorites', href: '/favorites' },
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Profile', href: '/profile' },
-];
-
-const tools: LinkItem[] = [
-  { label: 'Advanced Search', href: '/advanced-search-bar' },
-  { label: 'Add Listing', href: '/property-listing-form' },
-];
+type LinkItem = {
+  label: string;
+  href:
+    | '/'
+    | '/properties'
+    | '/agents'
+    | '/services'
+    | '/favorites'
+    | '/dashboard'
+    | '/profile'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/advanced-search-bar'
+    | '/property-listing-form'
+    | { pathname: '/properties'; query: { mode: string } };
+};
 
 function Section({ title, items }: { title: string; items: LinkItem[] }) {
   return (
     <nav aria-label={title} className="space-y-3">
       <h4 className="text-sm font-semibold text-fg">{title}</h4>
       <ul className="space-y-2">
-        {items.map((it) => (
-          <li key={it.href}>
+        {items.map((it, index) => (
+          <li key={index}>
             <Link
               href={it.href}
               className="text-sm text-muted-foreground hover:text-primary"
@@ -44,15 +40,40 @@ function Section({ title, items }: { title: string; items: LinkItem[] }) {
 }
 
 export default function GlobalFooter() {
+  const t = useTranslations('footer');
   const year = new Date().getFullYear();
+
+  const explore: LinkItem[] = [
+    {
+      label: t('buy'),
+      href: { pathname: '/properties', query: { mode: 'buy' } },
+    },
+    {
+      label: t('rent'),
+      href: { pathname: '/properties', query: { mode: 'rent' } },
+    },
+    { label: t('agents'), href: '/agents' },
+    { label: t('services'), href: '/services' },
+  ];
+
+  const account: LinkItem[] = [
+    { label: t('signIn'), href: '/auth/signin' },
+    { label: t('signUp'), href: '/auth/signup' },
+    { label: t('favorites'), href: '/favorites' },
+    { label: t('dashboard'), href: '/dashboard' },
+    { label: t('profile'), href: '/profile' },
+  ];
+
+  const tools: LinkItem[] = [
+    { label: t('advancedSearch'), href: '/advanced-search-bar' },
+    { label: t('addListing'), href: '/property-listing-form' },
+  ];
 
   return (
     <footer className="bg-white border-t">
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Top */}
-        <div className="py-12 grid gap-8 md:grid-cols-4">
-          {/* Brand */}
-          <div className="space-y-4">
+      <div className="container mx-auto px-4 md:px-6 py-10 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="space-y-3">
             <Link
               href="/"
               aria-label="Go to homepage"
@@ -60,29 +81,25 @@ export default function GlobalFooter() {
             >
               <Logo size="md" className="shrink-0" />
             </Link>
-            <p className="text-sm text-muted-foreground">
-              Discover properties, connect with trusted agents, and make
-              confident decisions.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('tagline')}</p>
           </div>
 
-          <Section title="Explore" items={explore} />
-          <Section title="My Account" items={account} />
-          <Section title="Tools" items={tools} />
+          <Section title={t('explore')} items={explore} />
+          <Section title={t('myAccount')} items={account} />
+          <Section title={t('tools')} items={tools} />
         </div>
 
-        {/* Bottom */}
-        <div className="border-t py-6 text-xs text-muted-foreground flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <p>© {year} Remax Wise — All rights reserved.</p>
+        <div className="border-top py-6 text-xs text-muted-foreground flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <p>{t('copyright', { year })}</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-primary">
-              Privacy
+              {t('privacy')}
             </Link>
             <Link href="/terms" className="hover:text-primary">
-              Terms
+              {t('terms')}
             </Link>
             <Link href="/contact" className="hover:text-primary">
-              Contact
+              {t('contact')}
             </Link>
           </div>
         </div>
