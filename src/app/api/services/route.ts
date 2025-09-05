@@ -1,64 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
-    const search = searchParams.get('search');
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !anon) {
+      return NextResponse.json({ error: 'Missing SUPABASE env' }, { status: 500 });
+    }
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll: () => cookieStore.getAll() } }
-    );
+    const supa = createClient(url, anon, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-    let query = supabase
+    const { data, error } = await supa
       .from('services')
-      .select('*')
+      .select('id, slug, title, short_description, icon, order_index, status')
       .eq('status', 'active')
-      .order('created_at', { ascending: false });
-
-    // Apply category filter
-    if (category) {
-      query = query.eq('category', category);
-    }
-
-    // Apply search filter
-    if (search) {
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
-    }
-
-    const { data, error } = await query;
+      .order('order_index', { ascending: true });
 
     if (error) {
-      console.error('Services query error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch services' },
+        { error: error.message, code: (error as any).code },
         { status: 500 }
       );
     }
 
-    return NextResponse.json(data || []);
-  } catch (error) {
-    console.error('Services API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ services: data ?? [] });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message ?? 'unknown' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll: () => cookieStore.getAll() } }
-    );
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const supabase = createClient(url, anon, { auth: { persistSession: false } });
 
     // Check if user is authenticated and has admin role
     const {
