@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
@@ -108,7 +108,11 @@ export async function updateListing(id: string, body: UpdateListingData) {
   if (isAdmin && body.status === 'active') {
     patch.status = 'active';
     patch.published_at = new Date().toISOString();
-  } else if (isAdmin && body.status && ['pending','sold','rented'].includes(body.status)) {
+  } else if (
+    isAdmin &&
+    body.status &&
+    ['pending', 'sold', 'rented'].includes(body.status)
+  ) {
     patch.status = body.status;
     if (body.status === 'pending') patch.published_at = null;
   } else if (!isAdmin && body.status) {

@@ -1,24 +1,25 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getCoverUrl } from '@/lib/image-helpers';
-import { SmartImage } from '@/lib/smart-image';
 
 // Real property data structure from Supabase
 type Property = {
   id: string;
   title: string;
-  price: number;
-  location: string;
+  price?: number | null;
+  location: string | null;
+  coverUrl?: string | null;
   city?: string;
   country?: string;
   photos?: string[];
   og_image_url?: string;
   slug?: string;
   type?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  size?: number;
-  published_at?: string;
-  created_at: string;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  size?: number | null;
+  published_at?: string | null;
+  created_at?: string | null;
 };
 
 type Props = {
@@ -75,13 +76,9 @@ export default function ListingCarousel({
       </div>
 
       {/* Mobile: horizontal scroll; Desktop: grid */}
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-6
-                      lg:[&>*]:snap-none
-                      overflow-x-auto snap-x lg:overflow-visible"
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-6 lg:[&>*]:snap-none overflow-x-auto snap-x lg:overflow-visible">
         {list.map((property) => {
-          const imageUrl = getCoverUrl(property);
+          const imageUrl = property.coverUrl ?? getCoverUrl(property) ?? null;
           const href = `/properties/${property.slug ?? property.id}`;
           const price = formatPrice(property.price);
           const location =
@@ -95,13 +92,18 @@ export default function ListingCarousel({
               href={href}
               className="min-w-[260px] lg:min-w-0 snap-start rounded-2xl bg-white border shadow-sm overflow-hidden hover:shadow-md transition"
             >
-              <div className="relative aspect-video bg-muted overflow-hidden rounded-lg">
-                <SmartImage
-                  src={imageUrl}
-                  alt={property.title || 'Property'}
-                  fill
-                  className="object-cover"
-                />
+              <div className="relative aspect-[4/3] bg-muted overflow-hidden rounded-lg">
+                {imageUrl ? (
+                  <Image
+                    src={imageUrl}
+                    alt={property.title || 'Property'}
+                    fill
+                    sizes="(max-width:768px) 100vw, 25vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gray-200" />
+                )}
               </div>
               <div className="p-4">
                 <div className="font-semibold">{price}</div>

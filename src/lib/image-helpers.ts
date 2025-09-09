@@ -10,14 +10,15 @@ export function isSupabaseOrSigned(u: string) {
 }
 
 /** Kapak görseli seçim sırası: photos[0] → cover_url → og/meta → image/image_url */
-export function getCoverUrl(p: any): string | null {
+export function getCoverUrl(p: unknown): string | null {
+  const get = (k: string) => (p as Record<string, unknown>)[k] as unknown;
   const candidates = [
-    p?.photos?.[0],
-    p?.cover_url,
-    p?.og_image_url,
-    p?.meta_image_url,
-    p?.image,
-    p?.image_url,
+    (get('photos') as unknown[] | undefined)?.[0],
+    get('cover_url'),
+    get('og_image_url'),
+    get('meta_image_url'),
+    get('image'),
+    get('image_url'),
   ];
   for (const c of candidates) {
     if (isRenderableSrc(c)) return String(c);

@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
 
 export async function GET() {
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!url || !anon) {
-      return NextResponse.json({ error: 'Missing SUPABASE env' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Missing SUPABASE env' },
+        { status: 500 }
+      );
     }
 
     const supa = createClient(url, anon, {
@@ -22,23 +24,29 @@ export async function GET() {
 
     if (error) {
       return NextResponse.json(
-        { error: error.message, code: (error as any).code },
+        { error: error.message, code: (error as { code?: string }).code },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ services: data ?? [] });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? 'unknown' }, { status: 500 });
+  } catch (e) {
+    const msg =
+      e && typeof e === 'object' && 'message' in e
+        ? (e as Error).message
+        : 'unknown';
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
+    // const cookieStore = await cookies();
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-    const supabase = createClient(url, anon, { auth: { persistSession: false } });
+    const supabase = createClient(url, anon, {
+      auth: { persistSession: false },
+    });
 
     // Check if user is authenticated and has admin role
     const {

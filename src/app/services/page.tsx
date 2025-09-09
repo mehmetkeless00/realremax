@@ -56,15 +56,27 @@ export default function ServicesPage() {
         setError(null);
         const response = await fetch('/api/services', { cache: 'no-store' });
         if (!response.ok) {
-          const err = await response.json().catch(() => ({} as any));
-          throw new Error(err?.error || `Failed to load services (status ${response.status})`);
+          const err = (await response.json().catch(() => ({}))) as {
+            error?: string;
+          };
+          throw new Error(
+            err?.error || `Failed to load services (status ${response.status})`
+          );
         }
         const json = await response.json();
-        const list = Array.isArray(json?.services) ? json.services : Array.isArray(json) ? json : [];
+        const list = Array.isArray(json?.services)
+          ? json.services
+          : Array.isArray(json)
+            ? json
+            : [];
         setServices(list);
-      } catch (e: any) {
+      } catch (e) {
         console.error('Failed to load services', e);
-        setError(e?.message ?? 'Failed to load services');
+        const msg =
+          e && typeof e === 'object' && 'message' in e
+            ? (e as Error).message
+            : 'Failed to load services';
+        setError(msg);
       } finally {
         setLoading(false);
       }
@@ -318,7 +330,10 @@ export default function ServicesPage() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" role="main">
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
+          role="main"
+        >
           {filteredServices.map((service) => (
             <Card
               key={service.id}
@@ -364,7 +379,7 @@ export default function ServicesPage() {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold text-fg">
-                    Request {selectedService.name}
+                    Request {selectedService.title}
                   </h3>
                   <button
                     onClick={() => setShowRequestForm(false)}

@@ -371,11 +371,15 @@ export default function ListingsPage() {
                     <div className="mb-4">
                       <Button
                         onClick={() => handlePublishToggle(property)}
-                        variant={property.status === 'active' ? 'outline' : 'primary'}
+                        variant={
+                          property.status === 'active' ? 'outline' : 'primary'
+                        }
                         size="sm"
                         className="w-full"
                       >
-                        {property.status === 'active' ? 'Deactivate' : 'Activate'}
+                        {property.status === 'active'
+                          ? 'Deactivate'
+                          : 'Activate'}
                       </Button>
                     </div>
                   )}

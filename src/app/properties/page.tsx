@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { searchProperties } from '@/repositories/propertyRepo';
+import { searchPropertiesRepo } from '@/server/db/properties';
 import FiltersBar from '@/components/search/FiltersBar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -46,7 +46,35 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
     location: params.city || params.district,
   } as const;
 
-  const properties = await searchProperties(filters);
+  type PropertyItem = {
+    id: string;
+    slug?: string;
+    title?: string;
+    price?: number | null;
+    location?: string | null;
+    type?: string | null;
+    bedrooms?: number | null;
+    bathrooms?: number | null;
+    size?: number | null;
+    published_at?: string | null;
+    created_at?: string | null;
+    coverUrl?: string | null;
+  };
+  let properties: PropertyItem[] = [];
+  try {
+    properties = (await searchPropertiesRepo(
+      {
+        location: filters.location,
+        type: filters.type,
+      },
+      24
+    )) as unknown as PropertyItem[];
+  } catch (e) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('properties search failed:', (e as Error).message);
+    }
+    properties = [];
+  }
 
   // Add empty state
   if (!properties || properties.length === 0) {
@@ -79,13 +107,18 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
             href={`/properties/${property.slug}`}
             className="rounded-2xl bg-white border shadow-sm overflow-hidden hover:shadow-md transition"
           >
-            <div className="relative aspect-[4/3]">
-              <Image
-                src={property.photos?.[0] ?? '/logo.png'}
-                alt={property.title}
-                fill
-                className="object-cover"
-              />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+              {property.coverUrl ? (
+                <Image
+                  src={property.coverUrl}
+                  alt={property.title || 'Property'}
+                  fill
+                  sizes="(max-width:768px) 100vw, 25vw"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-neutral-200" />
+              )}
             </div>
             <div className="p-4">
               <div className="text-lg font-semibold">
